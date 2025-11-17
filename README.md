@@ -100,15 +100,93 @@ git commit -m "docs: update README installation guide"
 git commit -m "chore: update react version to 18.2.0"
 ```
 
-## Phân công nhiệm vụ
+## 🎯 PHÂN CÔNG NHIỆM VỤ - LAKHE MANAGEMENT
 
-| Thành viên | Module                                   | Branch                      |
-| ---------- | ---------------------------------------- | --------------------------- |
-| Member 1   | Authentication (Login, Register, Logout) | `feature/auth-member1`      |
-| Member 2   | Dashboard & Layout                       | `feature/dashboard-member2` |
-| Member 3   | Products Management                      | `feature/products-member3`  |
-| Member 4   | Orders Management                        | `feature/orders-member4`    |
-| Member 5   | User Profile & Settings                  | `feature/profile-member5`   |
+| Thành viên   | Module                           | Tính năng chính                                                  | Branch                                 |
+| ------------ | -------------------------------- | ---------------------------------------------------------------- | -------------------------------------- |
+| **Member 1** | **Admin - Overview & Thống kê**  | Dashboard tổng quan, Thống kê nhân khẩu, Biểu đồ, Cards thống kê | `feature/admin-overview-member1`       |
+| **Member 2** | **Admin - Quản lý Hộ khẩu**      | Danh sách hộ khẩu, Chi tiết hộ khẩu, Tìm kiếm, Filter            | `feature/household-management-member2` |
+| **Member 3** | **Admin - Forms & Thao tác**     | Form khai báo, Thêm nhân khẩu, Thay đổi nhân khẩu, Tách hộ       | `feature/household-forms-member3`      |
+| **Member 4** | **Kế toán - Quản lý Thu phí**    | Tạo đợt thu, Quản lý đợt thu, Danh sách thu phí                  | `feature/fee-management-member4`       |
+| **Member 5** | **Kế toán - Thu tiền & Báo cáo** | Ghi nhận thu tiền, Thống kê doanh thu, Báo cáo tài chính         | `feature/payment-stats-member5`        |
+
+### 📋 CHI TIẾT CÔNG VIỆC TỪNG THÀNH VIÊN
+
+#### Member 1 - Admin Overview & Thống kê
+
+```bash
+git checkout -b feature/admin-overview-member1
+```
+
+**Tasks:**
+
+- [ ] Trang Dashboard admin
+- [ ] Cards: Tổng nhân khẩu, Tổng hộ khẩu, Tạm trú, Tạm vắng
+- [ ] Biểu đồ thống kê nhân khẩu theo giới tính
+- [ ] Filter theo khoảng thời gian
+- [ ] Cards biến động (chuyển đến, chuyển đi, qua đời)
+
+---
+
+#### Member 2 - Quản lý Hộ khẩu
+
+```bash
+git checkout -b feature/household-management-member2
+```
+
+**Tasks:**
+
+- [ ] Trang danh sách hộ khẩu (400+ hộ)
+- [ ] Trang chi tiết hộ khẩu
+- [ ] Tìm kiếm hộ khẩu theo tên chủ hộ, địa chỉ
+- [ ] Filter và phân trang
+- [ ] Xem lịch sử thay đổi hộ khẩu
+
+---
+
+#### Member 3 - Forms & Thao tác
+
+```bash
+git checkout -b feature/household-forms-member3
+```
+
+**Tasks:**
+
+- [ ] Form khai báo hộ khẩu mới
+- [ ] Form thêm nhân khẩu mới ("mới sinh")
+- [ ] Form thay đổi nhân khẩu (chuyển đi, qua đời)
+- [ ] Form tách hộ khẩu
+- [ ] Form khai báo tạm vắng/tạm trú
+
+---
+
+#### Member 4 - Quản lý Thu phí
+
+```bash
+git checkout -b feature/fee-management-member4
+```
+
+**Tasks:**
+
+- [ ] Trang quản lý thu phí & đóng góp
+- [ ] Form tạo đợt thu (bắt buộc + tự nguyện)
+- [ ] Danh sách các đợt thu
+- [ ] Quản lý thông tin đợt thu
+
+---
+
+#### Member 5 - Thu tiền & Báo cáo
+
+```bash
+git checkout -b feature/payment-stats-member5
+```
+
+**Tasks:**
+
+- [ ] Trang ghi nhận thu tiền (chi tiết từng đợt thu)
+- [ ] Cards: Tổng tiền đã thu, Thu dự kiến, Số hộ đã nộp
+- [ ] Thống kê doanh thu quý
+- [ ] Báo cáo tài chính
 
 ## Giải quyết Conflict
 
