@@ -104,18 +104,18 @@ git commit -m "chore: update react version to 18.2.0"
 
 | Thành viên   | Module                           | Tính năng chính                                                  | Branch                                 |
 | ------------ | -------------------------------- | ---------------------------------------------------------------- | -------------------------------------- |
-| **Member 1** | **Admin - Overview & Thống kê**  | Dashboard tổng quan, Thống kê nhân khẩu, Biểu đồ, Cards thống kê | `feature/admin-overview-member1`       |
-| **Member 2** | **Admin - Quản lý Hộ khẩu**      | Danh sách hộ khẩu, Chi tiết hộ khẩu, Tìm kiếm, Filter            | `feature/household-management-member2` |
-| **Member 3** | **Admin - Forms & Thao tác**     | Form khai báo, Thêm nhân khẩu, Thay đổi nhân khẩu, Tách hộ       | `feature/household-forms-member3`      |
-| **Member 4** | **Kế toán - Quản lý Thu phí**    | Tạo đợt thu, Quản lý đợt thu, Danh sách thu phí                  | `feature/fee-management-member4`       |
-| **Member 5** | **Kế toán - Thu tiền & Báo cáo** | Ghi nhận thu tiền, Thống kê doanh thu, Báo cáo tài chính         | `feature/payment-stats-member5`        |
+| **Việt** | **Admin - Overview & Thống kê**  | Dashboard tổng quan, Thống kê nhân khẩu, Biểu đồ, Cards thống kê | `feature/admin-overview-viet`       |
+| **Minh Quân 16** | **Admin - Quản lý Hộ khẩu**      | Danh sách hộ khẩu, Chi tiết hộ khẩu, Tìm kiếm, Filter            | `feature/household-management-quan16` |
+| **Nhật Minh** | **Admin - Forms & Thao tác**     | Form khai báo, Thêm nhân khẩu, Thay đổi nhân khẩu, Tách hộ       | `feature/household-forms-minh`      |
+| **Minh Quân 15** | **Kế toán - Quản lý Thu phí**    | Tạo đợt thu, Quản lý đợt thu, Danh sách thu phí                  | `feature/fee-management-quan15`       |
+| **Hoàng Quân** | **Kế toán - Thu tiền & Báo cáo** | Ghi nhận thu tiền, Thống kê doanh thu, Báo cáo tài chính         | `feature/payment-stats-hquan`        |
 
 ### 📋 CHI TIẾT CÔNG VIỆC TỪNG THÀNH VIÊN
 
 #### Member 1 - Admin Overview & Thống kê
 
 ```bash
-git checkout -b feature/admin-overview-member1
+git checkout -b feature/admin-overview-viet
 ```
 
 **Tasks:**
@@ -131,7 +131,7 @@ git checkout -b feature/admin-overview-member1
 #### Member 2 - Quản lý Hộ khẩu
 
 ```bash
-git checkout -b feature/household-management-member2
+git checkout -b feature/household-management-quan16
 ```
 
 **Tasks:**
@@ -147,7 +147,7 @@ git checkout -b feature/household-management-member2
 #### Member 3 - Forms & Thao tác
 
 ```bash
-git checkout -b feature/household-forms-member3
+git checkout -b feature/household-forms-minh
 ```
 
 **Tasks:**
@@ -163,7 +163,7 @@ git checkout -b feature/household-forms-member3
 #### Member 4 - Quản lý Thu phí
 
 ```bash
-git checkout -b feature/fee-management-member4
+git checkout -b feature/fee-management-quan15
 ```
 
 **Tasks:**
@@ -178,7 +178,7 @@ git checkout -b feature/fee-management-member4
 #### Member 5 - Thu tiền & Báo cáo
 
 ```bash
-git checkout -b feature/payment-stats-member5
+git checkout -b feature/payment-stats-hquan
 ```
 
 **Tasks:**
@@ -261,12 +261,6 @@ git branch -m new-branch-name
 - Giải quyết conflict ngay khi phát hiện
 
 ## Meeting Schedule
-
-- **Daily Standup**: Mỗi ngày 9:00 AM (15 phút)
-
-  - Hôm qua làm gì?
-  - Hôm nay sẽ làm gì?
-  - Có vấn đề gì cần hỗ trợ?
 
 - **Weekly Review**: Thứ 7 hàng tuần 10:00 PM
   - Demo chức năng đã hoàn thành
