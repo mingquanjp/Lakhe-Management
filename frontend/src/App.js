@@ -5,7 +5,7 @@ function App() {
       <div>La Khe Management</div>
 
       <div>
-       
+
       </div>
     </>
   );
