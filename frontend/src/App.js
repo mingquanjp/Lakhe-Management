@@ -4,8 +4,7 @@ function App() {
     <>
       <div>La Khe Management</div>
 
-      <div style={{padding : '20px', margin : '0 4px auto'}}>
-        <Demo />
+      <div>
       </div>
     </>
   );
