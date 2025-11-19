@@ -1,0 +1,79 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  min-width: 100px; /* Đảm bảo kích cỡ tối thiểu */
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.btn-primary {
+  background-color: black;
+  color: white;
+  border-color: black;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: rgb(54, 54, 54);
+  border-color: rgb(54, 47, 47);
+}
+
+.btn-secondary {
+  background-color: #888c92;
+  color: white;
+  border-color: #ced0d3;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #94969a;
+  border-color: #a3a4a5;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: black;
+  border-color: black;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: black;
+  color: white;
+}
+
+/* Sizes */
+.btn-small {
+  padding: 6px 12px;
+  font-size: 14px;
+  min-width: 100px; /* Đảm bảo kích cỡ đồng nhất */
+}
+
+.btn-medium {
+  padding: 10px 16px;
+  font-size: 16px;
+  min-width: 120px;
+}
+
+.btn-large {
+  padding: 12px 24px;
+  font-size: 18px;
+  min-width: 150px;
+}
+
+/* Action button trong table */
+.action-btn {
+  min-width: 120px !important; /* Đảm bảo cả 2 button có cùng width */
+}

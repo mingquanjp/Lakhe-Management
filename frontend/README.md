@@ -1,70 +1,97 @@
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Cấu trúc thư mục Quản lý - Accountants
+frontend/
+├── public/                          // Thư mục tài nguyên công khai
+│   ├── index.html                   // File HTML chính
+│   ├── manifest.json               // Cấu hình PWA
+│   └── robots.txt                  // Cấu hình cho search engine
+├── src/                            // Thư mục mã nguồn chính
+│   ├── components/                 // Các component tái sử dụng
+│   │   ├── common/                 // Component dùng chung toàn dự án
+│   │   │   ├── Header/             // Thanh header/navigation
+│   │   │   │   ├── Header.js       // Component header chính
+│   │   │   │   └── Header.css      // Style cho header
+│   │   │   ├── Sidebar/            // Thanh menu bên
+│   │   │   │   ├── Sidebar.js      // Component sidebar
+│   │   │   │   └── Sidebar.css     // Style cho sidebar
+│   │   │   ├── Layout/             // Layout tổng thể
+│   │   │   │   ├── Layout.js       // Component layout chính
+│   │   │   │   └── Layout.css      // Style cho layout
+│   │   │   ├── Button/             // Nút bấm tái sử dụng
+│   │   │   ├── Modal/              // Popup/modal
+│   │   │   ├── Loading/            // Hiệu ứng loading
+│   │   │   ├── Table/              // Bảng dữ liệu
+│   │   │   └── Card/               // Thẻ hiển thị thông tin
+│   │   ├── forms/                  // Các component form
+│   │   │   ├── HouseholdForm/      // Form quản lý hộ khẩu
+│   │   │   ├── PersonForm/         // Form quản lý nhân khẩu
+│   │   │   └── FeeForm/            // Form quản lý phí
+│   │   ├── charts/                 // Các component biểu đồ
+│   │   |   ├── PieChart/           // Biểu đồ tròn
+│   │   |   └── BarChart/           // Biểu đồ cột
+|   |   └── Dashboard/
+|   |       ├── DashboardContent.css
+|   |       └── DashboardContent.js
+│   ├── pages/                      // Các trang chính của ứng dụng
+│   │   ├── Admin/                  // Trang dành cho Admin
+│   │   │   ├── Dashboard/          // Trang tổng quan admin
+│   │   │   │   ├── Dashboard.js    // Component dashboard admin
+│   │   │   │   └── Dashboard.css   // Style cho dashboard admin
+│   │   │   ├── HouseholdManagement/ // Quản lý hộ khẩu
+│   │   │   │   ├── HouseholdList.js     // Danh sách hộ khẩu
+│   │   │   │   ├── HouseholdDetail.js   // Chi tiết hộ khẩu
+│   │   │   │   └── HouseholdManagement.css
+│   │   │   ├── PersonManagement/   // Quản lý nhân khẩu
+│   │   │   ├── FormManagement/     // Quản lý các loại form
+│   │   │   └── Reports/            // Báo cáo thống kê
+│   │   ├── Accountant/             // Trang dành cho Kế toán
+│   │   │   ├── FeeManagement/      // Quản lý phí
+│   │   │   ├── PaymentTracking/    // Theo dõi thanh toán
+│   │   │   └── FinancialReports/   // Báo cáo tài chính
+│   │   ├── Resident/               // Trang dành cho Cư dân
+│   │   │   ├── Profile/            // Hồ sơ cá nhân
+│   │   │   ├── FeeHistory/         // Lịch sử phí
+│   │   │   └── Forms/              // Các form đơn từ
+│   │   └── Auth/                   // Trang xác thực
+│   │       ├── Login/              // Trang đăng nhập
+│   │       │   ├── Login.js        // Component đăng nhập
+│   │       │   └── Login.css       // Style đăng nhập
+│   │       ├── Register/           // Trang đăng ký
+│   │       └── ForgotPassword/     // Quên mật khẩu
+│   ├── services/                   // Các service gọi API
+│   │   ├── api.js                  // Service API chung
+│   │   ├── authService.js          // Service xác thực
+│   │   ├── householdService.js     // Service hộ khẩu
+│   │   ├── personService.js        // Service nhân khẩu
+│   │   └── feeService.js           // Service phí
+│   ├── utils/                      // Các hàm tiện ích
+│   │   ├── constants.js            // Hằng số dự án
+│   │   ├── helpers.js              // Hàm hỗ trợ chung
+│   │   ├── validators.js           // Hàm validate form
+│   │   ├── formatters.js           // Hàm format dữ liệu
+│   │   └── dateHelpers.js          // Hàm xử lý ngày tháng
+│   ├── hooks/                      // Custom React hooks
+│   │   ├── useAuth.js              // Hook xác thực
+│   │   ├── useApi.js               // Hook gọi API
+│   │   ├── useForm.js              // Hook quản lý form
+│   │   └── useLocalStorage.js      // Hook local storage
+│   ├── context/                    // React Context (quản lý state toàn cục)
+│   │   ├── AuthContext.js          // Context xác thực
+│   │   ├── ThemeContext.js         // Context theme
+│   │   └── AppContext.js           // Context chung app
+│   ├── styles/                     // Style CSS toàn cục
+│   │   ├── globals.css             // Style toàn cục
+│   │   ├── variables.css           // Biến CSS (màu sắc, font...)
+│   │   ├── components.css          // Style component chung
+│   │   └── responsive.css          // Style responsive
+│   ├── assets/                     // Tài nguyên tĩnh
+│   │   ├── images/                 // Hình ảnh
+│   │   │   ├── logos/              // Logo
+│   │   │   ├── avatars/            // Avatar mặc định
+│   │   │   └── illustrations/      // Hình minh họa
+│   │   ├── icons/                  // Icon SVG
+│   │   └── fonts/                  // Font chữ
+│   ├── App.js                      // Component App chính
+│   ├── index.js                    // File khởi động React
+│   └── index.css                   // Style cơ bản
+├── package.json                    // Cấu hình dependencies
+└── README.md                       // Tài liệu dự án
