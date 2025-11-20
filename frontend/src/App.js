@@ -1,5 +1,5 @@
 import React from "react";
-import Login from "./components/Login";
+import Login from "./pages/Login";
 // import Header from "./components/layout/Header";
 // import Sidebar from "./components/layout/Sidebar";
 

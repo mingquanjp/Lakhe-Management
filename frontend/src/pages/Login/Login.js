@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Login.css";
-import { Input } from "../commons";
-import { Button } from "../commons";
+import { Input } from "../../components/commons";
+import { Button } from "../../components/commons";
 import loginPics from "../../assets/images/loginpics.jpg";
 import logoLK from "../../assets/images/logoLK.png";
 
