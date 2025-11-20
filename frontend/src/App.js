@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "./components/layout/Header";
 import Sidebar from "./components/layout/Sidebar";
+import Overview from "./pages/Overview/Overview";
 
 function App() {
   return (
@@ -9,8 +10,7 @@ function App() {
       <div className="main-content">
         <Header />
         <div className="content">
-          
-          <h1>Welcome to LaKhe Management</h1>
+          <Overview/>
         </div>
       </div>
     </div>
