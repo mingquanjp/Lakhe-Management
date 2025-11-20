@@ -1,0 +1,9 @@
+export { default as toggleIcon } from "./toggle.png";
+export { default as searchIcon } from "./search.png";
+export { default as overView } from "./dashboard.png";
+export { default as historyIcon } from "./his.png";
+export { default as bellIcon } from "./bell.png";
+export { default as People } from "./overpopulation.png";
+export { default as Staff } from "./staff-management.png";
+export { default as Statistic } from "./pie-chart.png";
+export { default as logoutIcon } from "./logout.png";
