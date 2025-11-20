@@ -21,6 +21,7 @@ const Button = ({
   disabled = false,
   onClick,
   type = "button",
+  className = "",
   ...props
 }) => {
   return (
@@ -28,7 +29,7 @@ const Button = ({
       type={type}
       className={`btn btn-${variant} btn-${size} ${
         disabled ? "btn-disabled" : ""
-      }`}
+      } ${className}`}
       disabled={disabled}
       onClick={onClick}
       {...props}
