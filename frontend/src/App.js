@@ -1,22 +1,8 @@
 import React from "react";
-import Login from "./pages/Login";
-// import Header from "./components/layout/Header";
-// import Sidebar from "./components/layout/Sidebar";
+import Staff from "./components/pages/Staff";
 
 function App() {
-  return (
-    <Login />
-    // <div className="app-container">
-    //   <Sidebar />
-    //   <div className="main-content">
-    //     <Header />
-    //     <div className="content">
-    //       
-    //       <h1>Welcome to LaKhe Management</h1>
-    //     </div>
-    //   </div>
-    // </div>
-  );
+  return <Staff />;
 }
 
 export default App;

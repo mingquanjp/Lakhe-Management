@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import "./Login.css";
-import { Input } from "../../components/commons";
-import { Button } from "../../components/commons";
-import loginPics from "../../assets/images/loginpics.jpg";
-import logoLK from "../../assets/images/logoLK.png";
+import loginPics from "../../../assets/images/loginpics.jpg";
+import logoLK from "../../../assets/images/logoLK.png";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +21,7 @@ const Login = () => {
     e.preventDefault();
     // Handle login logic here
     console.log("Login submitted:", formData);
-  };
+  }; 
 
   return (
     <div className="login-container">
