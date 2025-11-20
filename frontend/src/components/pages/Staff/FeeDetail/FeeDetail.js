@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import "./FeeDetail.css";
-import Sidebar from "../../../layout/Sidebar";
-import Header from "../../../layout/Header";
 import { Card, Button } from "../../../commons";
 import { searchIcon } from "../../../../assets/icons";
 import HouseholdDetailModal from "./HouseholdDetailModal";
@@ -114,11 +112,7 @@ const FeeDetail = () => {
   ];
 
   return (
-    <div className="app-container">
-      <Sidebar />
-      <div className="main-content">
-        <Header />
-        <div className="content">
+    <div className="content">
           {/* Stat Cards */}
           <div className="stats-grid">
             {stats.map((stat, index) => (
@@ -208,10 +202,7 @@ const FeeDetail = () => {
               </table>
             </div>
           </Card>
-        </div>
-      </div>
 
-      {/* Household Detail Modal */}
       <HouseholdDetailModal
         isOpen={isModalOpen}
         onClose={() => {

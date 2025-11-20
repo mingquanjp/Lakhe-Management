@@ -3,7 +3,7 @@ import "./Login.css";
 import loginPics from "../../../assets/images/loginpics.jpg";
 import logoLK from "../../../assets/images/logoLK.png";
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -19,8 +19,9 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login submitted:", formData);
+    if (onLogin) {
+      onLogin();
+    }
   }; 
 
   return (

@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import "./FeeDashboard.css";
-import Sidebar from "../../../layout/Sidebar";
-import Header from "../../../layout/Header";
 import { Card } from "../../../commons";
 import { Button } from "../../../commons";
 import { searchIcon } from "../../../../assets/icons";
@@ -41,11 +39,7 @@ const FeeDashboard = () => {
   const tableData = [];
 
   return (
-    <div className="app-container">
-      <Sidebar />
-      <div className="main-content">
-        <Header />
-        <div className="content">
+    <div className="content">
           {/* Banner chọn đợt thu/đóng góp */}
           <div className="period-selector-banner">
             <div className="period-selector-left">
@@ -146,8 +140,6 @@ const FeeDashboard = () => {
               </table>
             </div>
           </Card>
-        </div>
-      </div>
     </div>
   );
 };
