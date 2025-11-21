@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import Card from '../commons/Card/Card';
+import { Card, Button, Modal } from '../commons';
 import { Link } from 'react-router-dom';
-import Button from '../commons/Button/Button';
-import Modal from '../commons/Modal/Modal';
 import CreateFeeForm from '../forms/CreateFeeForm';
 import { feeData, existedFeeData } from '../../data/mockData'; // Import mock data
 import './DashboardContent.css';

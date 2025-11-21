@@ -7,7 +7,7 @@ import {
   Statistic,
   logoutIcon,
 } from "../../assets/icons";
-import Button from "../commons/Button/Button";
+import { Button } from "../commons";
 
 const Sidebar = () => {
   const [expandedItems, setExpandedItems] = useState({});
