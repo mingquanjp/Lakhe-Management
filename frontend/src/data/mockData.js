@@ -48,3 +48,112 @@ export const genderData = [
   { name: "Nam", value: 70 },
   { name: "Nữ", value: 30 },
 ];
+
+export const householdData = [
+  {
+    id: 1,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 10, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 2,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 3,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 4,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 5,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 6,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 7,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 8,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 9,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+
+  {
+    id: 10,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 11,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 12,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 13,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 14,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  },
+  {
+    id: 15,
+    code: "09123456",
+    owner: "Đinh Văn Phạm Việt",
+    address: "Số 12, ngõ 50...",
+    members: 3,
+  }
+];

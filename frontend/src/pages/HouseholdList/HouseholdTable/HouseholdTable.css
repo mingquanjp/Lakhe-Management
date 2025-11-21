@@ -1,0 +1,54 @@
+.table-container {
+  overflow-x: auto;
+}
+
+.household-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.household-table th {
+  text-align: left;
+  padding: 15px 10px;
+  color: #8898aa;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.household-table td {
+  padding: 15px 10px;
+  color: #525f7f;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+.household-table tr:last-child td {
+  border-bottom: none;
+}
+
+.text-center { text-align: center !important; }
+.owner-name { font-weight: 500; color: #32325d; }
+
+.action-cell {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-action {
+  border: none;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-action:hover { opacity: 0.9; }
+.btn-detail { background-color: #2dce89; } 
+.btn-delete { background-color: #f5365c; } 
