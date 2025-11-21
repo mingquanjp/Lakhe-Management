@@ -1,7 +1,11 @@
 import React from "react";
 import "./Overview.css";
 import StatCard from "./StatCard";
-import { statData} from "../../data/mockData";
+import PopulationChart from "./PopulationChart";
+import ActivityList from "./ActivityList";
+import {
+  statData,
+  populationData} from "../../data/mockData";
 
 const Overview = () => {
   return (
@@ -16,6 +20,11 @@ const Overview = () => {
             isPositive={item.isPositive}
           />
         ))}
+      </div>
+
+      <div className="charts-row-1">
+        <PopulationChart data={populationData} />
+        <ActivityList />
       </div>
     </div>
   );
