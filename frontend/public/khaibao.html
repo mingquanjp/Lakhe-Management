@@ -94,6 +94,85 @@
 
         // --- COMPONENTS ---
 
+        // 1. Add Member Modal (NEW - Based on your latest image)
+        const AddMemberModal = ({ isOpen, onClose }) => {
+            if (!isOpen) return null;
+
+            return (
+                // Dark Overlay: bg-slate-900/95 for extreme dark opacity + blur
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/95 backdrop-blur-sm p-4 animate-fade-in">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] animate-scale-up relative">
+                        
+                        {/* Header */}
+                        <div className="px-8 py-6 border-b border-gray-100">
+                            <h2 className="text-2xl font-bold text-gray-900">Thêm nhân khẩu mới</h2>
+                            <p className="text-gray-500 text-sm mt-1">Điền các thông tin của nhân khẩu để thêm</p>
+                        </div>
+
+                        {/* Scrollable Form Body */}
+                        <div className="p-8 overflow-y-auto custom-scrollbar">
+                            <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Full width: Họ và tên */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Họ và tên thành viên *</label>
+                                    <input type="text" className="w-full bg-blue-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-0 rounded-lg px-4 py-3 text-gray-700" />
+                                </div>
+
+                                {/* Row 2 */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Quan hệ với chủ hộ *</label>
+                                    <input type="text" className="w-full bg-blue-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-0 rounded-lg px-4 py-3 text-gray-700" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Số CMND hoặc CCCD *</label>
+                                    <input type="text" className="w-full bg-blue-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-0 rounded-lg px-4 py-3 text-gray-700" />
+                                </div>
+
+                                {/* Row 3 */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Ngày sinh *</label>
+                                    <input type="date" className="w-full bg-blue-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-0 rounded-lg px-4 py-3 text-gray-700" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Ngày cấp và nơi cấp *</label>
+                                    <input type="text" className="w-full bg-blue-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-0 rounded-lg px-4 py-3 text-gray-700" />
+                                </div>
+
+                                {/* Row 4 */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Nghề nghiệp *</label>
+                                    <input type="text" className="w-full bg-blue-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-0 rounded-lg px-4 py-3 text-gray-700" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Ngày tháng năm đăng ký thường trú *</label>
+                                    <input type="date" className="w-full bg-blue-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-0 rounded-lg px-4 py-3 text-gray-700" />
+                                </div>
+
+                                {/* Full width: Địa chỉ trước khi chuyển đến */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Địa chỉ nơi thường trú trước khi chuyển đến *</label>
+                                    <input type="text" className="w-full bg-blue-50 border-transparent focus:border-blue-500 focus:bg-white focus:ring-0 rounded-lg px-4 py-3 text-gray-700" />
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="px-8 py-6 border-t border-gray-100 flex justify-between items-center bg-white">
+                            <button className="bg-green-700 hover:bg-green-800 text-white text-base font-bold py-3 px-12 rounded-lg shadow-md transition-colors w-full md:w-auto">
+                                Add
+                            </button>
+                            <button 
+                                onClick={onClose}
+                                className="border-2 border-red-500 text-red-500 hover:bg-red-50 text-base font-bold py-3 px-12 rounded-lg transition-colors w-full md:w-auto ml-4"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         // 1. Status Badge Component (Updated logic for "Còn sống" / "Đã qua đời")
         const StatusBadge = ({ status }) => {
             let colorClass = '';
@@ -180,7 +259,7 @@
         // 3. Header Component
         const Header = () => {
             return (
-                <div className="h-16 bg-white mb-6 rounded-xl shadow-sm flex items-center justify-between px-6">
+                <div className="relative h-16 bg-white mb-6 rounded-xl shadow-sm flex items-center justify-between px-6">
                     {/* Left: Breadcrumbs */}
                     <div className="flex items-center space-x-4">
                         <div className="flex items-center text-gray-400 text-sm">
@@ -231,6 +310,8 @@
 
         // 4. Main Content Component
         const MainContent = () => {
+            const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
+
             return (
                 <div className="flex-1 ml-64 p-8 min-h-screen bg-gray-50">
                     <Header />
@@ -246,9 +327,12 @@
                         </div>
                     </div>
 
-                    {/* Declaration Button (Updated Text and Style) */}
+                    {/* Button "Thêm nhân khẩu mới" - Triggers Add Modal */}
                     <div className="flex justify-end mb-6">
-                         <button className="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2.5 rounded-lg shadow-lg text-sm font-medium flex items-center transition-colors">
+                         <button 
+                            onClick={() => setIsAddModalOpen(true)}
+                            className="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2.5 rounded-lg shadow-lg text-sm font-medium flex items-center transition-colors"
+                         >
                             <i className="fas fa-plus mr-2"></i> Thêm nhân khẩu mới
                         </button>
                     </div>
@@ -361,6 +445,12 @@
                         </div>
 
                     </div>
+
+                    {/* Add Member Modal */}
+                    <AddMemberModal 
+                        isOpen={isAddModalOpen} 
+                        onClose={() => setIsAddModalOpen(false)} 
+                    />
                 </div>
             );
         };
