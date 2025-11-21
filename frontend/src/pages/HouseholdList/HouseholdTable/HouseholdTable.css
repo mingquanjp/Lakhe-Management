@@ -1,54 +1,97 @@
+/* Table Container */
 .table-container {
   overflow-x: auto;
 }
 
+/* Table Structure */
 .household-table {
   width: 100%;
   border-collapse: collapse;
+  background: white;
   font-size: 14px;
 }
 
 .household-table th {
+  padding: 12px 16px;
   text-align: left;
-  padding: 15px 10px;
-  color: #8898aa;
+  font-size: 13px;
   font-weight: 600;
-  font-size: 12px;
-  text-transform: uppercase;
-  border-bottom: 1px solid #e9ecef;
+  color: #333;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+  white-space: nowrap;
+  position: relative;
 }
 
 .household-table td {
-  padding: 15px 10px;
-  color: #525f7f;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
   border-bottom: 1px solid #e9ecef;
   vertical-align: middle;
 }
 
+.household-table tr {
+  transition: background-color 0.2s ease;
+}
+
+.household-table tr:hover {
+  background: #f8f9fa;
+}
+
+/* Remove last border */
 .household-table tr:last-child td {
   border-bottom: none;
 }
 
-.text-center { text-align: center !important; }
-.owner-name { font-weight: 500; color: #32325d; }
+/* Text helpers */
+.text-center {
+  text-align: center !important;
+}
 
+.owner-name {
+  font-weight: 600;
+  color: #1976d2;
+}
+
+/* Action Buttons */
 .action-cell {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   justify-content: center;
 }
 
 .btn-action {
   border: none;
-  border-radius: 20px;
-  padding: 6px 16px;
-  font-size: 12px;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
   font-weight: 600;
-  color: white;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s ease;
+  color: white;
 }
 
-.btn-action:hover { opacity: 0.9; }
-.btn-detail { background-color: #2dce89; } 
-.btn-delete { background-color: #f5365c; } 
+.btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  opacity: 0.95;
+}
+
+.btn-detail {
+  background: linear-gradient(90deg, #28a745, #5cb85c);
+}
+
+.btn-delete {
+  background: linear-gradient(90deg, #dc3545, #e57373);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .household-table th,
+  .household-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
