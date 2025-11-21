@@ -1,5 +1,5 @@
 ## Cấu trúc thư mục Quản lý - Accountants
-
+```
 frontend/
 ├── public/                        # Tài nguyên công khai (HTML, manifest, robots)
 │   ├── index.html
