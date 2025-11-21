@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '../common/Button/Button';
+import Button from '../commons/Button/Button';
 import './Form.css';
 
 const PaymentForm = ({ householdData, onSubmit, onCancel }) => {

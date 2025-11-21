@@ -163,6 +163,8 @@
   justify-content: center !important;
   gap: 8px !important;
   width: 100% !important;
+  background-color: red;
+  border-color: white;
 }
 
 .logout-icon {

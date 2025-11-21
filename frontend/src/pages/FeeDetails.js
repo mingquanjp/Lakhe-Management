@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Table from '../components/common/Table/Table';
-import Button from '../components/common/Button/Button';
-import Modal from '../components/common/Modal/Modal';
+import Table from '../components/commons/Table/Table';
+import Button from '../components/commons/Button/Button';
+import Modal from '../components/commons/Modal/Modal';
 import PaymentForm from '../components/forms/Paymentform';
 import { feeData, existedFeeData, householdDataByFee } from '../data/mockData';
 import './FeeDetails.css';

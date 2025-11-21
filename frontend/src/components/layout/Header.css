@@ -19,6 +19,7 @@
   align-items: center;
   gap: 12px;
   flex: 1;
+ /* margin-left: 240px; */ 
 }
 
 .menu-toggle,
@@ -193,12 +194,20 @@
   .header-nav {
     display: none;
   }
-
+  .header-left {
+    margin-left: 0;
+  }
+  .header-logo {
+    font-size: 18px;
+  }
   .search-input {
     width: 180px;
   }
 
   .header-actions {
     gap: 2px;
+  }
+  .user-name {
+    display: none;
   }
 }

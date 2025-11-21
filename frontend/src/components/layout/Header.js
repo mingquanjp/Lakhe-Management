@@ -5,7 +5,7 @@ import {
   toggleIcon,
   searchIcon
 } from "../../assets/icons";
-import { Button } from "../commons";
+import Button from "../commons/Button/Button";
 
 const Header = () => {
   const [searchValue, setSearchValue] = useState("");
