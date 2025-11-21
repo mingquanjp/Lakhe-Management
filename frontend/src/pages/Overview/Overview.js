@@ -3,9 +3,14 @@ import "./Overview.css";
 import StatCard from "./StatCard";
 import PopulationChart from "./PopulationChart";
 import ActivityList from "./ActivityList";
+import AgeChart from "./AgeChart";
+import GenderChart from "./GenderChart";
 import {
   statData,
-  populationData} from "../../data/mockData";
+  populationData,
+  ageData,
+  genderData,
+} from "../../data/mockData";
 
 const Overview = () => {
   return (
@@ -25,6 +30,11 @@ const Overview = () => {
       <div className="charts-row-1">
         <PopulationChart data={populationData} />
         <ActivityList />
+      </div>
+
+      <div className="charts-row-2">
+        <AgeChart data={ageData} />
+        <GenderChart data={genderData} />
       </div>
     </div>
   );
