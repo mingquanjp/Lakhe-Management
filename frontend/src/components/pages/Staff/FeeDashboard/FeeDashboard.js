@@ -106,7 +106,104 @@ const FeeDashboard = () => {
     }
   ];
 
-  const tableData = [];
+  const tableData = [
+    {
+      householdId: "H001",
+      ownerName: "Nguyễn Minh Quân",
+      houseNumber: "36",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "paid",
+    },
+    {
+      householdId: "H002",
+      ownerName: "Trần Văn An",
+      houseNumber: "37",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "paid",
+    },
+    {
+      householdId: "H003",
+      ownerName: "Đinh Văn Phạm Việt",
+      houseNumber: "38",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "unpaid",
+    },
+    {
+      householdId: "H004",
+      ownerName: "Lê Thị Bình",
+      houseNumber: "39",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "paid",
+    },
+    {
+      householdId: "H005",
+      ownerName: "Tạ Hải Tùng",
+      houseNumber: "40",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "unpaid",
+    },
+    {
+      householdId: "H006",
+      ownerName: "Phạm Văn Đức",
+      houseNumber: "41",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "paid",
+    },
+    {
+      householdId: "H007",
+      ownerName: "Hoàng Thị Mai",
+      houseNumber: "42",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "paid",
+    },
+    {
+      householdId: "H008",
+      ownerName: "Trần Thế Hùng",
+      houseNumber: "43",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "unpaid",
+    },
+    {
+      householdId: "H009",
+      ownerName: "Nguyễn Văn Hùng",
+      houseNumber: "44",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "paid",
+    },
+    {
+      householdId: "H010",
+      ownerName: "Đỗ Thị Lan",
+      houseNumber: "45",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "paid",
+    },
+    {
+      householdId: "H011",
+      ownerName: "Đinh Viết Sang",
+      houseNumber: "46",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "unpaid",
+    },
+    {
+      householdId: "H012",
+      ownerName: "Vũ Văn Tuấn",
+      houseNumber: "47",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "paid",
+    },
+  ];
 
   return (
     <div className="content">
