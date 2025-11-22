@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import Button from '../../commons/Button/Button';
+import Input from '../../commons/Input/Input';
+import Card from '../../commons/Card/Card';
 import './SplitHouseholdForm.css';
 
 const SplitHouseholdForm = () => {
@@ -23,44 +26,33 @@ const SplitHouseholdForm = () => {
     };
 
     return (
-        <div className="split-household-form p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Tách hộ khẩu</h2>
+        <Card title="Tách hộ khẩu" className="split-household-form">
             <form className="space-y-4" onSubmit={handleSubmit}>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Chọn hộ khẩu gốc</label>
-                    <input 
-                        type="text" 
-                        name="originalHouseholdId"
-                        value={formData.originalHouseholdId}
-                        onChange={handleChange}
-                        placeholder="Nhập số sổ hộ khẩu hoặc tên chủ hộ" 
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
-                        required
-                    />
-                </div>
+                <Input
+                    label="Chọn hộ khẩu gốc"
+                    name="originalHouseholdId"
+                    value={formData.originalHouseholdId}
+                    onChange={handleChange}
+                    placeholder="Nhập số sổ hộ khẩu hoặc tên chủ hộ"
+                    required
+                />
                 
                 <div className="border-t border-gray-200 pt-4 mt-4">
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Thông tin hộ mới</h3>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Chủ hộ mới</label>
-                        <input 
-                            type="text" 
-                            name="newOwnerName"
-                            value={formData.newOwnerName}
-                            onChange={handleChange}
-                            placeholder="Chọn thành viên làm chủ hộ mới" 
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
-                            required
-                        />
-                    </div>
+                    <Input
+                        label="Chủ hộ mới"
+                        name="newOwnerName"
+                        value={formData.newOwnerName}
+                        onChange={handleChange}
+                        placeholder="Chọn thành viên làm chủ hộ mới"
+                        required
+                    />
                     <div className="mt-2">
-                        <label className="block text-sm font-medium text-gray-700">Địa chỉ hộ mới</label>
-                        <input 
-                            type="text" 
+                        <Input
+                            label="Địa chỉ hộ mới"
                             name="newAddress"
                             value={formData.newAddress}
                             onChange={handleChange}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
                             required
                         />
                     </div>
@@ -74,9 +66,11 @@ const SplitHouseholdForm = () => {
                     </div>
                 </div>
 
-                <button type="submit" className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Tách hộ</button>
+                <div className="mt-4">
+                    <Button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white">Tách hộ</Button>
+                </div>
             </form>
-        </div>
+        </Card>
     );
 };
 

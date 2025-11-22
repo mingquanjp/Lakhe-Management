@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import Button from '../../commons/Button/Button';
+import Input from '../../commons/Input/Input';
+import Card from '../../commons/Card/Card';
 import './MemberStatusChangeForm.css';
 
 const MemberStatusChangeForm = () => {
@@ -24,57 +27,51 @@ const MemberStatusChangeForm = () => {
     };
 
     return (
-        <div className="member-status-change-form p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Thay đổi nhân khẩu</h2>
+        <Card title="Thay đổi nhân khẩu" className="member-status-change-form">
             <form className="space-y-4" onSubmit={handleSubmit}>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Chọn nhân khẩu</label>
-                    <input 
-                        type="text" 
-                        name="memberName"
-                        value={formData.memberName}
-                        onChange={handleChange}
-                        placeholder="Tìm kiếm tên hoặc CMND/CCCD" 
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
-                        required
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Loại thay đổi</label>
+                <Input
+                    label="Chọn nhân khẩu"
+                    name="memberName"
+                    value={formData.memberName}
+                    onChange={handleChange}
+                    placeholder="Tìm kiếm tên hoặc CMND/CCCD"
+                    required
+                />
+                <div className="input-group">
+                    <label className="input-label">Loại thay đổi</label>
                     <select 
                         name="changeType"
                         value={formData.changeType}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        className="input-field"
                     >
                         <option value="move_out">Chuyển đi</option>
                         <option value="deceased">Qua đời</option>
                     </select>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Ngày thay đổi</label>
-                    <input 
-                        type="date" 
-                        name="changeDate"
-                        value={formData.changeDate}
-                        onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
-                        required
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Ghi chú / Lý do</label>
+                <Input
+                    label="Ngày thay đổi"
+                    type="date"
+                    name="changeDate"
+                    value={formData.changeDate}
+                    onChange={handleChange}
+                    required
+                />
+                <div className="input-group">
+                    <label className="input-label">Ghi chú / Lý do</label>
                     <textarea 
                         name="reason"
                         value={formData.reason}
                         onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+                        className="input-field"
                         rows="3"
                     ></textarea>
                 </div>
-                <button type="submit" className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">Cập nhật trạng thái</button>
+                <div className="mt-4">
+                    <Button type="submit" className="bg-yellow-600 hover:bg-yellow-700 text-white">Cập nhật trạng thái</Button>
+                </div>
             </form>
-        </div>
+        </Card>
     );
 };
 
