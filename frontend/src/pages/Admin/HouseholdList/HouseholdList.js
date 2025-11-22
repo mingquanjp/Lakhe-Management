@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Search, Filter, Download } from "lucide-react";
 import "./HouseholdList.css";
 import HouseholdTable from "./HouseholdTable";
-import Pagination from "../../components/commons/Pagination";
-import { householdData } from "../../data/mockData";
+import Pagination from "../../../components/commons/Pagination";
+import { householdData } from "../../../data/mockData";
 const HouseholdList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;

@@ -1,8 +1,7 @@
 import React from "react";
 import Header from "./components/layout/Header";
 import Sidebar from "./components/layout/Sidebar";
-import HouseholdList from "./pages/HouseholdList/HouseholdList";
-
+import Overview from "./pages/Admin/Overview/Overview";
 function App() {
   return (
     <div className="app-container">
@@ -10,7 +9,7 @@ function App() {
       <div className="main-content">
         <Header />
         <div className="content">
-          <HouseholdList />
+          <Overview />
         </div>
       </div>
     </div>

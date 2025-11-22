@@ -10,7 +10,7 @@ import {
   populationData,
   ageData,
   genderData,
-} from "../../data/mockData";
+} from "../../../data/mockData";
 
 const Overview = () => {
   return (
