@@ -11,3 +11,6 @@ export { default as calendarIcon } from "./calendar.png";
 export { default as userIcon } from "./people.png";
 export { default as tombIcon } from "./tomb.png";
 export { default as upArrowIcon } from "./up-arrow.png";
+export { default as exportIcon } from "./export.png";
+export { default as plusIcon } from "./plus.png";
+export { default as filterIcon } from "./filter.png";
