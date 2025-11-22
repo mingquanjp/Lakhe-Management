@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Login from "./components/pages/Login";
-import Staff from "./components/pages/Staff";
+import Login from "./pages/Login";
+import Staff from "./pages/Staff";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

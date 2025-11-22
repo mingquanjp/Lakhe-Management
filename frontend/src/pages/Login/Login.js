@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Login.css";
-import loginPics from "../../../assets/images/loginpics.jpg";
-import logoLK from "../../../assets/images/logoLK.png";
+import loginPics from "../../assets/images/loginpics.jpg";
+import logoLK from "../../assets/images/logoLK.png";
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({

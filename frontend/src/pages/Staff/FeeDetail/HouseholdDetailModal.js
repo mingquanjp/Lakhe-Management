@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./HouseholdDetailModal.css";
-import { Modal } from "../../../commons";
-import EnhancedTable from "../../../commons/Table/EnhancedTable";
+import { Modal } from "../../../components/commons";
+import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
 
 const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
   const [activeTab, setActiveTab] = useState("payment");

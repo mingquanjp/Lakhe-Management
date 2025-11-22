@@ -1,13 +1,11 @@
 import React, { useState } from "react";
-import "./FeeDetail.css";
-import { Card, Button } from "../../../commons";
-import EnhancedTable from "../../../commons/Table/EnhancedTable";
-import { searchIcon } from "../../../../assets/icons";
-import HouseholdDetailModal from "./HouseholdDetailModal";
+import "./FeeDashboard.css";
+import { Card, Button } from "../../../components/commons";
+import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
+import { searchIcon } from "../../../assets/icons";
 
-const FeeDetail = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedHousehold, setSelectedHousehold] = useState(null);
+const FeeDashboard = () => {
+  const [selectedPeriod, setSelectedPeriod] = useState("Phí vệ sinh 2025");
 
   // Sample data
   const stats = [
@@ -25,7 +23,7 @@ const FeeDetail = () => {
     },
     {
       value: "300",
-      label: "Số hộ còn nợ",
+      label: "Số hộ chưa nộp",
     },
   ];
 
@@ -42,10 +40,10 @@ const FeeDetail = () => {
     },
     { 
       key: "ownerName", 
-      title: "Họ tên chủ hộ",
+      title: "Họ và tên chủ hộ",
       headerRender: () => (
         <>
-          Họ tên chủ hộ
+          Họ và tên chủ hộ
           <span className="sort-arrow">▼</span>
         </>
       )
@@ -56,6 +54,26 @@ const FeeDetail = () => {
       headerRender: () => (
         <>
           Số nhà
+          <span className="sort-arrow">▼</span>
+        </>
+      )
+    },
+    { 
+      key: "commune", 
+      title: "Xã",
+      headerRender: () => (
+        <>
+          Xã
+          <span className="sort-arrow">▼</span>
+        </>
+      )
+    },
+    { 
+      key: "district", 
+      title: "Huyện",
+      headerRender: () => (
+        <>
+          Huyện
           <span className="sort-arrow">▼</span>
         </>
       )
@@ -72,33 +90,11 @@ const FeeDetail = () => {
       render: (value, row) => (
         <span
           className={`status-badge ${
-            row.status === "paid" ? "status-paid" : "status-owing"
+            row.status === "paid" ? "status-paid" : "status-unpaid"
           }`}
         >
-          {row.status === "paid" ? "• Đã nộp" : "• Còn nợ"}
+          {row.status === "paid" ? "• Đã nộp" : "• Chưa nộp"}
         </span>
-      )
-    },
-    { 
-      key: "details", 
-      title: "Thông tin cụ thể",
-      headerRender: () => (
-        <>
-          Thông tin cụ thể
-          <span className="sort-arrow">▼</span>
-        </>
-      ),
-      render: (value, row) => (
-        <Button
-          variant="outline"
-          size="small"
-          onClick={() => {
-            setSelectedHousehold(row);
-            setIsModalOpen(true);
-          }}
-        >
-          Xem chi tiết
-        </Button>
       )
     },
     {
@@ -115,78 +111,122 @@ const FeeDetail = () => {
       householdId: "H001",
       ownerName: "Nguyễn Minh Quân",
       houseNumber: "36",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
       status: "paid",
     },
     {
       householdId: "H002",
       ownerName: "Trần Văn An",
-      houseNumber: "36",
+      houseNumber: "37",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
       status: "paid",
     },
     {
       householdId: "H003",
       ownerName: "Đinh Văn Phạm Việt",
-      houseNumber: "36",
-      status: "owing",
+      houseNumber: "38",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "unpaid",
     },
     {
       householdId: "H004",
       ownerName: "Lê Thị Bình",
-      houseNumber: "36",
+      houseNumber: "39",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
       status: "paid",
     },
     {
       householdId: "H005",
       ownerName: "Tạ Hải Tùng",
-      houseNumber: "36",
-      status: "owing",
+      houseNumber: "40",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "unpaid",
     },
     {
       householdId: "H006",
       ownerName: "Phạm Văn Đức",
-      houseNumber: "36",
+      houseNumber: "41",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
       status: "paid",
     },
     {
       householdId: "H007",
       ownerName: "Hoàng Thị Mai",
-      houseNumber: "36",
+      houseNumber: "42",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
       status: "paid",
     },
     {
       householdId: "H008",
       ownerName: "Trần Thế Hùng",
-      houseNumber: "36",
-      status: "owing",
+      houseNumber: "43",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "unpaid",
     },
     {
       householdId: "H009",
       ownerName: "Nguyễn Văn Hùng",
-      houseNumber: "36",
+      houseNumber: "44",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
       status: "paid",
     },
     {
       householdId: "H010",
       ownerName: "Đỗ Thị Lan",
-      houseNumber: "36",
+      houseNumber: "45",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
       status: "paid",
     },
     {
       householdId: "H011",
       ownerName: "Đinh Viết Sang",
-      houseNumber: "36",
-      status: "owing",
+      houseNumber: "46",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
+      status: "unpaid",
     },
     {
       householdId: "H012",
       ownerName: "Vũ Văn Tuấn",
-      houseNumber: "36",
+      houseNumber: "47",
+      commune: "Yên Sơn",
+      district: "Quốc Oai",
       status: "paid",
     },
   ];
 
   return (
     <div className="content">
+          {/* Banner chọn đợt thu/đóng góp */}
+          <div className="period-selector-banner">
+            <div className="period-selector-left">
+              <span className="period-selector-label">
+                Chọn đợt thu/đóng góp
+              </span>
+            </div>
+            <div className="period-selector-right">
+              <select
+                className="period-select"
+                value={selectedPeriod}
+                onChange={(e) => setSelectedPeriod(e.target.value)}
+              >
+                <option value="Phí vệ sinh 2025">Phí vệ sinh 2025</option>
+                <option value="Phí vệ sinh 2024">Phí vệ sinh 2024</option>
+                <option value="Phí vệ sinh 2023">Phí vệ sinh 2023</option>
+              </select>
+            </div>
+          </div>
+
           {/* Stat Cards */}
           <div className="stats-grid">
             {stats.map((stat, index) => (
@@ -200,13 +240,14 @@ const FeeDetail = () => {
           {/* Detailed Statistical Table */}
           <Card
             title="Bảng thống kê chi tiết"
+            subtitle={`Chi tiết thu phí: ${selectedPeriod}`}
             actions={
               <div className="table-actions">
                 <div className="table-search">
                   <img src={searchIcon} alt="Search" className="search-icon" />
                   <input
                     type="text"
-                    placeholder="Q Search..."
+                    placeholder="Search..."
                     className="table-search-input"
                   />
                 </div>
@@ -223,18 +264,8 @@ const FeeDetail = () => {
               <EnhancedTable columns={tableColumns} data={tableData} className="staff-table" />
             </div>
           </Card>
-
-      <HouseholdDetailModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedHousehold(null);
-        }}
-        household={selectedHousehold}
-      />
     </div>
   );
 };
 
-export default FeeDetail;
-
+export default FeeDashboard;
