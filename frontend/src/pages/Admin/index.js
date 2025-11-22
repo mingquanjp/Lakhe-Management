@@ -43,7 +43,14 @@ const Admin = () => {
         }}
       >
         <Header />
-        <main style={{ flex: 1, padding: "24px", backgroundColor: "#f5f7fa" }}>
+        <main
+          style={{
+            flex: 1,
+            padding: "24px",
+            backgroundColor: "#f5f7fa",
+            marginTop: "40px",
+          }}
+        >
           {renderPage()}
         </main>
       </div>
