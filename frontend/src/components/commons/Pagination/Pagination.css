@@ -1,0 +1,31 @@
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 20px;
+}
+
+.page-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background-color: #f6f9fc;
+  color: #8898aa;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page-btn:hover { background-color: #e9ecef; }
+
+.page-btn.active {
+  background-color: #fceceb;
+  color: #f5365c;
+  font-weight: bold;
+}
+
+.page-btn.dots { cursor: default; background: transparent; }

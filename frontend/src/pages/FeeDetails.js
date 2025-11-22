@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Table, Button, Modal } from '../components/commons';
+import { Table, Button, Modal, Pagination } from '../components/commons';
 import PaymentForm from '../components/forms/Paymentform';
 import { feeData, existedFeeData, householdDataByFee } from '../data/mockData';
 import './FeeDetails.css';
@@ -14,6 +14,10 @@ const FeeDetail = () => {
   const [currentFee, setCurrentFee] = useState(null);
   const [householdData, setHouseholdData] = useState([]);
   const [allFees, setAllFees] = useState([]);
+  
+  // Pagination state - THÊM PHẦN NÀY
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6; // Số item hiển thị mỗi trang
 
   // Lấy thông tin đợt thu dựa vào feeId
   useEffect(() => {
@@ -26,6 +30,9 @@ const FeeDetail = () => {
     // Lấy dữ liệu household cho đợt thu này
     const households = householdDataByFee[feeId] || [];
     setHouseholdData(households);
+    
+    // Reset về trang 1 khi đổi đợt thu - THÊM DÒNG NÀY
+    setCurrentPage(1);
   }, [feeId]);
 
   // Xử lý khi thay đổi dropdown
@@ -51,6 +58,17 @@ const FeeDetail = () => {
     row.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     row.householdNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Tính toán dữ liệu cho trang hiện tại - THÊM PHẦN NÀY
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentData = filteredData.slice(startIndex, endIndex);
+
+  // Reset về trang 1 khi search - THÊM PHẦN NÀY
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   // Xử lý khi click vào "Xem chi tiết" hoặc "Ghi nhận"
   const handleViewDetail = (household) => {
@@ -95,8 +113,8 @@ const FeeDetail = () => {
     return col;
   });
 
-  // Render dữ liệu với custom render
-  const enhancedData = filteredData.map(row => {
+  // Render dữ liệu với custom render - SỬA ĐỔI: dùng currentData thay vì filteredData
+  const enhancedData = currentData.map(row => {
     const newRow = { ...row };
     enhancedColumns.forEach(col => {
       if (col.render) {
@@ -163,7 +181,10 @@ const FeeDetail = () => {
       <div className="fee-detail-table">
         <div className="table-header-section">
           <h2>Bảng thống kê chi tiết</h2>
-          <p className="table-subtitle">Chi tiết thu phí: {currentFee.title}</p>
+          <p className="table-subtitle">
+            Chi tiết thu phí: {currentFee.title}
+            {filteredData.length > 0 && ` (${filteredData.length} hộ)`}
+          </p>
           
           <div className="table-actions">
             <div className="search-box">
@@ -186,16 +207,14 @@ const FeeDetail = () => {
 
         <Table columns={enhancedColumns} data={enhancedData} />
 
-        {/* Pagination */}
-        <div className="pagination">
-          <button className="page-btn">&lt;</button>
-          <button className="page-btn active">1</button>
-          <button className="page-btn">2</button>
-          <button className="page-btn">...</button>
-          <button className="page-btn">8</button>
-          <button className="page-btn">9</button>
-          <button className="page-btn">&gt;</button>
-        </div>
+         {/* Pagination Component */}
+        {totalPages > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
 
       {/* Modal ghi nhận thanh toán */}
