@@ -14,11 +14,9 @@ const FeeDetail = () => {
   const [currentFee, setCurrentFee] = useState(null);
   const [householdData, setHouseholdData] = useState([]);
   const [allFees, setAllFees] = useState([]);
-  
-  // Pagination state - THÊM PHẦN NÀY
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; // Số item hiển thị mỗi trang
-
+  
   // Lấy thông tin đợt thu dựa vào feeId
   useEffect(() => {
     const fees = [...feeData, ...existedFeeData];
