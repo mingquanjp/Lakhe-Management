@@ -18,7 +18,7 @@ const StaffSidebar = ({ currentPage, onPageChange, onLogout }) => {
     },
     {
       id: "overview",
-      label: "Tổng Quan",
+      label: "Tổng quan",
       icon: overView,
       page: "dashboard",
     },
