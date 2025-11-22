@@ -1,8 +1,11 @@
-import React from "react";
-import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDashboard";
-import StaffManagement from "./pages/Admin/StaffManagement/StaffManagement";
+import Admin from "./pages/Admin";
+
 function App() {
-  return <StaffManagement />;
+  return (
+    <div className="App">
+      <Admin />
+    </div>
+  );
 }
 
 export default App;

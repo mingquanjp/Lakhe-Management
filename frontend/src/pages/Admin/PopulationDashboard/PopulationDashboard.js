@@ -1,6 +1,4 @@
 import React, { useState, useRef } from "react";
-import Header from "../../../components/layout/Header";
-import Sidebar from "../../../components/layout/Sidebar";
 import { Card } from "../../../components/commons";
 import {
   calendarIcon,
@@ -59,200 +57,182 @@ const PopulationDashboard = () => {
   };
 
   return (
-    <div className="app-container">
-      <Sidebar />
-      <div className="main-content">
-        <Header />
-        <div className="content">
-          {/* Date Filter Section */}
-          <div className="date-filter-section">
-            <div
-              className="date-input-group"
-              onClick={() => handleDateClick(startDateRef)}
-            >
-              <span className="date-label">Từ {formatDate(startDate)}</span>
-              <img
-                src={calendarIcon}
-                alt="calendar"
-                className="dashboard-icon"
-              />
-              <input
-                type="date"
-                ref={startDateRef}
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                style={{
-                  position: "absolute",
-                  opacity: 0,
-                  pointerEvents: "none",
-                  bottom: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                }}
-              />
+    <div className="content">
+      {/* Date Filter Section */}
+      <div className="date-filter-section">
+        <div
+          className="date-input-group"
+          onClick={() => handleDateClick(startDateRef)}
+        >
+          <span className="date-label">Từ {formatDate(startDate)}</span>
+          <img src={calendarIcon} alt="calendar" className="dashboard-icon" />
+          <input
+            type="date"
+            ref={startDateRef}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            style={{
+              position: "absolute",
+              opacity: 0,
+              pointerEvents: "none",
+              bottom: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+            }}
+          />
+        </div>
+        <div
+          className="date-input-group"
+          onClick={() => handleDateClick(endDateRef)}
+        >
+          <span className="date-label">Đến {formatDate(endDate)}</span>
+          <img src={calendarIcon} alt="calendar" className="dashboard-icon" />
+          <input
+            type="date"
+            ref={endDateRef}
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            style={{
+              position: "absolute",
+              opacity: 0,
+              pointerEvents: "none",
+              bottom: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+            }}
+          />
+        </div>
+      </div>
+      {/* Summary Cards */}
+      <div className="summary-cards-grid">
+        <Card className="summary-card blue-light">
+          <div className="card-title">Tổng số nhân khẩu</div>
+          <div className="card-value-row">
+            <span className="card-value">7,265</span>
+            <span className="card-trend positive">
+              +11.01% <TrendUpIcon />
+            </span>
+          </div>
+        </Card>
+        <Card className="summary-card blue-light">
+          <div className="card-title">Tổng số hộ khẩu</div>
+          <div className="card-value-row">
+            <span className="card-value">200</span>
+          </div>
+        </Card>
+        <Card className="summary-card blue-light">
+          <div className="card-title">Tổng số tạm trú</div>
+          <div className="card-value-row">
+            <span className="card-value">30</span>
+          </div>
+        </Card>
+        <Card className="summary-card blue-light">
+          <div className="card-title">Tổng số tạm vắng</div>
+          <div className="card-value-row">
+            <span className="card-value">20</span>
+          </div>
+        </Card>
+      </div>
+      {/* Charts Section */}
+      <div className="charts-grid">
+        {/* Gender Chart */}
+        <Card className="chart-card">
+          <h3 className="chart-title">Thống kê giới tính</h3>
+          <div className="gender-chart-container">
+            <div className="donut-chart">
+              <div className="donut-hole"></div>
             </div>
-            <div
-              className="date-input-group"
-              onClick={() => handleDateClick(endDateRef)}
-            >
-              <span className="date-label">Đến {formatDate(endDate)}</span>
-              <img
-                src={calendarIcon}
-                alt="calendar"
-                className="dashboard-icon"
-              />
-              <input
-                type="date"
-                ref={endDateRef}
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                style={{
-                  position: "absolute",
-                  opacity: 0,
-                  pointerEvents: "none",
-                  bottom: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                }}
-              />
+            <div className="chart-legend">
+              <div className="legend-item">
+                <span className="dot male"></span>
+                <span className="label">Nam</span>
+                <span className="value">60.5%</span>
+              </div>
+              <div className="legend-item">
+                <span className="dot female"></span>
+                <span className="label">Nữ</span>
+                <span className="value">39.5%</span>
+              </div>
             </div>
           </div>
-          {/* Summary Cards */}
-          <div className="summary-cards-grid">
-            <Card className="summary-card blue-light">
-              <div className="card-title">Tổng số nhân khẩu</div>
-              <div className="card-value-row">
-                <span className="card-value">7,265</span>
-                <span className="card-trend positive">
-                  +11.01% <TrendUpIcon />
-                </span>
-              </div>
-            </Card>
-            <Card className="summary-card blue-light">
-              <div className="card-title">Tổng số hộ khẩu</div>
-              <div className="card-value-row">
-                <span className="card-value">200</span>
-              </div>
-            </Card>
-            <Card className="summary-card blue-light">
-              <div className="card-title">Tổng số tạm trú</div>
-              <div className="card-value-row">
-                <span className="card-value">30</span>
-              </div>
-            </Card>
-            <Card className="summary-card blue-light">
-              <div className="card-title">Tổng số tạm vắng</div>
-              <div className="card-value-row">
-                <span className="card-value">20</span>
-              </div>
-            </Card>
-          </div>
-          {/* Charts Section */}
-          <div className="charts-grid">
-            {/* Gender Chart */}
-            <Card className="chart-card">
-              <h3 className="chart-title">Thống kê giới tính</h3>
-              <div className="gender-chart-container">
-                <div className="donut-chart">
-                  <div className="donut-hole"></div>
-                </div>
-                <div className="chart-legend">
-                  <div className="legend-item">
-                    <span className="dot male"></span>
-                    <span className="label">Nam</span>
-                    <span className="value">60.5%</span>
-                  </div>
-                  <div className="legend-item">
-                    <span className="dot female"></span>
-                    <span className="label">Nữ</span>
-                    <span className="value">39.5%</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
+        </Card>
 
-            {/* Age Chart */}
-            <Card className="chart-card">
-              <h3 className="chart-title">Thống kê nhân khẩu</h3>
-              <div className="age-chart-container">
-                <div className="bar-chart">
-                  {[
-                    { label: "0-5 tuổi", value: 70 },
-                    { label: "6-10 tuổi", value: 35 },
-                    { label: "11-14 tuổi", value: 95 },
-                    { label: "15-17 tuổi", value: 70 },
-                    { label: "18-60 tuổi", value: 70 },
-                    { label: "60+ tuổi", value: 70 },
-                  ].map((item, index) => (
-                    <div key={index} className="bar-column">
-                      <div className="bar-track">
-                        <div
-                          className="bar-fill"
-                          style={{ height: `${item.value}%` }}
-                        ></div>
-                      </div>
-                      <span className="bar-label">{item.label}</span>
-                    </div>
-                  ))}
+        {/* Age Chart */}
+        <Card className="chart-card">
+          <h3 className="chart-title">Thống kê nhân khẩu</h3>
+          <div className="age-chart-container">
+            <div className="bar-chart">
+              {[
+                { label: "0-5 tuổi", value: 70 },
+                { label: "6-10 tuổi", value: 35 },
+                { label: "11-14 tuổi", value: 95 },
+                { label: "15-17 tuổi", value: 70 },
+                { label: "18-60 tuổi", value: 70 },
+                { label: "60+ tuổi", value: 70 },
+              ].map((item, index) => (
+                <div key={index} className="bar-column">
+                  <div className="bar-track">
+                    <div
+                      className="bar-fill"
+                      style={{ height: `${item.value}%` }}
+                    ></div>
+                  </div>
+                  <span className="bar-label">{item.label}</span>
                 </div>
-                <div className="y-axis">
-                  <span>100</span>
-                  <span>75</span>
-                  <span>50</span>
-                  <span>25</span>
-                  <span>0</span>
-                </div>
-              </div>
-            </Card>
-          </div>{" "}
-          {/* Fluctuation Section */}
-          <div className="fluctuation-section">
-            <h3 className="section-title">Biến động</h3>
-            <div className="fluctuation-grid">
-              <Card className="fluctuation-card gray">
-                <div className="fluctuation-header">
-                  <span>Nhân khẩu mới sinh</span>
-                  <img src={userIcon} alt="user" className="dashboard-icon" />
-                </div>
-                <div className="fluctuation-value">50</div>
-              </Card>
-              <Card className="fluctuation-card gray">
-                <div className="fluctuation-header">
-                  <span>Chuyển tới</span>
-                  <img
-                    src={upArrowIcon}
-                    alt="arrow down"
-                    className="dashboard-icon rotate-180"
-                  />
-                </div>
-                <div className="fluctuation-value">100</div>
-              </Card>
-              <Card className="fluctuation-card gray">
-                <div className="fluctuation-header">
-                  <span>Chuyển đi</span>
-                  <img
-                    src={upArrowIcon}
-                    alt="arrow up"
-                    className="dashboard-icon"
-                  />
-                </div>
-                <div className="fluctuation-value">30</div>
-              </Card>
-              <Card className="fluctuation-card gray">
-                <div className="fluctuation-header">
-                  <span>Qua đời</span>
-                  <img
-                    src={tombIcon}
-                    alt="deceased"
-                    className="dashboard-icon"
-                  />
-                </div>
-                <div className="fluctuation-value">100</div>
-              </Card>
+              ))}
+            </div>
+            <div className="y-axis">
+              <span>100</span>
+              <span>75</span>
+              <span>50</span>
+              <span>25</span>
+              <span>0</span>
             </div>
           </div>
+        </Card>
+      </div>{" "}
+      {/* Fluctuation Section */}
+      <div className="fluctuation-section">
+        <h3 className="section-title">Biến động</h3>
+        <div className="fluctuation-grid">
+          <Card className="fluctuation-card gray">
+            <div className="fluctuation-header">
+              <span>Nhân khẩu mới sinh</span>
+              <img src={userIcon} alt="user" className="dashboard-icon" />
+            </div>
+            <div className="fluctuation-value">50</div>
+          </Card>
+          <Card className="fluctuation-card gray">
+            <div className="fluctuation-header">
+              <span>Chuyển tới</span>
+              <img
+                src={upArrowIcon}
+                alt="arrow down"
+                className="dashboard-icon rotate-180"
+              />
+            </div>
+            <div className="fluctuation-value">100</div>
+          </Card>
+          <Card className="fluctuation-card gray">
+            <div className="fluctuation-header">
+              <span>Chuyển đi</span>
+              <img
+                src={upArrowIcon}
+                alt="arrow up"
+                className="dashboard-icon"
+              />
+            </div>
+            <div className="fluctuation-value">30</div>
+          </Card>
+          <Card className="fluctuation-card gray">
+            <div className="fluctuation-header">
+              <span>Qua đời</span>
+              <img src={tombIcon} alt="deceased" className="dashboard-icon" />
+            </div>
+            <div className="fluctuation-value">100</div>
+          </Card>
         </div>
       </div>
     </div>

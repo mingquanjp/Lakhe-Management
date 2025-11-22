@@ -5,8 +5,6 @@ import Button from "../../../components/commons/Button/Button";
 import Table from "../../../components/commons/Table/Table";
 import Modal from "../../../components/commons/Modal/Modal";
 import Input from "../../../components/commons/Input/Input";
-import Header from "../../../components/layout/Header";
-import Sidebar from "../../../components/layout/Sidebar";
 import {
   exportIcon,
   plusIcon,
@@ -169,60 +167,48 @@ const StaffManagement = () => {
   ];
 
   return (
-    <div className="app-container">
-      <Sidebar />
-      <div className="main-content">
-        <Header />
-        <div className="content">
-          <div className="staff-management-container">
-            {/* Top Actions */}
-            <div className="top-actions">
-              <Button className="btn-top btn-export">
-                <img src={exportIcon} alt="Export" className="btn-icon" />
-                Export
-              </Button>
-              <Button
-                className="btn-top btn-add"
-                onClick={() => setIsModalOpen(true)}
-              >
-                <img src={plusIcon} alt="Add" className="btn-icon" />
-                Add Staff
-              </Button>
-            </div>
-
-            {/* Main Card */}
-            <Card
-              title="Quản lý Staff"
-              subtitle="Detailed Staff Information Table"
-              className="staff-card"
-              actions={
-                <div className="card-tools">
-                  <div className="search-wrapper">
-                    <img
-                      src={searchIcon}
-                      alt="Search"
-                      className="search-icon"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Search..."
-                      className="search-input"
-                    />
-                  </div>
-                  <Button variant="outline" className="btn-filter">
-                    <img src={filterIcon} alt="Filter" className="btn-icon" />
-                    Filters
-                  </Button>
-                </div>
-              }
+    <>
+      <div className="content">
+        <div className="staff-management-container">
+          {/* Top Actions */}
+          <div className="top-actions">
+            <Button className="btn-top btn-export">
+              <img src={exportIcon} alt="Export" className="btn-icon" />
+              Export
+            </Button>
+            <Button
+              className="btn-top btn-add"
+              onClick={() => setIsModalOpen(true)}
             >
-              <Table
-                columns={columns}
-                data={tableData}
-                className="staff-table"
-              />
-            </Card>
+              <img src={plusIcon} alt="Add" className="btn-icon" />
+              Add Staff
+            </Button>
           </div>
+
+          {/* Main Card */}
+          <Card
+            title="Quản lý Staff"
+            subtitle="Detailed Staff Information Table"
+            className="staff-card"
+            actions={
+              <div className="card-tools">
+                <div className="search-wrapper">
+                  <img src={searchIcon} alt="Search" className="search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="search-input"
+                  />
+                </div>
+                <Button variant="outline" className="btn-filter">
+                  <img src={filterIcon} alt="Filter" className="btn-icon" />
+                  Filters
+                </Button>
+              </div>
+            }
+          >
+            <Table columns={columns} data={tableData} className="staff-table" />
+          </Card>
         </div>
       </div>
 
@@ -367,7 +353,7 @@ const StaffManagement = () => {
           </div>
         </div>
       </Modal>
-    </div>
+    </>
   );
 };
 
