@@ -157,3 +157,20 @@ export const householdData = [
     members: 3,
   }
 ];
+
+
+export const HouseholdDetailData = {
+  id: 1,
+  code: "HK123456",
+  owner: "Nguyễn Văn A",
+  address: "Hà Nội",
+  members: [
+    { id: 10, name: "Nguyễn Văn A", relation: "Chủ hộ" },
+    { id: 11, name: "Nguyễn Văn B", relation: "Con" },
+    { id: 12, name: "Nguyễn Thị C", relation: "Vợ" },
+    { id: 13, name: "Nguyễn Văn D", relation: "Con" },
+    { id: 14, name: "Nguyễn Thị E", relation: "Con" },
+  ]
+};
+
+
