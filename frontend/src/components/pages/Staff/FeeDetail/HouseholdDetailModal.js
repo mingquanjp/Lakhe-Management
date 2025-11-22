@@ -1,11 +1,140 @@
 import React, { useState } from "react";
 import "./HouseholdDetailModal.css";
 import { Modal } from "../../../commons";
+import EnhancedTable from "../../../commons/Table/EnhancedTable";
 
 const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
   const [activeTab, setActiveTab] = useState("payment");
 
   if (!household) return null;
+
+  // Payment history data
+  const paymentData = [
+    {
+      stt: 1,
+      feeName: "Phí vệ sinh năm 2024",
+      feeType: "mandatory",
+      required: 360000,
+      paid: 360000,
+      paymentDate: "07/01/2025",
+      status: "paid"
+    },
+    {
+      stt: 2,
+      feeName: "Ngày thương binh liệt sỹ 27/07 năm 2025",
+      feeType: "donation",
+      required: 0,
+      paid: 100000,
+      paymentDate: "20/07/2025",
+      status: "paid"
+    },
+    {
+      stt: 3,
+      feeName: "Phí vệ sinh năm 2025",
+      feeType: "mandatory",
+      required: 360000,
+      paid: 0,
+      paymentDate: "NULL",
+      status: "owing"
+    },
+    {
+      stt: 4,
+      feeName: "Tết trung thu 2025",
+      feeType: "donation",
+      required: 0,
+      paid: 50000,
+      paymentDate: "22/08/2025",
+      status: "paid"
+    }
+  ];
+
+  const paymentColumns = [
+    { key: "stt", title: "STT" },
+    { key: "feeName", title: "Tên đợt thu" },
+    {
+      key: "feeType",
+      title: "Loại phí",
+      render: (value) => (
+        <span className={`badge ${value === "mandatory" ? "badge-mandatory" : "badge-donation"}`}>
+          {value === "mandatory" ? "• Bắt buộc" : "• Ủng hộ"}
+        </span>
+      )
+    },
+    { key: "required", title: "Phải nộp" },
+    { key: "paid", title: "Đã nộp" },
+    { key: "paymentDate", title: "Ngày nộp" },
+    {
+      key: "status",
+      title: "Trạng thái",
+      render: (value) => (
+        <span className={`badge ${value === "paid" ? "badge-paid" : "badge-owing"}`}>
+          {value === "paid" ? "• Đã nộp" : "• Còn nợ"}
+        </span>
+      )
+    }
+  ];
+
+  // Demographic data
+  const demographicData = [
+    {
+      stt: 1,
+      name: "Nguyễn Minh Quân",
+      birthDate: "36/36/2036",
+      relationship: "Chủ hộ",
+      residenceStatus: "permanent"
+    },
+    {
+      stt: 2,
+      name: "Phạm Phương Linh",
+      birthDate: "36/36/2036",
+      relationship: "Vợ",
+      residenceStatus: "permanent"
+    },
+    {
+      stt: 3,
+      name: "Nguyễn Minh Tùng",
+      birthDate: "36/36/2036",
+      relationship: "Con trai",
+      residenceStatus: "permanent"
+    },
+    {
+      stt: 4,
+      name: "Phạm Minh Mai",
+      birthDate: "36/36/2036",
+      relationship: "Con gái",
+      residenceStatus: "temporary"
+    },
+    {
+      stt: 5,
+      name: "Nguyễn Minh Long",
+      birthDate: "36/36/2036",
+      relationship: "Con trai",
+      residenceStatus: "absent"
+    }
+  ];
+
+  const demographicColumns = [
+    { key: "stt", title: "STT" },
+    { key: "name", title: "Họ và tên" },
+    { key: "birthDate", title: "Ngày sinh" },
+    { key: "relationship", title: "Quan hệ với chủ hộ" },
+    {
+      key: "residenceStatus",
+      title: "Trạng thái cư trú",
+      render: (value) => {
+        let badgeClass = "badge-permanent";
+        let text = "• Thường trú";
+        if (value === "temporary") {
+          badgeClass = "badge-temporary";
+          text = "• Tạm trú";
+        } else if (value === "absent") {
+          badgeClass = "badge-absent";
+          text = "• Tạm vắng";
+        }
+        return <span className={`badge ${badgeClass}`}>{text}</span>;
+      }
+    }
+  ];
 
   return (
     <Modal
@@ -62,134 +191,11 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
             <div className="tab-content-wrapper">
           {activeTab === "payment" ? (
             <div className="table-container">
-              <table className="detail-table">
-                <thead>
-                  <tr>
-                    <th>STT</th>
-                    <th>Tên đợt thu</th>
-                    <th>Loại phí</th>
-                    <th>Phải nộp</th>
-                    <th>Đã nộp</th>
-                    <th>Ngày nộp</th>
-                    <th>Trạng thái</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>Phí vệ sinh năm 2024</td>
-                    <td>
-                      <span className="badge badge-mandatory">• Bắt buộc</span>
-                    </td>
-                    <td>360000</td>
-                    <td>360000</td>
-                    <td>07/01/2025</td>
-                    <td>
-                      <span className="badge badge-paid">• Đã nộp</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>Ngày thương binh liệt sỹ 27/07 năm 2025</td>
-                    <td>
-                      <span className="badge badge-donation">• Ủng hộ</span>
-                    </td>
-                    <td>0</td>
-                    <td>100000</td>
-                    <td>20/07/2025</td>
-                    <td>
-                      <span className="badge badge-paid">• Đã nộp</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>Phí vệ sinh năm 2025</td>
-                    <td>
-                      <span className="badge badge-mandatory">• Bắt buộc</span>
-                    </td>
-                    <td>360000</td>
-                    <td>0</td>
-                    <td>NULL</td>
-                    <td>
-                      <span className="badge badge-owing">• Còn nợ</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>4</td>
-                    <td>Tết trung thu 2025</td>
-                    <td>
-                      <span className="badge badge-donation">• Ủng hộ</span>
-                    </td>
-                    <td>0</td>
-                    <td>50000</td>
-                    <td>22/08/2025</td>
-                    <td>
-                      <span className="badge badge-paid">• Đã nộp</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <EnhancedTable columns={paymentColumns} data={paymentData} className="detail-table" />
             </div>
           ) : (
             <div className="table-container">
-              <table className="detail-table">
-                <thead>
-                  <tr>
-                    <th>STT</th>
-                    <th>Họ và tên</th>
-                    <th>Ngày sinh</th>
-                    <th>Quan hệ với chủ hộ</th>
-                    <th>Trạng thái cư trú</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>Nguyễn Minh Quân</td>
-                    <td>36/36/2036</td>
-                    <td>Chủ hộ</td>
-                    <td>
-                      <span className="badge badge-permanent">• Thường trú</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>Phạm Phương Linh</td>
-                    <td>36/36/2036</td>
-                    <td>Vợ</td>
-                    <td>
-                      <span className="badge badge-permanent">• Thường trú</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>Nguyễn Minh Tùng</td>
-                    <td>36/36/2036</td>
-                    <td>Con trai</td>
-                    <td>
-                      <span className="badge badge-permanent">• Thường trú</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>4</td>
-                    <td>Phạm Minh Mai</td>
-                    <td>36/36/2036</td>
-                    <td>Con gái</td>
-                    <td>
-                      <span className="badge badge-temporary">• Tạm trú</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>5</td>
-                    <td>Nguyễn Minh Long</td>
-                    <td>36/36/2036</td>
-                    <td>Con trai</td>
-                    <td>
-                      <span className="badge badge-absent">• Tạm vắng</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <EnhancedTable columns={demographicColumns} data={demographicData} className="detail-table" />
             </div>
           )}
         </div>

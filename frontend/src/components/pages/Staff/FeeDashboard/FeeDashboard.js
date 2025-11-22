@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./FeeDashboard.css";
-import { Card } from "../../../commons";
-import { Button } from "../../../commons";
+import { Card, Button } from "../../../commons";
+import EnhancedTable from "../../../commons/Table/EnhancedTable";
 import { searchIcon } from "../../../../assets/icons";
 
 const FeeDashboard = () => {
@@ -28,12 +28,82 @@ const FeeDashboard = () => {
   ];
 
   const tableColumns = [
-    { key: "householdId", title: "Số hộ khẩu" },
-    { key: "ownerName", title: "Họ và tên chủ hộ" },
-    { key: "houseNumber", title: "Số nhà" },
-    { key: "commune", title: "Xã" },
-    { key: "district", title: "Huyện" },
-    { key: "status", title: "Trạng thái" },
+    { 
+      key: "householdId", 
+      title: "Số hộ khẩu",
+      headerRender: () => (
+        <>
+          Số hộ khẩu
+          <span className="sort-arrow">▼</span>
+        </>
+      )
+    },
+    { 
+      key: "ownerName", 
+      title: "Họ và tên chủ hộ",
+      headerRender: () => (
+        <>
+          Họ và tên chủ hộ
+          <span className="sort-arrow">▼</span>
+        </>
+      )
+    },
+    { 
+      key: "houseNumber", 
+      title: "Số nhà",
+      headerRender: () => (
+        <>
+          Số nhà
+          <span className="sort-arrow">▼</span>
+        </>
+      )
+    },
+    { 
+      key: "commune", 
+      title: "Xã",
+      headerRender: () => (
+        <>
+          Xã
+          <span className="sort-arrow">▼</span>
+        </>
+      )
+    },
+    { 
+      key: "district", 
+      title: "Huyện",
+      headerRender: () => (
+        <>
+          Huyện
+          <span className="sort-arrow">▼</span>
+        </>
+      )
+    },
+    { 
+      key: "status", 
+      title: "Trạng thái",
+      headerRender: () => (
+        <>
+          Trạng thái
+          <span className="sort-arrow">▼</span>
+        </>
+      ),
+      render: (value, row) => (
+        <span
+          className={`status-badge ${
+            row.status === "paid" ? "status-paid" : "status-unpaid"
+          }`}
+        >
+          {row.status === "paid" ? "• Đã nộp" : "• Chưa nộp"}
+        </span>
+      )
+    },
+    {
+      title: "",
+      headerRender: () => null,
+      render: () => (
+        <button className="table-menu-btn">⋮</button>
+      )
+    }
   ];
 
   const tableData = [];
@@ -94,50 +164,7 @@ const FeeDashboard = () => {
             }
           >
             <div className="table-wrapper">
-              <table className="staff-table">
-                <thead>
-                  <tr>
-                    {tableColumns.map((column, index) => (
-                      <th key={index} className="table-header">
-                        {column.title}
-                        <span className="sort-arrow">▼</span>
-                      </th>
-                    ))}
-                    <th className="table-header"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableData.length === 0 ? (
-                    <tr>
-                      <td colSpan={tableColumns.length + 1} className="table-empty">
-                        Không có dữ liệu
-                      </td>
-                    </tr>
-                  ) : (
-                    tableData.map((row, rowIndex) => (
-                      <tr key={rowIndex} className="table-row">
-                        <td className="table-cell">{row.householdId}</td>
-                        <td className="table-cell">{row.ownerName}</td>
-                        <td className="table-cell">{row.houseNumber}</td>
-                        <td className="table-cell">{row.commune}</td>
-                        <td className="table-cell">{row.district}</td>
-                        <td className="table-cell">
-                          <span
-                            className={`status-badge ${
-                              row.status === "paid" ? "status-paid" : "status-unpaid"
-                            }`}
-                          >
-                            {row.status === "paid" ? "• Đã nộp" : "• Chưa nộp"}
-                          </span>
-                        </td>
-                        <td className="table-cell">
-                          <button className="table-menu-btn">⋮</button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+              <EnhancedTable columns={tableColumns} data={tableData} className="staff-table" />
             </div>
           </Card>
     </div>

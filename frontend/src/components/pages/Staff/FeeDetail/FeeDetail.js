@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./FeeDetail.css";
 import { Card, Button } from "../../../commons";
+import EnhancedTable from "../../../commons/Table/EnhancedTable";
 import { searchIcon } from "../../../../assets/icons";
 import HouseholdDetailModal from "./HouseholdDetailModal";
 
@@ -29,11 +30,84 @@ const FeeDetail = () => {
   ];
 
   const tableColumns = [
-    { key: "householdId", title: "Số hộ khẩu" },
-    { key: "ownerName", title: "Họ tên chủ hộ" },
-    { key: "houseNumber", title: "Số nhà" },
-    { key: "status", title: "Trạng thái" },
-    { key: "details", title: "Thông tin cụ thể" },
+    { 
+      key: "householdId", 
+      title: "Số hộ khẩu",
+      headerRender: () => (
+        <>
+          Số hộ khẩu
+          <span className="sort-arrow">▼</span>
+        </>
+      )
+    },
+    { 
+      key: "ownerName", 
+      title: "Họ tên chủ hộ",
+      headerRender: () => (
+        <>
+          Họ tên chủ hộ
+          <span className="sort-arrow">▼</span>
+        </>
+      )
+    },
+    { 
+      key: "houseNumber", 
+      title: "Số nhà",
+      headerRender: () => (
+        <>
+          Số nhà
+          <span className="sort-arrow">▼</span>
+        </>
+      )
+    },
+    { 
+      key: "status", 
+      title: "Trạng thái",
+      headerRender: () => (
+        <>
+          Trạng thái
+          <span className="sort-arrow">▼</span>
+        </>
+      ),
+      render: (value, row) => (
+        <span
+          className={`status-badge ${
+            row.status === "paid" ? "status-paid" : "status-owing"
+          }`}
+        >
+          {row.status === "paid" ? "• Đã nộp" : "• Còn nợ"}
+        </span>
+      )
+    },
+    { 
+      key: "details", 
+      title: "Thông tin cụ thể",
+      headerRender: () => (
+        <>
+          Thông tin cụ thể
+          <span className="sort-arrow">▼</span>
+        </>
+      ),
+      render: (value, row) => (
+        <Button
+          variant="outline"
+          size="small"
+          onClick={() => {
+            setSelectedHousehold(row);
+            setIsModalOpen(true);
+          }}
+        >
+          Xem chi tiết
+        </Button>
+      )
+    },
+    {
+      title: "",
+      headerRender: () => null,
+      render: () => (
+        <button className="table-menu-btn">⋮</button>
+      )
+    }
   ];
 
   const tableData = [
@@ -146,60 +220,7 @@ const FeeDetail = () => {
             }
           >
             <div className="table-wrapper">
-              <table className="staff-table">
-                <thead>
-                  <tr>
-                    {tableColumns.map((column, index) => (
-                      <th key={index} className="table-header">
-                        {column.title}
-                        <span className="sort-arrow">▼</span>
-                      </th>
-                    ))}
-                    <th className="table-header"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableData.length === 0 ? (
-                    <tr>
-                      <td colSpan={tableColumns.length + 1} className="table-empty">
-                        Không có dữ liệu
-                      </td>
-                    </tr>
-                  ) : (
-                    tableData.map((row, rowIndex) => (
-                      <tr key={rowIndex} className="table-row">
-                        <td className="table-cell">{row.householdId}</td>
-                        <td className="table-cell">{row.ownerName}</td>
-                        <td className="table-cell">{row.houseNumber}</td>
-                        <td className="table-cell">
-                          <span
-                            className={`status-badge ${
-                              row.status === "paid" ? "status-paid" : "status-owing"
-                            }`}
-                          >
-                            {row.status === "paid" ? "• Đã nộp" : "• Còn nợ"}
-                          </span>
-                        </td>
-                        <td className="table-cell">
-                          <Button
-                            variant="outline"
-                            size="small"
-                            onClick={() => {
-                              setSelectedHousehold(row);
-                              setIsModalOpen(true);
-                            }}
-                          >
-                            Xem chi tiết
-                          </Button>
-                        </td>
-                        <td className="table-cell">
-                          <button className="table-menu-btn">⋮</button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+              <EnhancedTable columns={tableColumns} data={tableData} className="staff-table" />
             </div>
           </Card>
 
