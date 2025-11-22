@@ -3,7 +3,6 @@ import StaffSidebar from "../../components/layout/StaffSidebar";
 import Header from "../../components/layout/Header";
 import FeeDashboard from "./FeeDashboard";
 import FeeDetail from "./FeeDetail";
-import FeeManagement from "./FeeManagement";
 
 const Staff = ({ currentPage, onPageChange, onLogout }) => {
   const renderPage = () => {
@@ -12,8 +11,6 @@ const Staff = ({ currentPage, onPageChange, onLogout }) => {
         return <FeeDashboard />;
       case "statistics":
         return <FeeDetail />;
-      case "fee-management":
-        return <FeeManagement />;
       default:
         return <FeeDashboard />;
     }
