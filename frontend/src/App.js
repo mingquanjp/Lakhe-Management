@@ -1,43 +1,52 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-import Header from "./components/layout/Header";
-import Sidebar from "./components/layout/Sidebar";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Admin from "./pages/Admin";
+import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDashboard";
+
 import HouseholdDetail from "./pages/HouseholdDetail";
 import Declaration from "./pages/Declaration";
 
+// Import Forms
+import NewHouseholdForm from "./pages/Admin/HouseholdForms/NewHouseholdForm";
+import NewMemberForm from "./pages/Admin/HouseholdForms/NewMemberForm";
+import MemberStatusChangeForm from "./pages/Admin/HouseholdForms/MemberStatusChangeForm";
+import TemporaryResidenceForm from "./pages/Admin/HouseholdForms/TemporaryResidenceForm";
+import ChangeOwnerForm from "./pages/Admin/HouseholdForms/ChangeOwnerForm/ChangeOwnerForm";
+
 function App() {
-  const [currentPath, setCurrentPath] = useState("/overview");
-
-  const renderContent = () => {
-    switch (currentPath) {
-      case "/household":
-        return <HouseholdDetail />;
-      case "/form":
-      case "/citizen":
-        return <Declaration />;
-      default:
-        return <h1>Welcome to LaKhe Management</h1>;
-    }
-  };
-
   return (
-    <div className="app-container">
-      <Sidebar onNavigate={setCurrentPath} />
-      <div className="main-content">
-        <Header />
-        <div className="content">
-          {renderContent()}
-        </div>
-      </div>
-    </div>
-  );
-=======
-import React from "react";
-import Login from "./pages/Login";
+    <Router>
+      <Routes>
+        <Route element={<Admin />}>
+          {/* Dashboard */}
+          <Route path="/" element={<PopulationDashboard />} />
+          <Route path="/overview" element={<PopulationDashboard />} />
 
-function App() {
-  return  <Login/>;
->>>>>>> develop
+          {/* Main Pages */}
+          <Route path="/household" element={<HouseholdDetail />} />
+          <Route path="/citizen" element={<Declaration />} />
+          <Route path="/form" element={<Declaration />} />
+
+          {/* Forms */}
+          <Route path="/form/new-household-form" element={<NewHouseholdForm />} />
+          <Route path="/form/new-member-form" element={<NewMemberForm />} />
+          <Route
+            path="/form/member-status-change-form"
+            element={<MemberStatusChangeForm />}
+          />
+          <Route
+            path="/form/temporary-residence-form"
+            element={<TemporaryResidenceForm />}
+          />
+          <Route
+            path="/form/change-owner-form"
+            element={<ChangeOwnerForm />}
+          />
+        </Route>
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;
