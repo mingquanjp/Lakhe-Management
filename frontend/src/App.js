@@ -1,8 +1,8 @@
 import React from "react";
-import Login from "./pages/Login";
+import Admin from "./pages/Admin/index.js";
 
 function App() {
-  return  <Login/>;
+  return  <Admin/>;
 }
 
 export default App;

@@ -1,2 +1,2 @@
-import HouseholdList from './HouseholdList';
+import HouseholdList from './HouseholdTemporayList';
 export default HouseholdList;

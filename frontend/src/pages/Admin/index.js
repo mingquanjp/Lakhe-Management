@@ -3,6 +3,7 @@ import Sidebar from "../../components/layout/Sidebar";
 import Header from "../../components/layout/Header";
 import PopulationDashboard from "./PopulationDashboard/PopulationDashboard";
 import StaffManagement from "./StaffManagement/StaffManagement";
+import Overview from "./Overview/Overview";
 
 const Admin = () => {
   const [currentPage, setCurrentPage] = useState("overview");
@@ -19,7 +20,7 @@ const Admin = () => {
   const renderPage = () => {
     switch (currentPage) {
       case "overview":
-        return <PopulationDashboard />;
+        return <Overview />;
       case "staff":
         return <StaffManagement />;
       default:
