@@ -35,12 +35,10 @@ git checkout -b feature/login-member_name1
 
 ```bash
 # 1. Trước khi bắt đầu code, pull code mới nhất
-git checkout develop
 git pull origin develop
 
-# 2. Merge develop vào branch của mình
-git checkout feature/login-member1
-git merge develop
+# 2. Sau đó lên github mở pull request
+
 
 # 3. Giải quyết conflict (nếu có)
 

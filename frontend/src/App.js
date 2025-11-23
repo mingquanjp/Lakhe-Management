@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from "react";
 import Header from "./components/layout/Header";
 import Sidebar from "./components/layout/Sidebar";
@@ -30,6 +31,13 @@ function App() {
       </div>
     </div>
   );
+=======
+import React from "react";
+import Login from "./pages/Login";
+
+function App() {
+  return  <Login/>;
+>>>>>>> develop
 }
 
 export default App;
