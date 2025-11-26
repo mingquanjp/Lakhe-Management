@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Table, Button, Modal, Pagination } from '../components/commons';
-import PaymentForm from '../components/forms/Paymentform';
-import { feeData, existedFeeData, householdDataByFee } from '../data/mockData';
-import './FeeDetails.css';
+import { Table, Button, Modal, Pagination } from '../../../components/commons';
+import PaymentForm from '../../../components/forms/Paymentform';
+import { feeData, existedFeeData, householdDataByFee } from '../../../data/mockData';
+import './TableFeeDetails.css';
 
-const FeeDetail = () => {
+const TableFeeDetail = () => {
   const { feeId } = useParams();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
@@ -239,4 +239,4 @@ const FeeDetail = () => {
   );
 };
 
-export default FeeDetail;
+export default TableFeeDetail;
