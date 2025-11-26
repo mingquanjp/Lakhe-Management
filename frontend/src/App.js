@@ -11,7 +11,6 @@ function App() {
       <Layout>
       <div className="App">
         <Routes>
-          {/* Route để test dashboard content */}
           <Route path="/" element={<TestAccountantDashboard />} />
           <Route path="/test-dashboard" element={<TestAccountantDashboard />} />
           <Route path="/fee-detail/:feeId" element={<FeeDetail />} />
