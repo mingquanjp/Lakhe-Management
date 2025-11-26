@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
-import Card from '../../../../components/commons/Card/Card';
 import './TemporaryResidenceForm.css';
 
 const TemporaryResidenceForm = () => {
@@ -46,11 +45,11 @@ const TemporaryResidenceForm = () => {
         : 'bg-red-600 hover:bg-red-700';
 
     return (
-        <Card title="Khai báo Tạm trú / Tạm vắng" className={`temporary-residence-form ${themeClass}`}>
+        <div className={`temporary-residence-form ${themeClass}`}>
             <form className="space-y-6" onSubmit={handleSubmit}>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Loại khai báo</label>
-                    <div className="flex space-x-6">
+                <div className="bg-gray-50 p-6 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">Loại khai báo</label>
+                    <div className="flex space-x-8">
                         <label className="inline-flex items-center cursor-pointer">
                             <input 
                                 type="radio" 
@@ -212,7 +211,7 @@ const TemporaryResidenceForm = () => {
                     </Button>
                 </div>
             </form>
-        </Card>
+        </div>
     );
 };
 

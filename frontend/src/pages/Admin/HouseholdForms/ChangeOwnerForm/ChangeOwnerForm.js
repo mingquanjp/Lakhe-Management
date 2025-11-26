@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
-import Card from '../../../../components/commons/Card/Card';
 import './ChangeOwnerForm.css';
 
 const ChangeOwnerForm = () => {
@@ -34,8 +33,8 @@ const ChangeOwnerForm = () => {
     };
 
     return (
-        <Card title="Thay đổi chủ hộ" className="change-owner-form">
-            <form className="space-y-4" onSubmit={handleSubmit}>
+        <div className="change-owner-form">
+            <form className="space-y-6" onSubmit={handleSubmit}>
                 <Input
                     label="Chủ hộ hiện tại"
                     name="currentOwner"
@@ -85,7 +84,7 @@ const ChangeOwnerForm = () => {
                     <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">Lưu thay đổi</Button>
                 </div>
             </form>
-        </Card>
+        </div>
     );
 };
 

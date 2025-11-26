@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
-import Card from '../../../../components/commons/Card/Card';
 import './MemberStatusChangeForm.css';
 
 const MemberStatusChangeForm = () => {
@@ -32,8 +31,8 @@ const MemberStatusChangeForm = () => {
     };
 
     return (
-        <Card title="Thay đổi nhân khẩu" className="member-status-change-form">
-            <form className="space-y-4" onSubmit={handleSubmit}>
+        <div className="member-status-change-form">
+            <form className="space-y-6" onSubmit={handleSubmit}>
                 <Input
                     label="Chọn nhân khẩu"
                     name="memberName"
@@ -109,7 +108,7 @@ const MemberStatusChangeForm = () => {
                     <Button type="submit" className="bg-yellow-600 hover:bg-yellow-700 text-white">Cập nhật trạng thái</Button>
                 </div>
             </form>
-        </Card>
+        </div>
     );
 };
 

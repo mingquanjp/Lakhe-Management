@@ -1,34 +1,11 @@
 .temporary-residence-form {
-    max-width: 600px;
-    margin: 2rem auto;
-    border: 1px solid #e5e7eb;
-    border-radius: 1rem;
-    background-color: #ffffff;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-}
-
-.temporary-residence-form:hover {
-    transform: translateY(-2px);
+    /* Container styles removed to merge with Modal */
+    width: 100%;
 }
 
 .temporary-residence-form h2 {
-    position: relative;
-    padding-bottom: 1rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #f3f4f6;
-    color: #1f2937;
-}
-
-.temporary-residence-form h2::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 60px;
-    height: 2px;
-    background-color: #9ca3af;
-    transition: background-color 0.3s ease;
+    /* Header styles removed as Modal handles title */
+    display: none;
 }
 
 .temporary-residence-form label {
@@ -60,14 +37,6 @@
 }
 
 /* --- Theme Yellow (Tạm trú) --- */
-.temporary-residence-form.theme-yellow {
-    border-top: 4px solid #eab308;
-}
-
-.temporary-residence-form.theme-yellow h2::after {
-    background-color: #eab308;
-}
-
 .temporary-residence-form.theme-yellow input:focus,
 .temporary-residence-form.theme-yellow textarea:focus,
 .temporary-residence-form.theme-yellow select:focus {
@@ -84,14 +53,6 @@
 }
 
 /* --- Theme Red (Tạm vắng) --- */
-.temporary-residence-form.theme-red {
-    border-top: 4px solid #dc2626;
-}
-
-.temporary-residence-form.theme-red h2::after {
-    background-color: #dc2626;
-}
-
 .temporary-residence-form.theme-red input:focus,
 .temporary-residence-form.theme-red textarea:focus,
 .temporary-residence-form.theme-red select:focus {
