@@ -6,63 +6,49 @@ import Modal from '../components/commons/Modal/Modal';
 import Input from '../components/commons/Input/Input';
 
 // Mock Data
-const initialMembers = [
+const initialHouseholds = [
     { 
         id: 1, 
-        name: 'Nguyễn Minh Quân', 
-        alias: 'Quân',
-        relation: 'Chủ hộ', 
-        dob: '01/01/1995', 
-        gender: 'Nam',
-        pob: 'Hà Nội', // Place of Birth
-        origin: 'Nam Định',
-        ethnicity: 'Kinh',
-        religion: 'Không',
-        idCard: '001095000001',
-        idCardDate: '01/01/2021',
-        idCardPlace: 'Cục Cảnh sát QLHC về TTXH',
-        job: 'Kỹ sư Full Stack', 
-        workplace: 'Công ty ABC',
+        householdId: 'HK001',
+        ownerName: 'Nguyễn Minh Quân', 
+        address: 'Số 1, Đại Cồ Việt, Hai Bà Trưng, Hà Nội',
+        memberCount: 4,
         regDate: '01/01/2020',
-        prevAddress: 'Số 1, Đại Cồ Việt',
         status: 'Thường trú' 
     },
     { 
         id: 2, 
-        name: 'Đặng Hoàng Quân', 
-        alias: '',
-        relation: 'Anh trai', 
-        dob: '01/02/2005', 
-        gender: 'Nam',
-        pob: 'Hà Nội',
-        origin: 'Hà Nội',
-        ethnicity: 'Kinh',
-        religion: 'Không',
-        idCard: '001205000002',
-        idCardDate: '01/02/2023',
-        idCardPlace: 'CA Hà Nội',
-        job: 'Kỹ sư Full Stack', 
-        workplace: 'Freelancer',
-        regDate: '01/02/2020',
-        prevAddress: 'Không',
+        householdId: 'HK002',
+        ownerName: 'Đặng Hoàng Quân', 
+        address: 'Số 10, Tạ Quang Bửu, Hai Bà Trưng, Hà Nội',
+        memberCount: 3,
+        regDate: '15/03/2021',
         status: 'Thường trú' 
     },
-    // ... other members with similar structure
+    { 
+        id: 3, 
+        householdId: 'HK003',
+        ownerName: 'Đinh Văn Phạm Việt', 
+        address: 'Số 5, Trần Đại Nghĩa, Hai Bà Trưng, Hà Nội',
+        memberCount: 2,
+        regDate: '20/11/2022',
+        status: 'Tạm trú' 
+    },
 ];
 
 const StatusBadge = ({ status }) => {
     let colorClass = '';
     let dotColor = '';
     
-    if (status === 'Thường trú' || status === 'Active') {
+    if (status === 'Thường trú') {
         colorClass = 'bg-green-100 text-green-700';
         dotColor = 'bg-green-500';
-    } else if (status === 'Tạm vắng' || status === 'Inactive') {
-        colorClass = 'bg-red-100 text-red-700';
-        dotColor = 'bg-red-500';
-    } else {
+    } else if (status === 'Tạm trú') {
         colorClass = 'bg-yellow-100 text-yellow-700';
         dotColor = 'bg-yellow-500';
+    } else {
+        colorClass = 'bg-gray-100 text-gray-700';
+        dotColor = 'bg-gray-500';
     }
 
     return (
@@ -74,29 +60,52 @@ const StatusBadge = ({ status }) => {
 };
 
 const HouseholdDetail = () => {
-    const [selectedMember, setSelectedMember] = useState(null);
-    const [members] = useState(initialMembers);
+    const [selectedHousehold, setSelectedHousehold] = useState(null);
+    const [households] = useState(initialHouseholds);
+    
+    // New Household Form State
+    const [isAddHouseholdModalOpen, setIsAddHouseholdModalOpen] = useState(false);
+    const [newHouseholdData, setNewHouseholdData] = useState({
+        householdId: '',
+        ownerName: '',
+        address: ''
+    });
+
+    const handleNewHouseholdChange = (e) => {
+        const { name, value } = e.target;
+        setNewHouseholdData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleNewHouseholdSubmit = (e) => {
+        e.preventDefault();
+        console.log('New Household Data:', newHouseholdData);
+        alert('Đã gửi thông tin khai báo hộ khẩu mới!');
+        setIsAddHouseholdModalOpen(false);
+    };
 
     const columns = [
-        { key: 'id', title: 'STT' },
-        { key: 'name', title: 'Họ và tên thành viên' },
-        { key: 'relation', title: 'Quan hệ với chủ hộ' },
-        { key: 'dob', title: 'Ngày sinh' },
-        { key: 'job', title: 'Nghề nghiệp' },
-        { key: 'statusDisplay', title: 'Trạng thái cư trú' },
+        { key: 'householdId', title: 'Mã hộ khẩu' },
+        { key: 'ownerName', title: 'Chủ hộ' },
+        { key: 'address', title: 'Địa chỉ' },
+        { key: 'memberCount', title: 'Số thành viên' },
+        { key: 'regDate', title: 'Ngày đăng ký' },
+        { key: 'statusDisplay', title: 'Trạng thái' },
         { key: 'actions', title: 'Hành động' },
     ];
 
     // Transform data for Table component
-    const tableData = members.map(member => ({
-        ...member,
-        statusDisplay: <StatusBadge status={member.status} />,
+    const tableData = households.map(household => ({
+        ...household,
+        statusDisplay: <StatusBadge status={household.status} />,
         actions: (
             <div className="flex items-center space-x-2">
                 <Button 
                     size="small" 
                     variant="primary" 
-                    onClick={() => setSelectedMember(member)}
+                    onClick={() => setSelectedHousehold(household)}
                     className="bg-cyan-400 hover:bg-cyan-500 border-none"
                 >
                     Sửa
@@ -116,22 +125,26 @@ const HouseholdDetail = () => {
         <div className="p-6">
             <div className="flex justify-between items-end mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800 mb-1">Chi tiết hộ khẩu</h1>
-                    <p className="text-gray-500 text-sm">Chi tiết các thành viên trong 1 hộ khẩu năm 2025</p>
+                    <h1 className="text-2xl font-bold text-gray-800 mb-1">Quản lý hộ khẩu</h1>
+                    <p className="text-gray-500 text-sm">Danh sách các hộ khẩu trong khu vực quản lý</p>
                 </div>
                 <div className="flex gap-2">
                      {/* Using Button component for navigation/action */}
-                     <Button variant="primary" className="bg-gray-800 hover:bg-gray-900">
+                     <Button 
+                        variant="primary" 
+                        className="bg-gray-800 hover:bg-gray-900"
+                        onClick={() => setIsAddHouseholdModalOpen(true)}
+                     >
                         Khai báo hộ khẩu
                      </Button>
                 </div>
             </div>
 
             <Card className="bg-white shadow-sm border border-gray-100">
-                <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-                    <h2 className="text-lg font-semibold text-gray-800">Bảng chi tiết hộ khẩu</h2>
-                    <div className="flex gap-2">
-                        <Input placeholder="Search..." className="w-64" />
+                <div className="p-4 border-b border-gray-100 flex justify-between items-center gap-4">
+                    <h2 className="text-lg font-semibold text-gray-800 whitespace-nowrap">Danh sách hộ khẩu</h2>
+                    <div className="flex gap-2 flex-1 justify-end">
+                        <Input placeholder="Search..." className="w-full max-w-md" />
                     </div>
                 </div>
                 
@@ -152,135 +165,80 @@ const HouseholdDetail = () => {
                 </div>
             </Card>
 
+            {/* Edit Household Modal */}
             <Modal
-                isOpen={!!selectedMember}
-                onClose={() => setSelectedMember(null)}
-                title="Chi tiết nhân khẩu"
-                size="large"
+                isOpen={!!selectedHousehold}
+                onClose={() => setSelectedHousehold(null)}
+                title="Chỉnh sửa hộ khẩu"
+                size="medium"
             >
-                <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Thông tin định danh */}
-                    <div className="md:col-span-2">
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">Thông tin định danh</h3>
-                    </div>
-                    <div className="md:col-span-1">
-                        <Input 
-                            label="Họ và tên" 
-                            defaultValue={selectedMember?.name} 
-                        />
-                    </div>
-                    <div className="md:col-span-1">
-                        <Input 
-                            label="Bí danh" 
-                            defaultValue={selectedMember?.alias}
-                        />
-                    </div>
-                    <div>
-                        <Input 
-                            label="Ngày sinh" 
-                            defaultValue={selectedMember?.dob} 
-                        />
-                    </div>
-                    <div>
-                        <Input 
-                            label="Giới tính" 
-                            defaultValue={selectedMember?.gender} 
-                        />
-                    </div>
-
-                    {/* Thông tin xuất thân */}
-                    <div className="md:col-span-2 mt-2">
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">Thông tin xuất thân</h3>
-                    </div>
-                    <div>
-                        <Input 
-                            label="Nơi sinh" 
-                            defaultValue={selectedMember?.pob}
-                        />
-                    </div>
-                    <div>
-                        <Input 
-                            label="Nguyên quán" 
-                            defaultValue={selectedMember?.origin}
-                        />
-                    </div>
-                    <div>
-                        <Input 
-                            label="Dân tộc" 
-                            defaultValue={selectedMember?.ethnicity}
-                        />
-                    </div>
-                    <div>
-                        <Input 
-                            label="Tôn giáo" 
-                            defaultValue={selectedMember?.religion}
-                        />
-                    </div>
-
-                    {/* Thông tin công dân */}
-                    <div className="md:col-span-2 mt-2">
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">Thông tin công dân</h3>
-                    </div>
-                    <div className="md:col-span-2">
-                        <Input 
-                            label="Số CMND/CCCD" 
-                            defaultValue={selectedMember?.idCard}
-                        />
-                    </div>
-                    <div>
-                        <Input 
-                            label="Ngày cấp" 
-                            defaultValue={selectedMember?.idCardDate}
-                        />
-                    </div>
-                    <div>
-                        <Input 
-                            label="Nơi cấp" 
-                            defaultValue={selectedMember?.idCardPlace}
-                        />
-                    </div>
-
-                    {/* Thông tin cư trú & Công việc */}
-                    <div className="md:col-span-2 mt-2">
-                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">Cư trú & Công việc</h3>
-                    </div>
-                    <div>
-                        <Input 
-                            label="Nghề nghiệp" 
-                            defaultValue={selectedMember?.job} 
-                        />
-                    </div>
-                    <div>
-                        <Input 
-                            label="Nơi làm việc" 
-                            defaultValue={selectedMember?.workplace} 
-                        />
-                    </div>
-                    <div>
-                        <Input 
-                            label="Ngày đăng ký thường trú" 
-                            defaultValue={selectedMember?.regDate} 
-                        />
-                    </div>
-                    <div>
-                        <Input 
-                            label="Địa chỉ trước khi chuyển đến" 
-                            defaultValue={selectedMember?.prevAddress} 
-                        />
-                    </div>
-                    <div className="md:col-span-2">
-                        <Input 
-                            label="Quan hệ với chủ hộ" 
-                            defaultValue={selectedMember?.relation} 
-                        />
-                    </div>
+                <form className="space-y-4">
+                    <Input 
+                        label="Mã hộ khẩu" 
+                        defaultValue={selectedHousehold?.householdId} 
+                        readOnly
+                        className="bg-gray-100"
+                    />
+                    <Input 
+                        label="Chủ hộ" 
+                        defaultValue={selectedHousehold?.ownerName} 
+                    />
+                    <Input 
+                        label="Địa chỉ" 
+                        defaultValue={selectedHousehold?.address} 
+                    />
+                    <Input 
+                        label="Ngày đăng ký" 
+                        type="date"
+                        defaultValue={selectedHousehold?.regDate ? selectedHousehold.regDate.split('/').reverse().join('-') : ''} 
+                    />
                     
-                    <div className="md:col-span-2 flex justify-end gap-4 mt-6 pt-4 border-t">
-                        <Button variant="outline" onClick={() => setSelectedMember(null)} className="text-red-500 border-red-500 hover:bg-red-50">
+                    <div className="flex justify-end gap-4 mt-6 pt-4 border-t">
+                        <Button variant="outline" onClick={() => setSelectedHousehold(null)} className="text-red-500 border-red-500 hover:bg-red-50">
                             Đóng
                         </Button>
                         <Button variant="primary" className="bg-blue-600 hover:bg-blue-700">
                             Lưu thay đổi
+                        </Button>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* New Household Modal */}
+            <Modal
+                isOpen={isAddHouseholdModalOpen}
+                onClose={() => setIsAddHouseholdModalOpen(false)}
+                title="Khai báo hộ khẩu mới"
+                size="medium"
+            >
+                <form className="space-y-4" onSubmit={handleNewHouseholdSubmit}>
+                    <Input
+                        label="Số sổ hộ khẩu"
+                        name="householdId"
+                        value={newHouseholdData.householdId}
+                        onChange={handleNewHouseholdChange}
+                        required
+                    />
+                    <Input
+                        label="Chủ hộ"
+                        name="ownerName"
+                        value={newHouseholdData.ownerName}
+                        onChange={handleNewHouseholdChange}
+                        required
+                    />
+                    <Input
+                        label="Địa chỉ"
+                        name="address"
+                        value={newHouseholdData.address}
+                        onChange={handleNewHouseholdChange}
+                        required
+                    />
+                    <div className="mt-6 flex justify-end gap-4">
+                        <Button variant="outline" onClick={() => setIsAddHouseholdModalOpen(false)} className="text-red-500 border-red-500 hover:bg-red-50">
+                            Hủy
+                        </Button>
+                        <Button type="submit" variant="primary" className="bg-blue-600 hover:bg-blue-700">
+                            Tạo mới
                         </Button>
                     </div>
                 </form>
