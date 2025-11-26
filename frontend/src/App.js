@@ -6,6 +6,7 @@ import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDas
 
 import HouseholdDetail from "./pages/HouseholdDetail";
 import Declaration from "./pages/Declaration";
+import FormsMenu from "./pages/Admin/FormsMenu/FormsMenu";
 
 // Import Forms
 import NewHouseholdForm from "./pages/Admin/HouseholdForms/NewHouseholdForm";
@@ -26,7 +27,7 @@ function App() {
           {/* Main Pages */}
           <Route path="/household" element={<HouseholdDetail />} />
           <Route path="/citizen" element={<Declaration />} />
-          <Route path="/form" element={<Declaration />} />
+          <Route path="/form" element={<FormsMenu />} />
 
           {/* Forms */}
           <Route path="/form/new-household-form" element={<NewHouseholdForm />} />

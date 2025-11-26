@@ -42,15 +42,7 @@ const Sidebar = () => {
       subItems: [
         { id: "household", label: "Quản lý hộ khẩu", path: "/household" },
         { id: "citizen", label: "Quản lý nhân khẩu", path: "/citizen" },
-        { id: "form", label: "Form khai báo", path: "/form", 
-          subItems: [
-            { id: "new-household", label: "Khai báo hộ khẩu mới", path: "/form/new-household-form" },
-            { id: "new-member", label: "Khai báo nhân khẩu mới", path: "/form/new-member-form" },
-            { id: "member-status-change", label: "Thay đổi nhân khẩu", path: "/form/member-status-change-form" },
-            { id: "change-owner", label: "Thay đổi chủ hộ", path: "/form/change-owner-form" },
-            { id: "temporary-residence", label: "Đăng ký tạm trú/tạm vắng", path: "/form/temporary-residence-form" },
-          ],
-        },
+        { id: "form", label: "Form khai báo", path: "/form" },
       ],
     },
 
