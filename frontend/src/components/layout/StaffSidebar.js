@@ -4,6 +4,7 @@ import {
   overView,
   Statistic,
   logoutIcon,
+  detailIcon,
 } from "../../assets/icons";
 import { Button } from "../commons";
 
@@ -33,7 +34,7 @@ const StaffSidebar = ({ currentPage, onPageChange, onLogout }) => {
     },
     {
       id: "fee-management",
-      label: "Quản lý thu phí",
+      label: "Quản lý đợt thu",
       icon: overView,
       page: "fee-management",
     },
@@ -43,6 +44,12 @@ const StaffSidebar = ({ currentPage, onPageChange, onLogout }) => {
       icon: Statistic,
       page: "statistics",
     },
+    {
+      id: "detail",
+      label: "Chi tiết các đợt thu",
+      icon: detailIcon,
+      page: "detail",
+    }
   ];
 
   const toggleExpand = (itemId) => {

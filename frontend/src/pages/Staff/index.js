@@ -12,6 +12,10 @@ const Staff = ({ currentPage, onPageChange, onLogout }) => {
         return <FeeDashboard />;
       case "statistics":
         return <FeeDetail />;
+      case "fee-management":
+        return <AccountantDashboard/>;
+      case "detail" :
+        return <TableFeeDetail/>;
       default:
         return <FeeDashboard />;
     }

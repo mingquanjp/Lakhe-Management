@@ -14,3 +14,4 @@ export { default as upArrowIcon } from "./up-arrow.png";
 export { default as exportIcon } from "./export.png";
 export { default as plusIcon } from "./plus.png";
 export { default as filterIcon } from "./filter.png";
+export { default as detailIcon } from "./detail.png";
