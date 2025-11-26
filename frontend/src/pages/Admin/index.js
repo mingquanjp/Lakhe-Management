@@ -4,9 +4,10 @@ import Header from "../../components/layout/Header";
 import PopulationDashboard from "./PopulationDashboard/PopulationDashboard";
 import StaffManagement from "./StaffManagement/StaffManagement";
 import Overview from "./Overview/Overview";
+import HouseholdList from "./HouseholdList/HouseholdList";
 
 const Admin = () => {
-  const [currentPage, setCurrentPage] = useState("overview");
+  const [currentPage, setCurrentPage] = useState("householdlist");
 
   const handlePageChange = (pageId) => {
     setCurrentPage(pageId);
@@ -19,6 +20,8 @@ const Admin = () => {
 
   const renderPage = () => {
     switch (currentPage) {
+      case "householdlist":
+        return <HouseholdList/>;
       case "overview":
         return <Overview />;
       case "staff":
