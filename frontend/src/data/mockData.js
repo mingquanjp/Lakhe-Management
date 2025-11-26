@@ -251,4 +251,67 @@ export const HouseholdDetailData = {
   ]
 };
 
+export const householdTemporaryData = [
+  {
+    id: 101,
+    code: "TT001",
+    owner: "Trần Văn Minh",
+    address: "Số 5, ngõ 10...",
+    members: 3,
+    memberDetails: [
+      { id: 101, name: "Trần Văn Minh", relation: "Chủ hộ" },
+      { id: 102, name: "Trần Thị Hương", relation: "Vợ" },
+      { id: 103, name: "Trần Văn Hùng", relation: "Con" },
+    ],
+  },
+  {
+    id: 102,
+    code: "TT002",
+    owner: "Phạm Thị Hồng",
+    address: "Số 8, ngõ 15...",
+    members: 2,
+    memberDetails: [
+      { id: 104, name: "Phạm Thị Hồng", relation: "Chủ hộ" },
+      { id: 105, name: "Phạm Văn Nam", relation: "Con" },
+    ],
+  },
+  {
+    id: 103,
+    code: "TT003",
+    owner: "Hoàng Văn Sơn",
+    address: "Số 12, ngõ 20...",
+    members: 4,
+    memberDetails: [
+      { id: 106, name: "Hoàng Văn Sơn", relation: "Chủ hộ" },
+      { id: 107, name: "Hoàng Thị Liên", relation: "Vợ" },
+      { id: 108, name: "Hoàng Văn Tùng", relation: "Con" },
+      { id: 109, name: "Hoàng Thị Yến", relation: "Con" },
+    ],
+  },
+  {
+    id: 104,
+    code: "TT004",
+    owner: "Lê Văn Hải",
+    address: "Số 15, ngõ 25...",
+    members: 3,
+    memberDetails: [
+      { id: 110, name: "Lê Văn Hải", relation: "Chủ hộ" },
+      { id: 111, name: "Lê Thị Mai", relation: "Vợ" },
+      { id: 112, name: "Lê Văn An", relation: "Con" },
+    ],
+  },
+  {
+    id: 105,
+    code: "TT005",
+    owner: "Vũ Thị Lan",
+    address: "Số 20, ngõ 30...",
+    members: 2,
+    memberDetails: [
+      { id: 113, name: "Vũ Thị Lan", relation: "Chủ hộ" },
+      { id: 114, name: "Vũ Văn Kiên", relation: "Con" },
+    ],
+  },
+];
+
+
 

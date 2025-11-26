@@ -9,7 +9,7 @@ import {
 } from "../../assets/icons";
 import { Button } from "../commons";
 
-const Sidebar = () => {
+const Sidebar = ({ currentPage, onPageChange, onLogout }) => {
   const [expandedItems, setExpandedItems] = useState({});
 
   const menuItems = [
@@ -38,7 +38,8 @@ const Sidebar = () => {
       label: "Quản lý dân cư",
       icon: People,
       subItems: [
-        { id: "household", label: "Quản lý hộ khẩu", path: "/household" },
+        { id: "household", label: "Quản lý hộ khẩu thường trú", path: "/household" },
+        { id: "householdtemporary", label: "Quản lý hộ khẩu tạm trú", path: "/householdtemporary" },
         { id: "citizen", label: "Quản lý nhân khẩu", path: "/citizen" },
         { id: "form", label: "Form khai báo", path: "/form" },
       ],
@@ -100,8 +101,13 @@ const Sidebar = () => {
     return (
       <div key={item.id}>
         <button
-          className="sidebar-item"
-          onClick={() => hasSubItems && toggleExpand(item.id)}
+          className={`sidebar-item ${currentPage === item.id ? "active" : ""}`}
+          onClick={() => {
+            if (!hasSubItems && onPageChange) {
+              onPageChange(item.id);
+            }
+            if (hasSubItems) toggleExpand(item.id);
+          }}
         >
           <span className="sidebar-icon">{renderIcon(item.icon)}</span>
           <span className="sidebar-label">{item.label}</span>
@@ -115,7 +121,11 @@ const Sidebar = () => {
         {hasSubItems && isExpanded && (
           <div className="sidebar-submenu">
             {item.subItems.map((subItem) => (
-              <button key={subItem.id} className="sidebar-subitem">
+              <button 
+                key={subItem.id} 
+                className={`sidebar-subitem ${currentPage === subItem.id ? "active" : ""}`}
+                onClick={() => onPageChange && onPageChange(subItem.id)}
+              >
                 {subItem.label}
               </button>
             ))}
@@ -135,7 +145,7 @@ const Sidebar = () => {
           variant="primary"
           size="medium"
           className="sidebar-logout-btn"
-          onClick={() => console.log("Logout clicked")}
+          onClick={() => onLogout && onLogout()}
         >
           <img src={logoutIcon} alt="logout" className="logout-icon" />
           <span>Log Out</span>

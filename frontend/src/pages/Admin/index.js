@@ -5,9 +5,10 @@ import PopulationDashboard from "./PopulationDashboard/PopulationDashboard";
 import StaffManagement from "./StaffManagement/StaffManagement";
 import Overview from "./Overview/Overview";
 import HouseholdList from "./HouseholdList/HouseholdList";
+import HouseholdTemporaryList from "./HouseholdTemporaryList/HouseholdTemporaryList";
 
 const Admin = () => {
-  const [currentPage, setCurrentPage] = useState("householdlist");
+  const [currentPage, setCurrentPage] = useState("overview");
 
   const handlePageChange = (pageId) => {
     setCurrentPage(pageId);
@@ -15,13 +16,14 @@ const Admin = () => {
 
   const handleLogout = () => {
     console.log("Logout clicked");
-    // Add logout logic here
   };
 
   const renderPage = () => {
     switch (currentPage) {
-      case "householdlist":
-        return <HouseholdList/>;
+      case "household":
+        return <HouseholdList />;
+      case "householdtemporary":
+        return <HouseholdTemporaryList />;
       case "overview":
         return <Overview />;
       case "staff":
