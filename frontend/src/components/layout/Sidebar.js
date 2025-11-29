@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import {
   overView,
@@ -10,6 +11,7 @@ import {
 import { Button } from "../commons";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   const [expandedItems, setExpandedItems] = useState({});
 
   const menuItems = [
@@ -81,6 +83,50 @@ const Sidebar = () => {
     return <img src={icon} alt="" className="sidebar-icon-img" />;
   };
 
+  const renderSubMenuItem = (subItem, level = 0) => {
+    const hasChildren = subItem.subItems && subItem.subItems.length > 0;
+    const isExpanded = expandedItems[subItem.id];
+    const paddingLeft = `${48 + level * 16}px`;
+
+    if (hasChildren) {
+      return (
+        <div key={subItem.id}>
+          <button
+            className="sidebar-subitem"
+            style={{ paddingLeft, justifyContent: "space-between" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleExpand(subItem.id);
+            }}
+          >
+            <span>{subItem.label}</span>
+            <span className={`sidebar-arrow ${isExpanded ? "expanded" : ""}`}>
+              ›
+            </span>
+          </button>
+          {isExpanded && (
+            <div className="sidebar-submenu-nested">
+              {subItem.subItems.map((child) =>
+                renderSubMenuItem(child, level + 1)
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <button
+        key={subItem.id}
+        className="sidebar-subitem"
+        style={{ paddingLeft }}
+        onClick={() => subItem.path && navigate(subItem.path)}
+      >
+        {subItem.label}
+      </button>
+    );
+  };
+
   const renderMenuItem = (item) => {
     if (item.type === "section") {
       return (
@@ -101,7 +147,13 @@ const Sidebar = () => {
       <div key={item.id}>
         <button
           className="sidebar-item"
-          onClick={() => hasSubItems && toggleExpand(item.id)}
+          onClick={() => {
+            if (hasSubItems) {
+              toggleExpand(item.id);
+            } else if (item.path) {
+              navigate(item.path);
+            }
+          }}
         >
           <span className="sidebar-icon">{renderIcon(item.icon)}</span>
           <span className="sidebar-label">{item.label}</span>
@@ -114,11 +166,7 @@ const Sidebar = () => {
 
         {hasSubItems && isExpanded && (
           <div className="sidebar-submenu">
-            {item.subItems.map((subItem) => (
-              <button key={subItem.id} className="sidebar-subitem">
-                {subItem.label}
-              </button>
-            ))}
+            {item.subItems.map((subItem) => renderSubMenuItem(subItem))}
           </div>
         )}
       </div>

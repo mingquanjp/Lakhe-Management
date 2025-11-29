@@ -1,0 +1,115 @@
+.forms-menu-container {
+    padding: 2rem;
+    min-height: 100vh;
+    background: linear-gradient(to bottom right, #f9fafb, #f3f4f6);
+}
+
+.forms-menu-header {
+    margin-bottom: 2rem;
+}
+
+.forms-menu-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.forms-menu-subtitle {
+    color: #4b5563;
+    font-size: 1.125rem;
+}
+
+.forms-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .forms-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.form-card {
+    cursor: pointer;
+    border-radius: 1rem;
+    border-width: 2px;
+    border-style: solid;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    background-color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.form-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Blue Theme */
+.card-blue {
+    background: linear-gradient(to bottom right, #eff6ff, #dbeafe);
+    color: #1d4ed8;
+    border-color: #93c5fd;
+}
+.card-blue:hover {
+    background: linear-gradient(to bottom right, #dbeafe, #bfdbfe);
+}
+
+/* Green Theme */
+.card-green {
+    background: linear-gradient(to bottom right, #f0fdf4, #dcfce7);
+    color: #15803d;
+    border-color: #86efac;
+}
+.card-green:hover {
+    background: linear-gradient(to bottom right, #dcfce7, #bbf7d0);
+}
+
+/* Yellow Theme */
+.card-yellow {
+    background: linear-gradient(to bottom right, #fefce8, #fef9c3);
+    color: #a16207;
+    border-color: #fde047;
+}
+.card-yellow:hover {
+    background: linear-gradient(to bottom right, #fef9c3, #fef08a);
+}
+
+.card-icon {
+    font-size: 3.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.card-description {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.card-action {
+    margin-top: auto;
+}
+
+.action-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+}
