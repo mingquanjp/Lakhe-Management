@@ -44,10 +44,10 @@ const HouseholdList = () => {
             <Search size={18} className="search-icon" />
             <input type="text" placeholder="Search..." />
           </div>
-          <button className="btn-tool btn-filter">
+          <button className="btn-tool">
             <Filter size={16} /> Filters
           </button>
-          <button className="btn-tool btn-export">
+          <button className="btn-tool">
             <Download size={16} /> Export
           </button>
           <button className="btn-tool btn-add" onClick={() => setIsAddModalOpen(true)}>
