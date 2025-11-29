@@ -55,15 +55,11 @@ export const householdData = [
     code: "09123456",
     owner: "Đinh Văn Phạm Việt",
     address: "Số 10, ngõ 50...",
-    members: 6,
+    members: 3,
     memberDetails: [
       { id: 1, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
       { id: 2, name: "Đinh Thị Kim Chi", relation: "Vợ" },
-      { id: 3, name: "Đinh Văn A", relation: "Con" },
-      { id: 46, name: "Đinh Văn B", relation: "Con" },
-      { id: 47, name: "Đinh Thị C", relation: "Con" },
-      { id: 48, name: "Đinh Văn C", relation: "Con" },
-    ],
+      { id: 3, name: "Đinh Văn A", relation: "Con" },    ],
   },
   {
     id: 2,

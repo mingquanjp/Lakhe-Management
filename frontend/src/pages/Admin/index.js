@@ -1,45 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "../../components/layout/Sidebar";
 import Header from "../../components/layout/Header";
-import PopulationDashboard from "./PopulationDashboard/PopulationDashboard";
-import StaffManagement from "./StaffManagement/StaffManagement";
-import Overview from "./Overview/Overview";
-import HouseholdList from "./HouseholdList/HouseholdList";
-import HouseholdTemporaryList from "./HouseholdTemporaryList/HouseholdTemporaryList";
 
 const Admin = () => {
-  const [currentPage, setCurrentPage] = useState("overview");
-
-  const handlePageChange = (pageId) => {
-    setCurrentPage(pageId);
-  };
-
-  const handleLogout = () => {
-    console.log("Logout clicked");
-  };
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case "household":
-        return <HouseholdList />;
-      case "householdtemporary":
-        return <HouseholdTemporaryList />;
-      case "overview":
-        return <Overview />;
-      case "staff":
-        return <StaffManagement />;
-      default:
-        return <PopulationDashboard />;
-    }
-  };
-
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      <Sidebar
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-        onLogout={handleLogout}
-      />
+      <Sidebar />
       <div
         style={{
           marginLeft: "240px",
@@ -54,10 +21,10 @@ const Admin = () => {
             flex: 1,
             padding: "24px",
             backgroundColor: "#f5f7fa",
-            marginTop: "40px",
+            marginTop: "60px",
           }}
         >
-          {renderPage()}
+          <Outlet />
         </main>
       </div>
     </div>
