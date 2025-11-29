@@ -5,13 +5,10 @@ import HouseholdTemporaryTable from "./HouseholdTemporaryTable";
 import Pagination from "../../../components/commons/Pagination";
 import { householdTemporaryData } from "../../../data/mockData";
 import HouseholdTemporaryAddModal from "./HouseholdTemporaryAddModal";
-import HouseholdTemporarySplitModal from "./HouseholdTemporarySplitModal";
 
 const HouseholdTemporaryList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
-  const [selectedHousehold, setSelectedHousehold] = useState(null);
   const itemsPerPage = 8;
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -23,15 +20,6 @@ const HouseholdTemporaryList = () => {
 
   const handleSaveHousehold = (newData) => {
     console.log("Dữ liệu nhận được từ form:", newData);
-  };
-
-  const handleSplitHousehold = (newData) => {
-    console.log("Dữ liệu tách hộ khẩu:", newData);
-  };
-
-  const handleSplitClick = (household) => {
-    setSelectedHousehold(household);
-    setIsSplitModalOpen(true);
   };
 
   return (
@@ -60,7 +48,7 @@ const HouseholdTemporaryList = () => {
           <span className="card-title">List content</span>
         </div>
 
-        <HouseholdTemporaryTable data={currentItems} onSplit={handleSplitClick} />
+        <HouseholdTemporaryTable data={currentItems} />
 
         <Pagination
           currentPage={currentPage}
@@ -75,15 +63,6 @@ const HouseholdTemporaryList = () => {
         onSave={handleSaveHousehold}
         size="xl"
       />
-
-      {selectedHousehold && (
-        <HouseholdTemporarySplitModal
-          isOpen={isSplitModalOpen}
-          onClose={() => setIsSplitModalOpen(false)}
-          householdData={selectedHousehold}
-          onSave={handleSplitHousehold}
-        />
-      )}
     </div>
   );
 };
