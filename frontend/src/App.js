@@ -4,8 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Admin from "./pages/Admin";
 import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDashboard";
 
-import HouseholdDetail from "./pages/HouseholdDetail";
-import Declaration from "./pages/Declaration";
+import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
+import Declaration from "./pages/Admin/ManagementTable/Declaration";
 import FormsMenu from "./pages/Admin/FormsMenu/FormsMenu";
 
 // Import Forms
@@ -25,7 +25,7 @@ function App() {
           <Route path="/overview" element={<PopulationDashboard />} />
 
           {/* Main Pages */}
-          <Route path="/household" element={<HouseholdDetail />} />
+          <Route path="/household" element={<HouseholdList />} />
           <Route path="/citizen" element={<Declaration />} />
           <Route path="/form" element={<FormsMenu />} />
 

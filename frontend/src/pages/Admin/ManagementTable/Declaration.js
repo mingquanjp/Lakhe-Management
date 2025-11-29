@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Card from '../components/commons/Card/Card';
-import Table from '../components/commons/Table/Table';
-import Button from '../components/commons/Button/Button';
-import Modal from '../components/commons/Modal/Modal';
-import Input from '../components/commons/Input/Input';
+import Card from '../../../components/commons/Card/Card';
+import Table from '../../../components/commons/Table/Table';
+import Button from '../../../components/commons/Button/Button';
+import Modal from '../../../components/commons/Modal/Modal';
+import Input from '../../../components/commons/Input/Input';
 
 // Mock Data
 const initialMembers = [
