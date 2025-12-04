@@ -1,24 +1,20 @@
 import React, { useState } from "react";
-// 1. Thêm import icon Split
 import { Search, Filter, Download, Split } from "lucide-react";
-import "./HouseholdList.css";
-import HouseholdTable from "./HouseholdTable";
+import "./HouseholdTemporaryList.css";
+import HouseholdTemporaryTable from "./HouseholdTemporaryTable";
 import Pagination from "../../../components/commons/Pagination";
-import { householdData } from "../../../data/mockData";
-import HouseholdAddModal from "./HouseholdAddModal";
-import HouseholdSplitModal from "./HouseholdSplitModal";
+import { householdTemporaryData } from "../../../data/mockData";
+import HouseholdTemporaryAddModal from "./HouseholdTemporaryAddModal";
 
-const HouseholdList = () => {
+const HouseholdTemporaryList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
-  const [selectedHousehold, setSelectedHousehold] = useState(null);
   const itemsPerPage = 8;
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = householdData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(householdData.length / itemsPerPage);
+  const currentItems = householdTemporaryData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(householdTemporaryData.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -26,19 +22,10 @@ const HouseholdList = () => {
     console.log("Dữ liệu nhận được từ form:", newData);
   };
 
-  const handleSplitHousehold = (newData) => {
-    console.log("Dữ liệu tách hộ khẩu:", newData);
-  };
-
-  const handleSplitClick = (household) => {
-    setSelectedHousehold(household);
-    setIsSplitModalOpen(true);
-  };
-
   return (
     <div className="household-page">
       <div className="page-header">
-        <h2 className="page-title">Danh sách hộ khẩu thường trú</h2>
+        <h2 className="page-title">Danh sách hộ khẩu tạm trú</h2>
         <div className="toolbar">
           <div className="search-box">
             <Search size={18} className="search-icon" />
@@ -61,7 +48,7 @@ const HouseholdList = () => {
           <span className="card-title">List content</span>
         </div>
 
-        <HouseholdTable data={currentItems} onSplit={handleSplitClick} />
+        <HouseholdTemporaryTable data={currentItems} />
 
         <Pagination
           currentPage={currentPage}
@@ -70,23 +57,14 @@ const HouseholdList = () => {
         />
       </div>
 
-      <HouseholdAddModal 
+      <HouseholdTemporaryAddModal 
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
         onSave={handleSaveHousehold}
         size="xl"
       />
-
-      {selectedHousehold && (
-        <HouseholdSplitModal
-          isOpen={isSplitModalOpen}
-          onClose={() => setIsSplitModalOpen(false)}
-          householdData={selectedHousehold}
-          onSave={handleSplitHousehold}
-        />
-      )}
     </div>
   );
 };
 
-export default HouseholdList;
+export default HouseholdTemporaryList;

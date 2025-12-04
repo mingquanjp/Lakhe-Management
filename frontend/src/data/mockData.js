@@ -56,6 +56,10 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 10, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 1, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 2, name: "Đinh Thị Kim Chi", relation: "Vợ" },
+      { id: 3, name: "Đinh Văn A", relation: "Con" },    ],
   },
   {
     id: 2,
@@ -63,6 +67,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 4, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 5, name: "Đinh Thị Lan", relation: "Vợ" },
+      { id: 6, name: "Đinh Thị B", relation: "Con" },
+    ],
   },
   {
     id: 3,
@@ -70,6 +79,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 7, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 8, name: "Đinh Thị C", relation: "Vợ" },
+      { id: 9, name: "Đinh Văn C", relation: "Con" },
+    ],
   },
   {
     id: 4,
@@ -77,6 +91,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 10, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 11, name: "Đinh Thị D", relation: "Vợ" },
+      { id: 12, name: "Đinh Văn D", relation: "Con" },
+    ],
   },
   {
     id: 5,
@@ -84,6 +103,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 13, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 14, name: "Đinh Thị E", relation: "Vợ" },
+      { id: 15, name: "Đinh Văn E", relation: "Con" },
+    ],
   },
   {
     id: 6,
@@ -91,6 +115,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 16, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 17, name: "Đinh Thị F", relation: "Vợ" },
+      { id: 18, name: "Đinh Văn F", relation: "Con" },
+    ],
   },
   {
     id: 7,
@@ -98,6 +127,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 19, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 20, name: "Đinh Thị G", relation: "Vợ" },
+      { id: 21, name: "Đinh Văn G", relation: "Con" },
+    ],
   },
   {
     id: 8,
@@ -105,6 +139,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 22, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 23, name: "Đinh Thị H", relation: "Vợ" },
+      { id: 24, name: "Đinh Văn H", relation: "Con" },
+    ],
   },
   {
     id: 9,
@@ -112,6 +151,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 25, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 26, name: "Đinh Thị I", relation: "Vợ" },
+      { id: 27, name: "Đinh Văn I", relation: "Con" },
+    ],
   },
 
   {
@@ -120,6 +164,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 28, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 29, name: "Đinh Thị J", relation: "Vợ" },
+      { id: 30, name: "Đinh Văn J", relation: "Con" },
+    ],
   },
   {
     id: 11,
@@ -127,6 +176,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 31, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 32, name: "Đinh Thị K", relation: "Vợ" },
+      { id: 33, name: "Đinh Văn K", relation: "Con" },
+    ],
   },
   {
     id: 12,
@@ -134,6 +188,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 34, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 35, name: "Đinh Thị L", relation: "Vợ" },
+      { id: 36, name: "Đinh Văn L", relation: "Con" },
+    ],
   },
   {
     id: 13,
@@ -141,6 +200,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 37, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 38, name: "Đinh Thị M", relation: "Vợ" },
+      { id: 39, name: "Đinh Văn M", relation: "Con" },
+    ],
   },
   {
     id: 14,
@@ -148,6 +212,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 40, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 41, name: "Đinh Thị N", relation: "Vợ" },
+      { id: 42, name: "Đinh Văn N", relation: "Con" },
+    ],
   },
   {
     id: 15,
@@ -155,6 +224,11 @@ export const householdData = [
     owner: "Đinh Văn Phạm Việt",
     address: "Số 12, ngõ 50...",
     members: 3,
+    memberDetails: [
+      { id: 43, name: "Đinh Văn Phạm Việt", relation: "Chủ hộ" },
+      { id: 44, name: "Đinh Thị O", relation: "Vợ" },
+      { id: 45, name: "Đinh Văn O", relation: "Con" },
+    ],
   }
 ];
 
@@ -172,5 +246,68 @@ export const HouseholdDetailData = {
     { id: 14, name: "Nguyễn Thị E", relation: "Con" },
   ]
 };
+
+export const householdTemporaryData = [
+  {
+    id: 101,
+    code: "TT001",
+    owner: "Trần Văn Minh",
+    address: "Số 5, ngõ 10...",
+    members: 3,
+    memberDetails: [
+      { id: 101, name: "Trần Văn Minh", relation: "Chủ hộ" },
+      { id: 102, name: "Trần Thị Hương", relation: "Vợ" },
+      { id: 103, name: "Trần Văn Hùng", relation: "Con" },
+    ],
+  },
+  {
+    id: 102,
+    code: "TT002",
+    owner: "Phạm Thị Hồng",
+    address: "Số 8, ngõ 15...",
+    members: 2,
+    memberDetails: [
+      { id: 104, name: "Phạm Thị Hồng", relation: "Chủ hộ" },
+      { id: 105, name: "Phạm Văn Nam", relation: "Con" },
+    ],
+  },
+  {
+    id: 103,
+    code: "TT003",
+    owner: "Hoàng Văn Sơn",
+    address: "Số 12, ngõ 20...",
+    members: 4,
+    memberDetails: [
+      { id: 106, name: "Hoàng Văn Sơn", relation: "Chủ hộ" },
+      { id: 107, name: "Hoàng Thị Liên", relation: "Vợ" },
+      { id: 108, name: "Hoàng Văn Tùng", relation: "Con" },
+      { id: 109, name: "Hoàng Thị Yến", relation: "Con" },
+    ],
+  },
+  {
+    id: 104,
+    code: "TT004",
+    owner: "Lê Văn Hải",
+    address: "Số 15, ngõ 25...",
+    members: 3,
+    memberDetails: [
+      { id: 110, name: "Lê Văn Hải", relation: "Chủ hộ" },
+      { id: 111, name: "Lê Thị Mai", relation: "Vợ" },
+      { id: 112, name: "Lê Văn An", relation: "Con" },
+    ],
+  },
+  {
+    id: 105,
+    code: "TT005",
+    owner: "Vũ Thị Lan",
+    address: "Số 20, ngõ 30...",
+    members: 2,
+    memberDetails: [
+      { id: 113, name: "Vũ Thị Lan", relation: "Chủ hộ" },
+      { id: 114, name: "Vũ Văn Kiên", relation: "Con" },
+    ],
+  },
+];
+
 
 

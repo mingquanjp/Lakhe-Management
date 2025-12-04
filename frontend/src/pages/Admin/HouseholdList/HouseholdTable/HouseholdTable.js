@@ -1,7 +1,7 @@
 import React from "react";
 import "./HouseholdTable.css";
 
-const HouseholdTable = ({ data }) => {
+const HouseholdTable = ({ data, onSplit }) => {
   return (
     <div className="table-container">
       <table className="household-table">
@@ -32,7 +32,9 @@ const HouseholdTable = ({ data }) => {
               <td>{row.address}</td>
               <td className="text-center">{row.members}</td>
               <td className="text-center action-cell">
-                <button className="btn-action btn-split">Tách hộ khẩu</button>
+                <button className="btn-action btn-split" onClick={() => onSplit && onSplit(row)}>
+                  Tách hộ khẩu
+                </button>
                 <button className="btn-action btn-detail">Chi tiết</button>
                 <button className="btn-action btn-delete">Xóa</button>
               </td>
