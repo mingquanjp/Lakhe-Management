@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const pool = require("./config/database");
+const authRoutes = require("./routes/authRoutes");
+const { verifyToken, requireAdmin } = require("./middleware/authMiddleware");
 
 const app = express();
 app.use(cors());
@@ -26,6 +28,27 @@ app.get("/api/test-db", async (req, res) => {
       error: error.message
     });
   }
+});
+
+// Auth routes
+app.use("/api/auth", authRoutes);
+
+// Example protected route - requires valid JWT token
+app.get("/api/test-protected", verifyToken, (req, res) => {
+  res.json({
+    success: true,
+    message: "Bạn đã truy cập route được bảo vệ thành công!",
+    user: req.user
+  });
+});
+
+// Example admin-only route
+app.get("/api/test-admin", verifyToken, requireAdmin, (req, res) => {
+  res.json({
+    success: true,
+    message: "Chào mừng Admin!",
+    user: req.user
+  });
 });
 
 app.listen(5000, () => {
