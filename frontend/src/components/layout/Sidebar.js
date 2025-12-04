@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./Sidebar.css";
 import {
   overView,
@@ -12,6 +13,7 @@ import { Button } from "../commons";
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [expandedItems, setExpandedItems] = useState({});
 
   const menuItems = [
@@ -24,7 +26,7 @@ const Sidebar = () => {
       id: "overview",
       label: "Overview",
       icon: overView,
-      path: "/overview",
+      path: "/admin/overview",
     },
     {
       id: "divider1",
@@ -40,9 +42,9 @@ const Sidebar = () => {
       label: "Quản lý dân cư",
       icon: People,
       subItems: [
-        { id: "household", label: "Quản lý hộ khẩu", path: "/household" },
-        { id: "citizen", label: "Quản lý nhân khẩu", path: "/citizen" },
-        { id: "form", label: "Form khai báo", path: "/form" },
+        { id: "household", label: "Quản lý hộ khẩu", path: "/admin/household" },
+        { id: "citizen", label: "Quản lý nhân khẩu", path: "/admin/citizen" },
+        { id: "form", label: "Form khai báo", path: "/admin/form" },
       ],
     },
 
@@ -54,12 +56,12 @@ const Sidebar = () => {
         {
           id: "citizen-stats",
           label: "Thống kê nhân khẩu",
-          path: "/stats/citizen",
+          path: "/admin/stats/citizen",
         },
         {
           id: "finance-stats",
           label: "Thống kê tài chính",
-          path: "/stats/finance",
+          path: "/admin/stats/finance",
         },
       ],
     },
@@ -67,7 +69,7 @@ const Sidebar = () => {
       id: "staff",
       label: "Quản lý cán bộ",
       icon: Staff,
-      path: "/staff",
+      path: "/admin/staff-management",
     },
   ];
 
@@ -76,6 +78,11 @@ const Sidebar = () => {
       ...prev,
       [itemId]: !prev[itemId],
     }));
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   const renderIcon = (icon) => {
@@ -183,7 +190,7 @@ const Sidebar = () => {
           variant="primary"
           size="medium"
           className="sidebar-logout-btn"
-          onClick={() => console.log("Logout clicked")}
+          onClick={handleLogout}
         >
           <img src={logoutIcon} alt="logout" className="logout-icon" />
           <span>Log Out</span>
