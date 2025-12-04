@@ -69,12 +69,14 @@ DB_HOST=localhost
 DB_NAME=lakhe
 DB_PASSWORD=your_password_here
 DB_PORT=5432
+JWT_SECRET=your_jwt_secret_here
 
 # Server Configuration
 PORT=5000
 ```
 
 > **Lưu ý:** Thay `your_password_here` bằng mật khẩu PostgreSQL của bạn.
+> Thay `your_jwt_secret_here` bằng một chuỗi bí mật.
 
 ## 🏃 Chạy ứng dụng
 
