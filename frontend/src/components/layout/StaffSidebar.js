@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./StaffSidebar.css";
 import {
   overView,
@@ -7,8 +9,11 @@ import {
 } from "../../assets/icons";
 import { Button } from "../commons";
 
-const StaffSidebar = ({ currentPage, onPageChange, onLogout }) => {
+const StaffSidebar = () => {
   const [expandedItems, setExpandedItems] = useState({});
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { logout } = useAuth();
 
   const menuItems = [
     {
@@ -20,7 +25,7 @@ const StaffSidebar = ({ currentPage, onPageChange, onLogout }) => {
       id: "overview",
       label: "Tổng quan",
       icon: overView,
-      page: "dashboard",
+      path: "/staff",
     },
     {
       id: "divider1",
@@ -35,13 +40,13 @@ const StaffSidebar = ({ currentPage, onPageChange, onLogout }) => {
       id: "fee-management",
       label: "Quản lý thu phí",
       icon: overView,
-      page: "fee-management",
+      // path: "/staff/fee-management", 
     },
     {
       id: "statistics",
       label: "Thống kê",
       icon: Statistic,
-      page: "statistics",
+      path: "/staff/fee-detail",
     },
   ];
 
@@ -53,11 +58,16 @@ const StaffSidebar = ({ currentPage, onPageChange, onLogout }) => {
   };
 
   const handleItemClick = (item) => {
-    if (item.page) {
-      onPageChange(item.page);
+    if (item.path) {
+      navigate(item.path);
     } else if (item.subItems) {
       toggleExpand(item.id);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   const renderIcon = (icon) => {
@@ -80,7 +90,7 @@ const StaffSidebar = ({ currentPage, onPageChange, onLogout }) => {
 
     const hasSubItems = item.subItems && item.subItems.length > 0;
     const isExpanded = expandedItems[item.id];
-    const isActive = item.page === currentPage;
+    const isActive = location.pathname === item.path;
 
     return (
       <div key={item.id}>
@@ -103,7 +113,7 @@ const StaffSidebar = ({ currentPage, onPageChange, onLogout }) => {
               <button
                 key={subItem.id}
                 className="sidebar-subitem"
-                onClick={() => subItem.page && onPageChange(subItem.page)}
+                onClick={() => subItem.path && navigate(subItem.path)}
               >
                 {subItem.label}
               </button>
@@ -124,7 +134,7 @@ const StaffSidebar = ({ currentPage, onPageChange, onLogout }) => {
           variant="primary"
           size="medium"
           className="sidebar-logout-btn"
-          onClick={onLogout}
+          onClick={handleLogout}
         >
           <img src={logoutIcon} alt="logout" className="logout-icon" />
           <span>Log Out</span>
@@ -135,4 +145,5 @@ const StaffSidebar = ({ currentPage, onPageChange, onLogout }) => {
 };
 
 export default StaffSidebar;
+
 
