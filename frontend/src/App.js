@@ -3,8 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Admin from "./pages/Admin";
 import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDashboard";
-
-import HouseholdDetail from "./pages/HouseholdDetail";
 import Declaration from "./pages/Declaration";
 import FormsMenu from "./pages/Admin/FormsMenu/FormsMenu";
 
@@ -14,6 +12,9 @@ import NewMemberForm from "./pages/Admin/HouseholdForms/NewMemberForm";
 import MemberStatusChangeForm from "./pages/Admin/HouseholdForms/MemberStatusChangeForm";
 import TemporaryResidenceForm from "./pages/Admin/HouseholdForms/TemporaryResidenceForm";
 import ChangeOwnerForm from "./pages/Admin/HouseholdForms/ChangeOwnerForm/ChangeOwnerForm";
+import Overview from "./pages/Admin/Overview/Overview";
+import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
+import HouseholdTemporaryList from "./pages/Admin/HouseholdTemporaryList/HouseholdTemporaryList";
 
 function App() {
   return (
@@ -22,10 +23,11 @@ function App() {
         <Route element={<Admin />}>
           {/* Dashboard */}
           <Route path="/" element={<PopulationDashboard />} />
-          <Route path="/overview" element={<PopulationDashboard />} />
+          <Route path="/overview" element={<Overview/>} />
 
           {/* Main Pages */}
-          <Route path="/household" element={<HouseholdDetail />} />
+          <Route path="/household" element={<HouseholdList />} />
+          <Route path="/householdtemporary" element={<HouseholdTemporaryList/>} />
           <Route path="/citizen" element={<Declaration />} />
           <Route path="/form" element={<FormsMenu />} />
 
