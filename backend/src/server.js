@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const pool = require("./config/database");
 const authRoutes = require("./routes/authRoutes");
+const residentRoutes = require("./routes/residentRoutes");
 const { verifyToken, requireAdmin } = require("./middleware/authMiddleware");
 
 const app = express();
@@ -32,6 +33,7 @@ app.get("/api/test-db", async (req, res) => {
 
 // Auth routes
 app.use("/api/auth", authRoutes);
+app.use("/api/residents", residentRoutes);
 
 // Example protected route - requires valid JWT token
 app.get("/api/test-protected", verifyToken, (req, res) => {
