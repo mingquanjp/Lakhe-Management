@@ -1,8 +1,14 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
+// Pages
+import Login from "./pages/Login/Login";
 import Admin from "./pages/Admin";
+import Staff from "./pages/Staff";
 import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDashboard";
+import HouseholdDetail from "./pages/HouseholdDetail";
 import Declaration from "./pages/Declaration";
 import FormsMenu from "./pages/Admin/FormsMenu/FormsMenu";
 
@@ -16,39 +22,89 @@ import Overview from "./pages/Admin/Overview/Overview";
 import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
 import HouseholdTemporaryList from "./pages/Admin/HouseholdTemporaryList/HouseholdTemporaryList";
 
+// Import Staff Pages
+import FeeDashboard from "./pages/Staff/FeeDashboard/FeeDashboard";
+import FeeDetail from "./pages/Staff/FeeDetail/FeeDetail";
+
+// Root redirect component
+const RootRedirect = () => {
+  const { isAuthenticated, user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Đang tải...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Redirect based on role
+  if (user?.role === "admin") {
+    return <Navigate to="/admin" replace />;
+  } else if (user?.role === "staff") {
+    return <Navigate to="/staff" replace />;
+  }
+
+  return <Navigate to="/login" replace />;
+};
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public Route */}
+      <Route path="/login" element={<Login />} />
+
+      {/* Root redirect */}
+      <Route path="/" element={<RootRedirect />} />
+
+      {/* Admin Routes - Protected */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Admin />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<PopulationDashboard />} />
+        <Route path="overview" element={<Overview />} />
+        <Route path="household" element={<HouseholdList />} />
+        <Route path="householdtemporary" element={<HouseholdTemporaryList />} />     
+        <Route path="citizen" element={<Declaration />} />
+        <Route path="form" element={<FormsMenu />} />
+        <Route path="form/new-household-form" element={<NewHouseholdForm />} />
+        <Route path="form/new-member-form" element={<NewMemberForm />} />
+        <Route path="form/member-status-change-form" element={<MemberStatusChangeForm />} />
+        <Route path="form/temporary-residence-form" element={<TemporaryResidenceForm />} />
+        <Route path="form/change-owner-form" element={<ChangeOwnerForm />} />
+      </Route>
+
+      {/* Staff Routes - Protected */}
+      <Route
+        path="/staff"
+        element={
+          <ProtectedRoute requiredRole="staff">
+            <Staff />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<FeeDashboard />} />
+        <Route path="fee-detail" element={<FeeDetail />} />
+      </Route>
+
+      {/* Fallback - redirect to root which will handle auth */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route element={<Admin />}>
-          {/* Dashboard */}
-          <Route path="/" element={<PopulationDashboard />} />
-          <Route path="/overview" element={<Overview/>} />
-
-          {/* Main Pages */}
-          <Route path="/household" element={<HouseholdList />} />
-          <Route path="/householdtemporary" element={<HouseholdTemporaryList/>} />
-          <Route path="/citizen" element={<Declaration />} />
-          <Route path="/form" element={<FormsMenu />} />
-
-          {/* Forms */}
-          <Route path="/form/new-household-form" element={<NewHouseholdForm />} />
-          <Route path="/form/new-member-form" element={<NewMemberForm />} />
-          <Route
-            path="/form/member-status-change-form"
-            element={<MemberStatusChangeForm />}
-          />
-          <Route
-            path="/form/temporary-residence-form"
-            element={<TemporaryResidenceForm />}
-          />
-          <Route
-            path="/form/change-owner-form"
-            element={<ChangeOwnerForm />}
-          />
-        </Route>
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
   );
 }
 

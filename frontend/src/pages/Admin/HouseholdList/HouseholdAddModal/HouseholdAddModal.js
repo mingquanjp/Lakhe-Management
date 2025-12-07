@@ -4,28 +4,25 @@ import "./HouseholdAddModal.css";
 
 const HouseholdAddModal = ({ isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({
-    ownerName: "",
-    householdCount: "",
+    household_code: "", 
+    address: "",        
+    owner_id: null,    
     memberCount: "",
     members: [],
-    address: "",
   });
-
   const handleCountChange = (e) => {
     const value = e.target.value;
     const count = parseInt(value) || 0;
-
     const newMembers = [...formData.members];
 
     if (count > newMembers.length) {
-        for (let i = newMembers.length; i < count; i++) {
-          newMembers.push({ name: "", dob: "", occupation: "", address: "", relation: "" });
+      for (let i = newMembers.length; i < count; i++) {
+        newMembers.push({ name: "", dob: "", occupation: "", relation: "" });
       }
     } else {
       newMembers.length = count;
     }
 
-    // Ensure first member is the household owner with default relation
     if (newMembers.length > 0) {
       newMembers[0].relation = "Chủ hộ";
     }
@@ -37,18 +34,13 @@ const HouseholdAddModal = ({ isOpen, onClose, onSave }) => {
     });
   };
 
-  const resetForm = () => {
+  const handleClose = () => {
     setFormData({
-      ownerName: "",
-      householdCount: "",
+      household_code: "",
+      address: "",
       memberCount: "",
       members: [],
-      address: "",
     });
-  };
-
-  const handleClose = () => {
-    resetForm();
     onClose();
   };
 
@@ -59,11 +51,22 @@ const HouseholdAddModal = ({ isOpen, onClose, onSave }) => {
   };
 
   const handleSubmit = () => {
-    if (onSave) {
-        onSave(formData);
+    // Validate cơ bản
+    if (!formData.household_code || !formData.address) {
+      alert("Vui lòng nhập Mã hộ khẩu và Địa chỉ!");
+      return;
     }
-    resetForm();
-    onClose();
+    
+    // Gửi dữ liệu sang cha (HouseholdList) xử lý
+    if (onSave) {
+      onSave({
+        household_code: formData.household_code,
+        address: formData.address
+        // Lưu ý: Hiện tại Backend chỉ mới lưu được Hộ khẩu. 
+        // Phần members cần xử lý riêng hoặc update Backend sau.
+      });
+    }
+    handleClose();
   };
 
   return (
