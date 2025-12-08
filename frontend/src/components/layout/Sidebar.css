@@ -104,7 +104,8 @@
 }
 
 /* Submenu */
-.sidebar-submenu {
+.sidebar-submenu,
+.sidebar-submenu-nested {
   display: flex;
   flex-direction: column;
   margin-top: 2px;
