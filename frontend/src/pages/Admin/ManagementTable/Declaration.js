@@ -112,7 +112,11 @@ const Declaration = () => {
                 <div className="p-4 border-b border-gray-100 flex justify-between items-center gap-4">
                     <h2 className="text-lg font-semibold text-gray-800 whitespace-nowrap">Danh sách nhân khẩu</h2>
                     <div className="flex gap-2 flex-1 justify-end">
-                        <Input placeholder="Search..." className="w-full max-w-md" />
+                        <input 
+                            type="text" 
+                            placeholder="Search..." 
+                            className="border border-gray-300 rounded-md px-4 py-2 text-sm w-[400px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
                     </div>
                 </div>
                 
