@@ -15,7 +15,6 @@ const StaffSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth();
-
   const menuItems = [
     {
       id: "dashboards",
@@ -28,6 +27,7 @@ const StaffSidebar = () => {
       icon: overView,
       path: "/staff",
     },
+
     {
       id: "divider1",
       type: "divider",
@@ -41,7 +41,7 @@ const StaffSidebar = () => {
       id: "fee-management",
       label: "Quản lý đợt thu",
       icon: overView,
-      // path: "/staff/fee-management", 
+      path: "/staff/fee-management", 
     },
     {
       id: "statistics",
@@ -53,7 +53,7 @@ const StaffSidebar = () => {
       id: "detail",
       label: "Chi tiết các đợt thu",
       icon: detailIcon,
-      page: "detail",
+      page: "/staff/table-detail",
     }
   ];
 

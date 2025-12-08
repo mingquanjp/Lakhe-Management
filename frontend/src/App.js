@@ -19,9 +19,11 @@ import MemberStatusChangeForm from "./pages/Admin/HouseholdForms/MemberStatusCha
 import TemporaryResidenceForm from "./pages/Admin/HouseholdForms/TemporaryResidenceForm";
 import ChangeOwnerForm from "./pages/Admin/HouseholdForms/ChangeOwnerForm/ChangeOwnerForm";
 
-// Import Staff Pages
-import FeeDashboard from "./pages/Staff/FeeDashboard/FeeDashboard";
-import FeeDetail from "./pages/Staff/FeeDetail/FeeDetail";
+// Import Staff Pages - SỬA ĐỔI TẠI ĐÂY
+import AccountantDashboard from "./pages/Staff/FeeDashboard/AccountantDashboard";
+import TableFeeDetails from "./pages/Staff/FeeDetail/TableFeeDetails";
+import FeeDashboard from "./pages/Staff/FeeDashboard/FeeDashboard"; // Giữ lại nếu cần
+import FeeDetail from "./pages/Staff/FeeDetail/FeeDetail"; // Giữ lại nếu cần
 
 // Root redirect component
 const RootRedirect = () => {
@@ -75,7 +77,7 @@ function AppRoutes() {
         <Route path="form/change-owner-form" element={<ChangeOwnerForm />} />
       </Route>
 
-      {/* Staff Routes - Protected */}
+      {/* Staff Routes - Protected - SỬA ĐỔI TẠI ĐÂY */}
       <Route
         path="/staff"
         element={
@@ -84,7 +86,19 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
+        {/* Trang mặc định khi vào /staff */}
         <Route index element={<FeeDashboard />} />
+        
+        {/* Route cho "Quản lý đợt thu" - AccountantDashboard */}
+        <Route path="fee-management" element={<AccountantDashboard />} />
+        
+        {/* Route cho "Chi tiết các đợt thu" - TableFeeDetails */}
+        <Route path="table-detail" element={<TableFeeDetails />} />
+        
+        {/* Route cho chi tiết một khoản thu cụ thể (với :feeId) */}
+        <Route path="fee-detail/:feeId" element={<TableFeeDetails />} />
+        
+        {/* Route cũ - giữ lại để tương thích */}
         <Route path="fee-detail" element={<FeeDetail />} />
       </Route>
 

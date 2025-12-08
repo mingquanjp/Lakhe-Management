@@ -1,50 +1,52 @@
 .dashboard-content {
   background-color: #f8fafc;
   min-height: 100vh;
+  padding: 24px;
 }
 
 /* Tab Navigation */
 .tab-navigation {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 24px;
   align-items: center;
 }
 
 .tab-btn {
-  padding: 12px 24px;
+  padding: 10px 24px;
   border: none;
-  background-color: #e2e8f0;
+  background: transparent;
   color: #64748b;
-  border-radius: 8px;
-  cursor: pointer;
+  font-size: 15px;
   font-weight: 500;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
 }
 
 .tab-btn.active {
-  background-color: black;
-  color: white;
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
 }
 
-.tab-btn:hover:not(.active) {
-  background-color: #cbd5e1;
+.tab-btn:hover {
+  color: #3b82f6;
 }
 
 .create-new-btn {
   margin-left: auto;
-  padding: 12px 24px;
-  background-color: black;
+  padding: 10px 20px;
+  background: black;
   color: white;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
+  border-radius: 6px;
   font-weight: 500;
-  transition: background-color 0.2s ease;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
 .create-new-btn:hover {
-  background-color: #059669;
+  background: #2563eb;
 }
 
 /* Content Area */
@@ -55,128 +57,170 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.fee-grid,
+.fee-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
 .fee-history-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 24px;
 }
 
-/* Fee Card Styles */
-.fee-card {
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background-color: #f8fafc;
-  transition: all 0.2s ease;
+/* ← SỬA: Card màu trắng, viền đen */
+.fee-card-modern {
+  background: white;
+  border: 2px solid #000000;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s;
 }
 
-.fee-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-.fee-card.completed {
-  opacity: 0.6; /* Làm mờ thẻ */
-  pointer-events: none; /* Vô hiệu hóa các hành động như click */
-  transition: opacity 0.3s ease; /* Hiệu ứng chuyển đổi */
+.fee-card-modern:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.fee-card.completed:hover {
-  opacity: 0.6; /* Không thay đổi khi hover */
+.fee-card-modern.completed {
+  opacity: 0.6;
+  pointer-events: none;
 }
-.fee-header {
+
+.fee-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  gap: 12px;
 }
 
-.fee-title {
+.fee-card-title {
   font-size: 18px;
   font-weight: 600;
-  color: #1e293b;
   margin: 0;
-  flex: 1;
+  color: #1e293b;
+  line-height: 1.4;
 }
 
-.fee-status {
+/* ← SỬA: Badge màu sắc */
+.fee-badge {
   padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
+  border-radius: 12px;
+  font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.fee-status.pending {
-  background-color: pink;
-  color: #d81d1d;
+.fee-badge.mandatory {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
-.fee-status.voluntary {
-  background-color: #d1fae5;
-  color: #059669;
-}
-
-.fee-stats {
-  margin-bottom: 12px;
-}
-
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: #64748b;
+.fee-badge.voluntary {
+  background: #dbeafe;
+  color: #2563eb;
 }
 
 /* Progress Bar */
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background-color: #e2e8f0;
-  border-radius: 4px;
-  margin: 16px 0;
-  overflow: hidden;
+.fee-progress-section {
+  margin-bottom: 20px;
 }
 
-.progress-fill {
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-bar-fill {
   height: 100%;
-  background-color: black;
+  background: #070707;
+  border-radius: 4px;
   transition: width 0.3s ease;
 }
 
-.fee-amount {
+.progress-info {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin: 16px 0;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
 }
 
-.amount-label {
+.progress-text {
+  font-weight: 500;
+}
+
+/* Total Section */
+.fee-total-section {
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.total-label {
   font-size: 14px;
   color: #64748b;
+  font-weight: 500;
 }
 
-.amount-value {
-  font-size: 20px;
+.total-amount {
+  font-size: 22px;
   font-weight: 700;
   color: #059669;
 }
 
-.fee-deadline {
+/* Deadline Section */
+.fee-deadline-section {
+  margin-bottom: 20px;
   display: flex;
   gap: 8px;
-  font-size: 14px;
-  margin: 16px 0;
+  align-items: baseline;
+}
+
+.deadline-label {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
 }
 
 .deadline-date {
+  font-size: 18px;
+  font-weight: 700;
   color: #dc2626;
-  font-weight: 600;
 }
 
-.fee-actions {
+/* Footer */
+.fee-card-footer {
   margin-top: 16px;
-  display: flex;
-  justify-content: flex-end;
+}
+
+.view-detail-btn {
+  width: 100%;
+  background: white !important;
+  color: black !important;
+  font-weight: 600;
+  padding: 12px !important;
+  border-radius: 8px !important;
+}
+
+.view-detail-btn:hover {
+  background: rgba(221, 222, 221, 0.6) !important;
+}
+
+.no-data {
+  text-align: center;
+  color: #64748b;
+  padding: 40px;
+  font-size: 15px;
 }
 
 /* History Content */
@@ -193,37 +237,30 @@
   }
   
   .fee-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 24px;
+    grid-template-columns: 1fr;
   }
-  .fee-history-grid {
-   display: grid;
-   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-   gap: 24px;
-}
+  
   .tab-navigation {
-    flex-direction: column;
-    align-items: stretch;
+    flex-wrap: wrap;
   }
   
   .create-new-btn {
+    width: 100%;
     margin-left: 0;
-    margin-top: 8px;
   }
 }
 
 @media (max-width: 480px) {
-  .fee-header {
+  .fee-card-header {
     flex-direction: column;
     gap: 8px;
   }
   
-  .fee-title {
+  .fee-card-title {
     font-size: 16px;
   }
   
-  .amount-value {
+  .total-amount {
     font-size: 18px;
   }
 }

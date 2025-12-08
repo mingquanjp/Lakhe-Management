@@ -1,37 +1,123 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import "./FeeDetail.css";
-import { Card, Button } from "../../../components/commons";
+import { Card, Button, Loading } from "../../../components/commons";
 import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
 import { searchIcon } from "../../../assets/icons";
 import HouseholdDetailModal from "./HouseholdDetailModal";
+import { 
+  getAllFees,
+  getFeeSummary, 
+  getAllHouseholdsForFee 
+} from "../../../services/feeService";
 
 const FeeDetail = () => {
+  const { feeId } = useParams();
+  const navigate = useNavigate();
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
+  const [selectedFeeId, setSelectedFeeId] = useState(null);
+  const [allFees, setAllFees] = useState([]);
+  const [feeSummary, setFeeSummary] = useState(null);
+  const [householdsData, setHouseholdsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Sample data
-  const stats = [
+  // Lấy danh sách tất cả khoản thu khi component mount
+  useEffect(() => {
+    fetchAllFees();
+  }, []);
+
+  const fetchAllFees = async () => {
+    try {
+      setLoading(true);
+      const response = await getAllFees();
+      
+      if (response.success && response.data.length > 0) {
+        setAllFees(response.data);
+        
+        // Nếu có feeId từ URL, dùng nó, nếu không thì chọn fee đầu tiên
+        const initialFeeId = feeId || response.data[0].fee_id;
+        setSelectedFeeId(initialFeeId);
+        
+        await fetchFeeData(initialFeeId);
+      } else {
+        setError('Chưa có khoản thu nào');
+      }
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching fees:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Lấy thống kê và danh sách hộ cho một khoản thu cụ thể
+  const fetchFeeData = async (feeIdParam) => {
+    try {
+      setLoading(true);
+      
+      // Lấy tổng hợp thống kê
+      const summaryResponse = await getFeeSummary(feeIdParam);
+      if (summaryResponse.success) {
+        setFeeSummary(summaryResponse.data);
+      }
+
+      // Lấy danh sách tất cả hộ (cả đã nộp và chưa nộp)
+      const householdsResponse = await getAllHouseholdsForFee(feeIdParam);
+      if (householdsResponse.success) {
+        setHouseholdsData(householdsResponse.data);
+      }
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching fee data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Xử lý khi thay đổi dropdown chọn đợt thu
+  const handleFeeChange = async (e) => {
+    const newFeeId = e.target.value;
+    setSelectedFeeId(newFeeId);
+    await fetchFeeData(newFeeId);
+  };
+
+  // Format tiền VND
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(amount);
+  };
+
+  // Cấu trúc stat cards từ feeSummary
+  const stats = feeSummary ? [
     {
-      value: "1 950 000 VND",
+      value: formatCurrency(feeSummary.total_collected),
       label: "Tổng tiền đã thu",
     },
     {
-      value: "3 000 000 VND",
+      value: feeSummary.expected_total 
+        ? formatCurrency(feeSummary.expected_total) 
+        : "Không giới hạn",
       label: "Tổng tiền thu dự kiến",
     },
     {
-      value: "1100",
+      value: feeSummary.paid_households,
       label: "Số hộ đã nộp",
     },
     {
-      value: "300",
+      value: feeSummary.unpaid_households,
       label: "Số hộ còn nợ",
     },
-  ];
+  ] : [];
 
   const tableColumns = [
     { 
-      key: "householdId", 
+      key: "household_code", 
       title: "Số hộ khẩu",
       headerRender: () => (
         <>
@@ -41,7 +127,7 @@ const FeeDetail = () => {
       )
     },
     { 
-      key: "ownerName", 
+      key: "head_name", 
       title: "Họ tên chủ hộ",
       headerRender: () => (
         <>
@@ -51,17 +137,17 @@ const FeeDetail = () => {
       )
     },
     { 
-      key: "houseNumber", 
-      title: "Số nhà",
+      key: "address", 
+      title: "Địa chỉ",
       headerRender: () => (
         <>
-          Số nhà
+          Địa chỉ
           <span className="sort-arrow">▼</span>
         </>
       )
     },
     { 
-      key: "status", 
+      key: "payment_status", 
       title: "Trạng thái",
       headerRender: () => (
         <>
@@ -69,13 +155,13 @@ const FeeDetail = () => {
           <span className="sort-arrow">▼</span>
         </>
       ),
-      render: (value, row) => (
+      render: (value) => (
         <span
           className={`status-badge ${
-            row.status === "paid" ? "status-paid" : "status-owing"
+            value === "Đã nộp" ? "status-paid" : "status-owing"
           }`}
         >
-          {row.status === "paid" ? "• Đã nộp" : "• Còn nợ"}
+          {value === "Đã nộp" ? "• Đã nộp" : "• Còn nợ"}
         </span>
       )
     },
@@ -110,120 +196,106 @@ const FeeDetail = () => {
     }
   ];
 
-  const tableData = [
-    {
-      householdId: "H001",
-      ownerName: "Nguyễn Minh Quân",
-      houseNumber: "36",
-      status: "paid",
-    },
-    {
-      householdId: "H002",
-      ownerName: "Trần Văn An",
-      houseNumber: "36",
-      status: "paid",
-    },
-    {
-      householdId: "H003",
-      ownerName: "Đinh Văn Phạm Việt",
-      houseNumber: "36",
-      status: "owing",
-    },
-    {
-      householdId: "H004",
-      ownerName: "Lê Thị Bình",
-      houseNumber: "36",
-      status: "paid",
-    },
-    {
-      householdId: "H005",
-      ownerName: "Tạ Hải Tùng",
-      houseNumber: "36",
-      status: "owing",
-    },
-    {
-      householdId: "H006",
-      ownerName: "Phạm Văn Đức",
-      houseNumber: "36",
-      status: "paid",
-    },
-    {
-      householdId: "H007",
-      ownerName: "Hoàng Thị Mai",
-      houseNumber: "36",
-      status: "paid",
-    },
-    {
-      householdId: "H008",
-      ownerName: "Trần Thế Hùng",
-      houseNumber: "36",
-      status: "owing",
-    },
-    {
-      householdId: "H009",
-      ownerName: "Nguyễn Văn Hùng",
-      houseNumber: "36",
-      status: "paid",
-    },
-    {
-      householdId: "H010",
-      ownerName: "Đỗ Thị Lan",
-      houseNumber: "36",
-      status: "paid",
-    },
-    {
-      householdId: "H011",
-      ownerName: "Đinh Viết Sang",
-      houseNumber: "36",
-      status: "owing",
-    },
-    {
-      householdId: "H012",
-      ownerName: "Vũ Văn Tuấn",
-      houseNumber: "36",
-      status: "paid",
-    },
-  ];
+  // Lọc dữ liệu theo search term
+  const filteredData = householdsData.filter(household =>
+    household.head_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    household.household_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    household.address?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading && !feeSummary) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return (
+      <div className="content">
+        <div className="error-message">
+          <p>Lỗi: {error}</p>
+          <Button onClick={fetchAllFees}>Thử lại</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const currentFee = allFees.find(f => f.fee_id === parseInt(selectedFeeId));
 
   return (
     <div className="content">
-          {/* Stat Cards */}
-          <div className="stats-grid">
-            {stats.map((stat, index) => (
-              <div key={index} className="stat-card">
-                <div className="stat-value">{stat.value}</div>
-                <div className="stat-label">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Detailed Statistical Table */}
-          <Card
-            title="Bảng thống kê chi tiết"
-            actions={
-              <div className="table-actions">
-                <div className="table-search">
-                  <img src={searchIcon} alt="Search" className="search-icon" />
-                  <input
-                    type="text"
-                    placeholder="Q Search..."
-                    className="table-search-input"
-                  />
-                </div>
-                <Button variant="outline" size="small">
-                  Filters
-                </Button>
-                <Button variant="outline" size="small">
-                  Export
-                </Button>
-              </div>
-            }
+      {/* Dropdown chọn đợt thu */}
+      {allFees.length > 0 && (
+        <div className="fee-selector-section">
+          <label htmlFor="feeSelect">Chọn đợt thu: </label>
+          <select 
+            id="feeSelect"
+            value={selectedFeeId || ''} 
+            onChange={handleFeeChange}
+            className="fee-select-dropdown"
           >
-            <div className="table-wrapper">
-              <EnhancedTable columns={tableColumns} data={tableData} className="staff-table" />
-            </div>
-          </Card>
+            {allFees.map(fee => (
+              <option key={fee.fee_id} value={fee.fee_id}>
+                {fee.fee_name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
+      {/* Stat Cards */}
+      {feeSummary && (
+        <div className="stats-grid">
+          {stats.map((stat, index) => (
+            <div key={index} className="stat-card">
+              <div className="stat-value">{stat.value}</div>
+              <div className="stat-label">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Detailed Statistical Table */}
+      <Card
+        title="Bảng thống kê chi tiết"
+        subtitle={currentFee ? `Chi tiết thu phí: ${currentFee.fee_name} (${filteredData.length} hộ)` : 'Chi tiết thu phí'}
+        actions={
+          <div className="table-actions">
+            <div className="table-search">
+              <img src={searchIcon} alt="Search" className="search-icon" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm..."
+                className="table-search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Button variant="outline" size="small">
+              Filters
+            </Button>
+            <Button variant="outline" size="small">
+              Export
+            </Button>
+          </div>
+        }
+      >
+        <div className="table-wrapper">
+          {loading ? (
+            <Loading />
+          ) : filteredData.length > 0 ? (
+            <EnhancedTable 
+              columns={tableColumns} 
+              data={filteredData} 
+              className="staff-table" 
+            />
+          ) : (
+            <div className="no-data">
+              <p>Không có dữ liệu</p>
+            </div>
+          )}
+        </div>
+      </Card>
+
+      {/* Household Detail Modal */}
       <HouseholdDetailModal
         isOpen={isModalOpen}
         onClose={() => {

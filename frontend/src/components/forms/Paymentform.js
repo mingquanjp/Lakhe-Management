@@ -2,19 +2,12 @@ import React, { useState } from 'react';
 import { Button } from '../commons';
 import './Form.css';
 
-const PaymentForm = ({ householdData, onSubmit, onCancel }) => {
-  // Hàm chuyển đổi định dạng ngày từ DD/MM/YYYY sang YYYY-MM-DD
-  const convertDateFormat = (dateStr) => {
-    if (!dateStr) return '';
-    const parts = dateStr.split('/');
-    if (parts.length === 3) {
-      return `${parts[2]}-${parts[1]}-${parts[0]}`; // YYYY-MM-DD
-    }
-    return dateStr;
-  };
-
+const PaymentForm = ({ householdData, feeType, onSubmit, onCancel }) => {
+  const isVoluntary = feeType === 'Voluntary';
+  
   const [formData, setFormData] = useState({
-    paymentDate: convertDateFormat(householdData.deadline) || '', // Chuyển đổi định dạng ngày
+    paymentDate: new Date().toISOString().split('T')[0],
+    amount: '', // Thêm trường amount cho tự nguyện
     note: ''
   });
 
@@ -28,20 +21,37 @@ const PaymentForm = ({ householdData, onSubmit, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Gửi dữ liệu bao gồm thông tin hộ gia đình và thông tin thanh toán
+    
+    // Validation cho tự nguyện
+    if (isVoluntary && (!formData.amount || parseFloat(formData.amount) <= 0)) {
+      alert('Vui lòng nhập số tiền hợp lệ');
+      return;
+    }
+
     onSubmit({
-      ...householdData,
-      ...formData
+      ...formData,
+      amount: isVoluntary ? parseFloat(formData.amount) : null, // Truyền amount nếu là tự nguyện
+      household_id: householdData.household_id
     });
   };
-
-  // Kiểm tra xem người dùng đã nộp chưa
-  const isPaid = householdData.status === 'paid';
 
   return (
     <form className="create-fee-form" onSubmit={handleSubmit}>
       <div className="form-description">
         Điền chi tiết thông tin thu của hộ khẩu
+      </div>
+
+      {/* Số hộ khẩu - Disabled */}
+      <div className="form-group">
+        <label htmlFor="householdNumber">Số hộ khẩu</label>
+        <input
+          type="text"
+          id="householdNumber"
+          name="householdNumber"
+          className="form-input disabled"
+          value={householdData.householdNumber}
+          disabled
+        />
       </div>
 
       {/* Chủ hộ - Disabled */}
@@ -57,20 +67,59 @@ const PaymentForm = ({ householdData, onSubmit, onCancel }) => {
         />
       </div>
 
-      {/* Số tiền phải đóng - Disabled */}
+      {/* Số tiền - Có thể edit nếu là tự nguyện */}
       <div className="form-group">
-        <label htmlFor="amount">Số tiền phải đóng</label>
-        <input
-          type="text"
-          id="amount"
-          name="amount"
-          className="form-input disabled"
-          value={householdData.amount}
-          disabled
-        />
+        <label htmlFor="amount">
+          {isVoluntary ? 'Số tiền phải đóng' : 'Số tiền phải đóng'}
+        </label>
+        {isVoluntary ? (
+          <input
+            type="number"
+            id="amount"
+            name="amount"
+            className="form-input"
+            value={formData.amount}
+            onChange={handleChange}
+            placeholder="Nhập số tiền (VND)"
+            min="0"
+            step="1000"
+            required
+          />
+        ) : (
+          <input
+            type="text"
+            id="amount"
+            name="amount"
+            className="form-input disabled"
+            value={householdData.amount}
+            disabled
+          />
+        )}
+        {isVoluntary && (
+          <small className="form-hint">
+            Đây là khoản thu tự nguyện, vui lòng nhập số tiền
+          </small>
+        )}
       </div>
 
-      {/* Ngày nộp - Editable */}
+      {/* Định mức - Chỉ hiển thị cho tự nguyện */}
+      {isVoluntary && householdData.amount !== 'Tự nguyện' && (
+        <div className="form-group">
+          <label htmlFor="suggestedAmount">Định mức đề nghị</label>
+          <input
+            type="text"
+            id="suggestedAmount"
+            className="form-input disabled"
+            value={householdData.amount}
+            disabled
+          />
+          <small className="form-hint">
+            Đây chỉ là định mức đề nghị, bạn có thể nhập số tiền khác
+          </small>
+        </div>
+      )}
+
+      {/* Ngày nộp */}
       <div className="form-group">
         <label htmlFor="paymentDate">Ngày nộp</label>
         <input
@@ -84,7 +133,7 @@ const PaymentForm = ({ householdData, onSubmit, onCancel }) => {
         />
       </div>
 
-      {/* Ghi chú - Editable */}
+      {/* Ghi chú */}
       <div className="form-group">
         <label htmlFor="note">Ghi chú</label>
         <textarea
@@ -98,21 +147,20 @@ const PaymentForm = ({ householdData, onSubmit, onCancel }) => {
         />
       </div>
 
+      {/* Form Actions */}
       <div className="form-actions">
-        <Button 
-          type="submit" 
-          variant="primary" 
-          className="btn-add"
-        >
-          {isPaid ? 'Cập nhật' : 'Ghi nhận'}
-        </Button>
         <Button 
           type="button" 
           variant="outline" 
           onClick={onCancel}
-          className="btn-cancel"
         >
-          Cancel
+          Hủy
+        </Button>
+        <Button 
+          type="submit" 
+          variant="primary"
+        >
+          Xác nhận
         </Button>
       </div>
     </form>

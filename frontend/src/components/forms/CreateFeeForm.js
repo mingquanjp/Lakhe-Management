@@ -7,7 +7,6 @@ const CreateFeeForm = ({ onSubmit, onCancel }) => {
     name: '',
     type: 'mandatory',
     amount: '',
-    scope: 'all',
     deadline: ''
   });
 
@@ -21,6 +20,13 @@ const CreateFeeForm = ({ onSubmit, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validation
+    if (formData.type === 'mandatory' && !formData.amount) {
+      alert('Vui lòng nhập định mức cho khoản thu bắt buộc');
+      return;
+    }
+
     onSubmit(formData);
   };
 
@@ -70,48 +76,25 @@ const CreateFeeForm = ({ onSubmit, onCancel }) => {
         </div>
       </div>
 
-      <div className="form-group">
-        <label htmlFor="amount">Định mức (VNĐ / 1 đơn vị)</label>
-        <input
-          type="number"
-          id="amount"
-          name="amount"
-          className="form-input"
-          value={formData.amount}
-          onChange={handleChange}
-          placeholder="Nhập định mức"
-          required
-        />
-      </div>
-
-      <div className="form-group">
-        <label>Áp dụng cho</label>
-        <div className="radio-group">
-          <label className="radio-label">
-            <input
-              type="radio"
-              name="scope"
-              value="all"
-              checked={formData.scope === 'all'}
-              onChange={handleChange}
-            />
-            <span>Mỗi nhân khẩu</span>
-          </label>
-          <label className="radio-label">
-            <input
-              type="radio"
-              name="scope"
-              value="household"
-              checked={formData.scope === 'household'}
-              onChange={handleChange}
-            />
-            <span>Mỗi hộ</span>
-          </label>
+      {formData.type === 'mandatory' && (
+        <div className="form-group">
+          <label htmlFor="amount">Định mức (VNĐ / 1 hộ)</label>
+          <input
+            type="number"
+            id="amount"
+            name="amount"
+            className="form-input"
+            value={formData.amount}
+            onChange={handleChange}
+            placeholder="Nhập định mức"
+            min="0"
+            required
+          />
         </div>
-      </div>
+      )}
 
       <div className="form-group">
-        <label htmlFor="deadline">Deadline</label>
+        <label htmlFor="deadline">Hạn chót</label>
         <input
           type="date"
           id="deadline"
@@ -119,25 +102,25 @@ const CreateFeeForm = ({ onSubmit, onCancel }) => {
           className="form-input"
           value={formData.deadline}
           onChange={handleChange}
+          min={new Date().toISOString().split('T')[0]}
           required
         />
       </div>
 
+      {/* Form Actions */}
       <div className="form-actions">
-        <Button 
-          type="submit" 
-          variant="primary" 
-          className="btn-add"
-        >
-          Thêm
-        </Button>
         <Button 
           type="button" 
           variant="outline" 
           onClick={onCancel}
-          className="btn-cancel"
         >
           Hủy
+        </Button>
+        <Button 
+          type="submit" 
+          variant="primary"
+        >
+          Tạo đợt thu
         </Button>
       </div>
     </form>
