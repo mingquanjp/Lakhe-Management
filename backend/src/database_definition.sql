@@ -7,7 +7,6 @@ CREATE TABLE users (
     full_name VARCHAR(100) NOT NULL, -- Họ và tên
     role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'staff')) -- 'admin', 'staff'
 );
-
 -- 2. Bảng Households (Hộ khẩu)
 CREATE TABLE households (
     household_id SERIAL PRIMARY KEY, 
@@ -95,7 +94,6 @@ CREATE TABLE change_history (
     change_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Ngày thay đổi
     change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('Split', 'MoveOut', 'Death', 'NewBirth')), -- 'Split', 'MoveOut', 'Death', 'NewBirth'
     changed_by_user_id INT NOT NULL, -- Người thực hiện thay đổi
-    
     CONSTRAINT fk_history_household FOREIGN KEY (household_id) REFERENCES households(household_id),
     CONSTRAINT fk_history_resident FOREIGN KEY (resident_id) REFERENCES residents(resident_id),
     CONSTRAINT fk_history_user FOREIGN KEY (changed_by_user_id) REFERENCES users(user_id)
@@ -120,7 +118,6 @@ CREATE TABLE payment_history (
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Ngày nộp
     collected_by_user_id INT NOT NULL, -- Cán bộ thu tiền
     notes TEXT, -- Ghi chú
-    
     CONSTRAINT fk_payment_fee FOREIGN KEY (fee_id) REFERENCES fees(fee_id),
     CONSTRAINT fk_payment_household FOREIGN KEY (household_id) REFERENCES households(household_id),
     CONSTRAINT fk_payment_user FOREIGN KEY (collected_by_user_id) REFERENCES users(user_id)
