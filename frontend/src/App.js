@@ -65,6 +65,8 @@ function AppRoutes() {
       >
         <Route index element={<PopulationDashboard />} />
         <Route path="overview" element={<PopulationDashboard />} />
+        <Route path="stats/citizen" element={<PopulationDashboard />} />
+        <Route path="stats/finance" element={<div>Trang thống kê tài chính (Đang phát triển)</div>} />
         <Route path="household" element={<HouseholdDetail />} />
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />
