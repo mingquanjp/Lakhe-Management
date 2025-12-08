@@ -93,6 +93,19 @@ const HouseholdAddModal = ({ isOpen, onClose, onSave }) => {
           </div>
         </div>
 
+        <div className="form-row">
+          <div className="form-group" style={{ width: '100%' }}>
+            <label>Địa chỉ hộ khẩu</label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Nhập địa chỉ hộ khẩu"
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+            />
+          </div>
+        </div>
+
         {formData.members.length > 0 && (
           <div className="members-section">
             <span className="section-title">Thông tin thành viên</span>

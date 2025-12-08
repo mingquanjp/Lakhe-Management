@@ -1,38 +1,102 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 // 1. Thêm import icon Split
 import { Search, Filter, Download, Split } from "lucide-react";
 import "./HouseholdList.css";
 import HouseholdTable from "./HouseholdTable";
 import Pagination from "../../../components/commons/Pagination";
-import { householdData } from "../../../data/mockData";
 import HouseholdAddModal from "./HouseholdAddModal";
 import HouseholdSplitModal from "./HouseholdSplitModal";
 
 const HouseholdList = () => {
+  const navigate = useNavigate();
+  const [households, setHouseholds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
   const itemsPerPage = 8;
 
+  useEffect(() => {
+    fetchHouseholds();
+  }, []);
+
+  const fetchHouseholds = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/households');
+      if (response.ok) {
+        const data = await response.json();
+        setHouseholds(data);
+      } else {
+        console.error('Failed to fetch households');
+      }
+    } catch (error) {
+      console.error('Error fetching households:', error);
+    }
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = householdData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(householdData.length / itemsPerPage);
+  const currentItems = households.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(households.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const handleSaveHousehold = (newData) => {
-    console.log("Dữ liệu nhận được từ form:", newData);
+  const handleSaveHousehold = async (newData) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/households', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newData),
+      });
+
+      if (response.ok) {
+        alert('Thêm hộ khẩu thành công!');
+        fetchHouseholds(); // Refresh list
+        setIsAddModalOpen(false);
+      } else {
+        const errorData = await response.json();
+        alert(`Lỗi: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error('Error creating household:', error);
+      alert('Có lỗi xảy ra khi thêm hộ khẩu');
+    }
   };
 
-  const handleSplitHousehold = (newData) => {
-    console.log("Dữ liệu tách hộ khẩu:", newData);
+  const handleSplitHousehold = async (newData) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/households/split', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newData),
+      });
+
+      if (response.ok) {
+        alert('Tách hộ khẩu thành công!');
+        fetchHouseholds(); // Refresh list
+        setIsSplitModalOpen(false);
+      } else {
+        const errorData = await response.json();
+        alert(`Lỗi: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error('Error splitting household:', error);
+      alert('Có lỗi xảy ra khi tách hộ khẩu');
+    }
   };
 
   const handleSplitClick = (household) => {
     setSelectedHousehold(household);
     setIsSplitModalOpen(true);
+  };
+
+  const handleDetailClick = (household) => {
+    navigate(`/admin/household/${household.id}`);
   };
 
   return (
@@ -61,7 +125,11 @@ const HouseholdList = () => {
           <span className="card-title">List content</span>
         </div>
 
-        <HouseholdTable data={currentItems} onSplit={handleSplitClick} />
+        <HouseholdTable 
+          data={currentItems} 
+          onSplit={handleSplitClick} 
+          onDetail={handleDetailClick}
+        />
 
         <Pagination
           currentPage={currentPage}

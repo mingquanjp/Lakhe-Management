@@ -8,14 +8,14 @@ const pool = require('../config/database');
 async function createUser() {
   try {
     // User data to create
-    const username = process.argv[2] || 'admin';
-    const password = process.argv[3] || 'admin123';
-    const full_name = process.argv[4] || 'Administrator';
+    const username = process.argv[2] || 'nhatminhjp';
+    const password = process.argv[3] || 'Minh@123';
+    const full_name = process.argv[4] || 'Nguyễn-Nhật-Minh';
     const role = process.argv[5] || 'admin';
 
     // Validate role
     if (!['admin', 'staff'].includes(role)) {
-      console.error('❌ Role phải là "admin" hoặc "staff"');
+      console.error('Role phải là "admin" hoặc "staff"');
       process.exit(1);
     }
 
@@ -40,9 +40,9 @@ async function createUser() {
     process.exit(0);
   } catch (error) {
     if (error.code === '23505') {
-      console.error('❌ Username đã tồn tại!');
+      console.error('Username đã tồn tại!');
     } else {
-      console.error('❌ Error creating user:', error.message);
+      console.error('Error creating user:', error.message);
     }
     process.exit(1);
   }
@@ -54,9 +54,9 @@ if (process.argv.includes('--help')) {
   console.log('Usage: node src/utils/createUser.js [username] [password] [full_name] [role]');
   console.log('');
   console.log('Arguments:');
-  console.log('  username   - Tên đăng nhập (default: admin)');
-  console.log('  password   - Mật khẩu (default: admin123)');
-  console.log('  full_name  - Họ và tên (default: Administrator)');
+  console.log('  username   - Tên đăng nhập (default: nhatminhjp)');
+  console.log('  password   - Mật khẩu (default: Minh@123)');
+  console.log('  full_name  - Họ và tên (default: Nguyễn-Nhật-Minh)');
   console.log('  role       - Vai trò: admin hoặc staff (default: admin)');
   console.log('');
   console.log('Examples:');
