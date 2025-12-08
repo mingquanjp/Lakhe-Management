@@ -18,7 +18,7 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  CartesianGrid
+  CartesianGrid,
 } from "recharts";
 
 // Inline SVG Icons for the dashboard
@@ -53,7 +53,7 @@ const PopulationDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
 
@@ -93,33 +93,36 @@ const PopulationDashboard = () => {
   };
 
   // Prepare data for charts
-  const genderData = stats?.charts?.gender.map(item => ({
-    name: item.gender === 'Male' ? 'Nam' : 'Nữ',
-    value: parseInt(item.count)
-  })) || [];
+  const genderData =
+    stats?.charts?.gender.map((item) => ({
+      name: item.gender === "Male" ? "Nam" : "Nữ",
+      value: parseInt(item.count),
+    })) || [];
 
-  const COLORS = ['#F2C94C', '#56CCF2']; // Yellow for Male, Blue for Female (matching screenshot)
+  const COLORS = ["#F2C94C", "#56CCF2"]; // Yellow for Male, Blue for Female (matching screenshot)
 
-  const ageData = stats?.charts?.age.map(item => ({
-    name: item.age_group + ' tuổi',
-    value: parseInt(item.count)
-  })) || [];
+  const ageData =
+    stats?.charts?.age.map((item) => ({
+      name: item.age_group + " tuổi",
+      value: parseInt(item.count),
+    })) || [];
 
   // Sort age data to match the order in screenshot
-  const ageOrder = ['0-5', '6-10', '11-14', '15-17', '18-60', '60+'];
+  const ageOrder = ["0-5", "6-10", "11-14", "15-17", "18-60", "60+"];
   ageData.sort((a, b) => {
-    const aKey = a.name.replace(' tuổi', '');
-    const bKey = b.name.replace(' tuổi', '');
+    const aKey = a.name.replace(" tuổi", "");
+    const bKey = b.name.replace(" tuổi", "");
     return ageOrder.indexOf(aKey) - ageOrder.indexOf(bKey);
   });
 
-  if (loading && !stats) return <div className="content">Đang tải dữ liệu...</div>;
+  if (loading && !stats)
+    return <div className="content">Đang tải dữ liệu...</div>;
   if (error) return <div className="content">Lỗi: {error}</div>;
 
   return (
     <div className="content">
       <h2 className="population-dashboard-title">Tổng quan</h2>
-      
+
       {/* Date Filter Section */}
       <div className="date-filter-section">
         <div
@@ -173,7 +176,9 @@ const PopulationDashboard = () => {
         <Card className="summary-card blue-light">
           <div className="card-title">Tổng số nhân khẩu</div>
           <div className="card-value-row">
-            <span className="card-value">{stats?.summary?.totalPopulation.toLocaleString()}</span>
+            <span className="card-value">
+              {stats?.summary?.totalPopulation.toLocaleString()}
+            </span>
             {/* Placeholder trend */}
             {/* <span className="card-trend positive">
               +11.01% <TrendUpIcon />
@@ -183,19 +188,25 @@ const PopulationDashboard = () => {
         <Card className="summary-card blue-light">
           <div className="card-title">Tổng số hộ khẩu</div>
           <div className="card-value-row">
-            <span className="card-value">{stats?.summary?.totalHouseholds.toLocaleString()}</span>
+            <span className="card-value">
+              {stats?.summary?.totalHouseholds.toLocaleString()}
+            </span>
           </div>
         </Card>
         <Card className="summary-card blue-light">
           <div className="card-title">Tổng số tạm trú</div>
           <div className="card-value-row">
-            <span className="card-value">{stats?.summary?.totalTempResidents.toLocaleString()}</span>
+            <span className="card-value">
+              {stats?.summary?.totalTempResidents.toLocaleString()}
+            </span>
           </div>
         </Card>
         <Card className="summary-card blue-light">
           <div className="card-title">Tổng số tạm vắng</div>
           <div className="card-value-row">
-            <span className="card-value">{stats?.summary?.totalTempAbsences.toLocaleString()}</span>
+            <span className="card-value">
+              {stats?.summary?.totalTempAbsences.toLocaleString()}
+            </span>
           </div>
         </Card>
       </div>
@@ -205,7 +216,10 @@ const PopulationDashboard = () => {
         {/* Gender Chart */}
         <Card className="chart-card">
           <h3 className="chart-title">Thống kê giới tính</h3>
-          <div className="gender-chart-container" style={{ height: '300px', display: 'flex', alignItems: 'center' }}>
+          <div
+            className="gender-chart-container"
+            style={{ height: "300px", display: "flex", alignItems: "center" }}
+          >
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -219,19 +233,45 @@ const PopulationDashboard = () => {
                   dataKey="value"
                 >
                   {genderData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
-            <div className="chart-legend" style={{ marginLeft: '20px' }}>
+            <div className="chart-legend" style={{ marginLeft: "20px" }}>
               {genderData.map((entry, index) => (
-                <div key={index} className="legend-item" style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <span className="dot" style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: COLORS[index], marginRight: '8px' }}></span>
-                  <span className="label" style={{ marginRight: '8px' }}>{entry.name}</span>
-                  <span className="value" style={{ fontWeight: 'bold' }}>
-                    {((entry.value / stats?.summary?.totalPopulation) * 100).toFixed(1)}%
+                <div
+                  key={index}
+                  className="legend-item"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "8px",
+                  }}
+                >
+                  <span
+                    className="dot"
+                    style={{
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                      backgroundColor: COLORS[index],
+                      marginRight: "8px",
+                    }}
+                  ></span>
+                  <span className="label" style={{ marginRight: "8px" }}>
+                    {entry.name}
+                  </span>
+                  <span className="value" style={{ fontWeight: "bold" }}>
+                    {(
+                      (entry.value / stats?.summary?.totalPopulation) *
+                      100
+                    ).toFixed(1)}
+                    %
                   </span>
                 </div>
               ))}
@@ -242,7 +282,7 @@ const PopulationDashboard = () => {
         {/* Age Chart */}
         <Card className="chart-card">
           <h3 className="chart-title">Thống kê nhân khẩu</h3>
-          <div className="age-chart-container" style={{ height: '300px' }}>
+          <div className="age-chart-container" style={{ height: "300px" }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={ageData}
@@ -256,8 +296,13 @@ const PopulationDashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} />
                 <YAxis axisLine={false} tickLine={false} />
-                <Tooltip cursor={{ fill: 'transparent' }} />
-                <Bar dataKey="value" fill="#E0E0E0" radius={[4, 4, 0, 0]} barSize={40} />
+                <Tooltip cursor={{ fill: "transparent" }} />
+                <Bar
+                  dataKey="value"
+                  fill="#E0E0E0"
+                  radius={[4, 4, 0, 0]}
+                  barSize={40}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -273,7 +318,9 @@ const PopulationDashboard = () => {
               <span>Nhân khẩu mới sinh</span>
               <img src={userIcon} alt="user" className="dashboard-icon" />
             </div>
-            <div className="fluctuation-value">{stats?.fluctuations?.newborns.toLocaleString()}</div>
+            <div className="fluctuation-value">
+              {stats?.fluctuations?.newborns.toLocaleString()}
+            </div>
           </Card>
           <Card className="fluctuation-card gray">
             <div className="fluctuation-header">
@@ -284,7 +331,9 @@ const PopulationDashboard = () => {
                 className="dashboard-icon rotate-180"
               />
             </div>
-            <div className="fluctuation-value">{stats?.fluctuations?.movedIn.toLocaleString()}</div>
+            <div className="fluctuation-value">
+              {stats?.fluctuations?.movedIn.toLocaleString()}
+            </div>
           </Card>
           <Card className="fluctuation-card gray">
             <div className="fluctuation-header">
@@ -295,14 +344,18 @@ const PopulationDashboard = () => {
                 className="dashboard-icon"
               />
             </div>
-            <div className="fluctuation-value">{stats?.fluctuations?.movedOut.toLocaleString()}</div>
+            <div className="fluctuation-value">
+              {stats?.fluctuations?.movedOut.toLocaleString()}
+            </div>
           </Card>
           <Card className="fluctuation-card gray">
             <div className="fluctuation-header">
               <span>Qua đời</span>
               <img src={tombIcon} alt="deceased" className="dashboard-icon" />
             </div>
-            <div className="fluctuation-value">{stats?.fluctuations?.deceased.toLocaleString()}</div>
+            <div className="fluctuation-value">
+              {stats?.fluctuations?.deceased.toLocaleString()}
+            </div>
           </Card>
         </div>
       </div>
