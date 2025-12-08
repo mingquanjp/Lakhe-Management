@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -66,14 +71,23 @@ function AppRoutes() {
         <Route index element={<PopulationDashboard />} />
         <Route path="overview" element={<PopulationDashboard />} />
         <Route path="stats/citizen" element={<PopulationDashboard />} />
-        <Route path="stats/finance" element={<div>Trang thống kê tài chính (Đang phát triển)</div>} />
+        <Route
+          path="stats/finance"
+          element={<div>Trang thống kê tài chính (Đang phát triển)</div>}
+        />
         <Route path="household" element={<HouseholdDetail />} />
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />
         <Route path="form/new-household-form" element={<NewHouseholdForm />} />
         <Route path="form/new-member-form" element={<NewMemberForm />} />
-        <Route path="form/member-status-change-form" element={<MemberStatusChangeForm />} />
-        <Route path="form/temporary-residence-form" element={<TemporaryResidenceForm />} />
+        <Route
+          path="form/member-status-change-form"
+          element={<MemberStatusChangeForm />}
+        />
+        <Route
+          path="form/temporary-residence-form"
+          element={<TemporaryResidenceForm />}
+        />
         <Route path="form/change-owner-form" element={<ChangeOwnerForm />} />
       </Route>
 
