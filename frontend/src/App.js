@@ -24,6 +24,9 @@ import NewMemberForm from "./pages/Admin/HouseholdForms/NewMemberForm";
 import MemberStatusChangeForm from "./pages/Admin/HouseholdForms/MemberStatusChangeForm";
 import TemporaryResidenceForm from "./pages/Admin/HouseholdForms/TemporaryResidenceForm";
 import ChangeOwnerForm from "./pages/Admin/HouseholdForms/ChangeOwnerForm/ChangeOwnerForm";
+import Overview from "./pages/Admin/Overview/Overview";
+import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
+import HouseholdTemporaryList from "./pages/Admin/HouseholdTemporaryList/HouseholdTemporaryList";
 
 // Import Staff Pages
 import FeeDashboard from "./pages/Staff/FeeDashboard/FeeDashboard";
@@ -70,7 +73,9 @@ function AppRoutes() {
         }
       >
         <Route index element={<PopulationDashboard />} />
-        <Route path="overview" element={<PopulationDashboard />} />
+        <Route path="overview" element={<Overview />} />
+        <Route path="household" element={<HouseholdList />} />
+        <Route path="householdtemporary" element={<HouseholdTemporaryList />} /> 
         <Route path="stats/citizen" element={<PopulationDashboard />} />
         <Route path="stats/finance" element={<StatsFinanceDashboard />} />
         <Route path="household" element={<HouseholdDetail />} />

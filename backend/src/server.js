@@ -5,6 +5,9 @@ const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const financeRoutes = require("./routes/financeRoutes");
 const { verifyToken, requireAdmin } = require("./middleware/authMiddleware");
+const householdRoutes = require('./routes/householdRoutes');
+const residentRoutes = require("./routes/residentRoutes");
+
 
 const app = express();
 app.use(cors());
@@ -55,6 +58,10 @@ app.get("/api/test-admin", verifyToken, requireAdmin, (req, res) => {
     user: req.user,
   });
 });
+
+app.use('/api/households', householdRoutes); 
+app.use("/api/residents", residentRoutes);
+
 
 app.listen(5000, () => {
   console.log("Server running on port 5000");
