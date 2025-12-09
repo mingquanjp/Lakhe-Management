@@ -112,11 +112,18 @@ const Declaration = () => {
                 <div className="p-4 border-b border-gray-100 flex justify-between items-center gap-4">
                     <h2 className="text-lg font-semibold text-gray-800 whitespace-nowrap">Danh sách nhân khẩu</h2>
                     <div className="flex gap-2 flex-1 justify-end">
-                        <input 
-                            type="text" 
-                            placeholder="Search..." 
-                            className="border border-gray-300 rounded-md px-4 py-2 text-sm w-[400px] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
+                        <div className="relative w-[300px] transition-all duration-300 focus-within:w-[400px]">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </span>
+                            <input 
+                                type="text" 
+                                placeholder="Tìm kiếm nhân khẩu..." 
+                                className="w-full pl-10 pr-4 py-2.5 text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200"
+                            />
+                        </div>
                     </div>
                 </div>
                 

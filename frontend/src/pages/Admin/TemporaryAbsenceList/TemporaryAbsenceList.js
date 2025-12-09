@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Search, Filter, Download } from "lucide-react";
-import "./HouseholdTemporaryList.css";
-import HouseholdTemporaryTable from "./HouseholdTemporaryTable";
+import "./TemporaryAbsenceList.css";
+import TemporaryAbsenceTable from "./TemporaryAbsenceTable";
 import Pagination from "../../../components/commons/Pagination";
 
-const HouseholdTemporaryList = () => {
+const TemporaryAbsenceList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState([]);
   const itemsPerPage = 8;
@@ -15,13 +15,13 @@ const HouseholdTemporaryList = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/residents/list/temporary-residence');
+      const response = await fetch('http://localhost:5000/api/residents/list/temporary-absence');
       if (response.ok) {
         const result = await response.json();
         setData(result.data);
       }
     } catch (error) {
-      console.error('Error fetching temporary residents:', error);
+      console.error('Error fetching temporary absences:', error);
     }
   };
 
@@ -35,7 +35,7 @@ const HouseholdTemporaryList = () => {
   return (
     <div className="household-page">
       <div className="page-header">
-        <h2 className="page-title">Danh sách hộ khẩu tạm trú</h2>
+        <h2 className="page-title">Danh sách tạm vắng</h2>
         <div className="toolbar">
           <div className="search-box">
             <Search size={18} className="search-icon" />
@@ -52,10 +52,10 @@ const HouseholdTemporaryList = () => {
 
       <div className="table-card">
         <div className="card-top">
-          <span className="card-title">Danh sách tạm trú</span>
+          <span className="card-title">Danh sách tạm vắng</span>
         </div>
 
-        <HouseholdTemporaryTable data={currentItems} />
+        <TemporaryAbsenceTable data={currentItems} />
 
         <Pagination
           currentPage={currentPage}
@@ -67,4 +67,4 @@ const HouseholdTemporaryList = () => {
   );
 };
 
-export default HouseholdTemporaryList;
+export default TemporaryAbsenceList;

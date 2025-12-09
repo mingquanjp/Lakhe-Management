@@ -1,7 +1,7 @@
 import React from "react";
-import "./HouseholdTemporaryTable.css";
+import "./TemporaryAbsenceList.css";
 
-const HouseholdTemporaryTable = ({ data }) => {
+const TemporaryAbsenceTable = ({ data }) => {
   const formatDate = (dateString) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString('vi-VN');
@@ -24,8 +24,8 @@ const HouseholdTemporaryTable = ({ data }) => {
           <tr>
             <th>ID</th>
             <th>Họ tên</th>
-            <th>Địa chỉ tạm trú</th>
-            <th>Chủ hộ</th>
+            <th>CMND/CCCD</th>
+            <th>Nơi tạm vắng</th>
             <th>Từ ngày</th>
             <th>Đến ngày</th>
             <th>Lý do</th>
@@ -37,14 +37,13 @@ const HouseholdTemporaryTable = ({ data }) => {
             <tr key={index}>
               <td>{row.id}</td>
               <td className="owner-name">{row.last_name} {row.first_name}</td>
+              <td>{row.identity_card_number}</td>
               <td>{row.temporary_address}</td>
-              <td>{row.host_name}</td>
               <td>{formatDate(row.start_date)}</td>
               <td>{formatDate(row.end_date)}</td>
               <td>{row.reason}</td>
               <td className="text-center action-cell">
                 <button className="btn-action btn-detail">Chi tiết</button>
-                <button className="btn-action btn-delete">Xóa</button>
               </td>
             </tr>
           ))}
@@ -59,4 +58,4 @@ const HouseholdTemporaryTable = ({ data }) => {
   );
 };
 
-export default HouseholdTemporaryTable;
+export default TemporaryAbsenceTable;

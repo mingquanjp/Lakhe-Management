@@ -12,6 +12,7 @@ import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDas
 import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
 import HouseholdDetail from "./pages/Admin/HouseholdList/HouseholdDetail";
 import HouseholdTemporaryList from "./pages/Admin/HouseholdTemporaryList/HouseholdTemporaryList";
+import TemporaryAbsenceList from "./pages/Admin/TemporaryAbsenceList/TemporaryAbsenceList";
 import Declaration from "./pages/Admin/ManagementTable/Declaration";
 import FormsMenu from "./pages/Admin/FormsMenu/FormsMenu";
 import Overview from "./pages/Admin/Overview/Overview";
@@ -26,7 +27,6 @@ import ChangeOwnerForm from "./pages/Admin/HouseholdForms/ChangeOwnerForm/Change
 // Import Staff Pages
 import FeeDashboard from "./pages/Staff/FeeDashboard/FeeDashboard";
 import FeeDetail from "./pages/Staff/FeeDetail/FeeDetail";
-import Layout from "./components/layout/Layout";
 
 // Root redirect component
 const RootRedirect = () => {
@@ -71,7 +71,8 @@ function App() {
             <Route path="overview" element={<Overview />} />
             <Route path="household" element={<HouseholdList />} />
             <Route path="household/:id" element={<HouseholdDetail />} />
-            <Route path="householdtemporary" element={<HouseholdTemporaryList />} />
+            <Route path="temporary-household" element={<HouseholdTemporaryList />} />
+            <Route path="temporary-absence" element={<TemporaryAbsenceList />} />
             <Route path="citizen" element={<Declaration />} />
             <Route path="form" element={<FormsMenu />} />
             <Route path="form/new-household-form" element={<NewHouseholdForm />} />

@@ -8,6 +8,7 @@ const TemporaryResidenceForm = () => {
         type: 'temporary_residence',
         fullName: '',
         dob: '',
+        gender: 'Nam',
         identityCard: '',
         fromDate: '',
         toDate: '',
@@ -18,6 +19,7 @@ const TemporaryResidenceForm = () => {
         permanentAddress: '',
         job: '',
         workplace: '',
+        temporaryAddress: '', // Địa chỉ tạm trú
         hostName: '', // Chủ hộ
         relationshipWithHost: '',
         // Temp Absence specific
@@ -32,10 +34,85 @@ const TemporaryResidenceForm = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const splitName = (fullName) => {
+        const parts = fullName.trim().split(' ');
+        const firstName = parts.pop() || '';
+        const lastName = parts.join(' ') || '';
+        return { firstName, lastName };
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Temporary Residence/Absence Data:', formData);
-        alert(`Đã lưu khai báo ${formData.type === 'temporary_residence' ? 'tạm trú' : 'tạm vắng'}!`);
+        
+        try {
+            const { firstName, lastName } = splitName(formData.fullName);
+
+            if (formData.type === 'temporary_residence') {
+                const payload = {
+                    first_name: firstName,
+                    last_name: lastName,
+                    identity_card_number: formData.identityCard,
+                    dob: formData.dob,
+                    gender: formData.gender === 'Nam' ? 'Male' : 'Female',
+                    permanent_address: formData.permanentAddress,
+                    temporary_address: formData.temporaryAddress,
+                    phone_number: formData.phone,
+                    email: formData.email,
+                    job: formData.job,
+                    workplace: formData.workplace,
+                    host_name: formData.hostName,
+                    relationship_with_host: formData.relationshipWithHost,
+                    reason: formData.reason,
+                    start_date: formData.fromDate,
+                    end_date: formData.toDate
+                };
+
+                const response = await fetch('http://localhost:5000/api/residents/temporary-residence', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Đăng ký tạm trú thành công!');
+                    // Reset form or redirect
+                } else {
+                    alert('Lỗi: ' + result.message + (result.error ? `\nChi tiết: ${result.error}` : ''));
+                }
+
+            } else {
+                // Temporary Absence
+                const payload = {
+                    first_name: firstName,
+                    last_name: lastName,
+                    dob: formData.dob,
+                    gender: formData.gender === 'Nam' ? 'Male' : 'Female',
+                    identity_card_number: formData.identityCard,
+                    permanent_address: formData.permanentAddress, // Assuming user enters this or we reuse field
+                    temporary_address: formData.tempAddress,
+                    reason: formData.reason,
+                    start_date: formData.fromDate,
+                    end_date: formData.toDate
+                };
+
+                const response = await fetch('http://localhost:5000/api/residents/temporary-absence', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Khai báo tạm vắng thành công!');
+                } else {
+                    alert('Lỗi: ' + result.message + (result.error ? `\nChi tiết: ${result.error}` : ''));
+                }
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('Có lỗi xảy ra khi gửi biểu mẫu.');
+        }
     };
 
     const isTemporaryResidence = formData.type === 'temporary_residence';
@@ -93,6 +170,18 @@ const TemporaryResidenceForm = () => {
                             onChange={handleChange}
                             required
                         />
+                        <div className="form-group">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Giới tính</label>
+                            <select
+                                name="gender"
+                                value={formData.gender}
+                                onChange={handleChange}
+                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
                         <Input
                             label="Số CMND/CCCD"
                             name="identityCard"
@@ -164,10 +253,18 @@ const TemporaryResidenceForm = () => {
                                     />
                                 </div>
                                 <div className="bg-yellow-50 p-3 rounded border border-yellow-100 mt-2">
-                                    <p className="text-sm font-medium text-yellow-800 mb-2">Thông tin chủ hộ (Nơi tạm trú)</p>
+                                    <p className="text-sm font-medium text-yellow-800 mb-2">Thông tin nơi tạm trú</p>
                                     <div className="grid grid-cols-2 gap-3">
                                         <Input
-                                            label="Tên chủ hộ"
+                                            label="Địa chỉ tạm trú"
+                                            name="temporaryAddress"
+                                            value={formData.temporaryAddress}
+                                            onChange={handleChange}
+                                            required
+                                            placeholder="Nhập địa chỉ tạm trú"
+                                        />
+                                        <Input
+                                            label="Tên chủ hộ (nếu có)"
                                             name="hostName"
                                             value={formData.hostName}
                                             onChange={handleChange}
@@ -182,14 +279,24 @@ const TemporaryResidenceForm = () => {
                                 </div>
                             </>
                         ) : (
-                            <Input
-                                label="Nơi đến (Địa chỉ tạm trú)"
-                                name="tempAddress"
-                                value={formData.tempAddress}
-                                onChange={handleChange}
-                                required
-                                placeholder="Nhập địa chỉ nơi sẽ đến tạm trú"
-                            />
+                            <>
+                                <Input
+                                    label="Địa chỉ thường trú (Hiện tại)"
+                                    name="permanentAddress"
+                                    value={formData.permanentAddress}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Nhập địa chỉ thường trú hiện tại"
+                                />
+                                <Input
+                                    label="Nơi đến (Địa chỉ tạm trú)"
+                                    name="tempAddress"
+                                    value={formData.tempAddress}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Nhập địa chỉ nơi sẽ đến tạm trú"
+                                />
+                            </>
                         )}
                     </div>
                 </div>

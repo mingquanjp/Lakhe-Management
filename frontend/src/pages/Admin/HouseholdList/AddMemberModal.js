@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Modal from "../../../components/commons/Modal/Modal";
-import "./HouseholdAddModal/HouseholdAddModal.css"; // Reuse styles
+import "./AddMemberModal.css";
 
-const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId }) => {
+const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialData }) => {
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
+    nickname: "",
     dob: "",
     gender: "Male",
     relationship_to_head: "",
@@ -19,29 +20,46 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId }) => {
     identity_card_place: "",
     previous_address: "",
     registration_date: new Date().toISOString().split('T')[0],
+    notes: "",
   });
 
   useEffect(() => {
     if (isOpen) {
-      setFormData({
-        first_name: "",
-        last_name: "",
-        dob: "",
-        gender: "Male",
-        relationship_to_head: "",
-        place_of_birth: "",
-        place_of_origin: "",
-        ethnicity: "Kinh",
-        occupation: "",
-        workplace: "",
-        identity_card_number: "",
-        identity_card_date: "",
-        identity_card_place: "",
-        previous_address: "",
-        registration_date: new Date().toISOString().split('T')[0],
-      });
+      if (initialData) {
+        setFormData({
+          ...initialData,
+          nickname: initialData.nickname || "",
+          place_of_origin: initialData.place_of_origin || "",
+          workplace: initialData.workplace || "",
+          identity_card_place: initialData.identity_card_place || "",
+          notes: initialData.notes || "",
+          dob: initialData.dob ? new Date(initialData.dob).toISOString().split('T')[0] : "",
+          identity_card_date: initialData.identity_card_date ? new Date(initialData.identity_card_date).toISOString().split('T')[0] : "",
+          registration_date: initialData.registration_date ? new Date(initialData.registration_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        });
+      } else {
+        setFormData({
+          first_name: "",
+          last_name: "",
+          nickname: "",
+          dob: "",
+          gender: "Male",
+          relationship_to_head: "",
+          place_of_birth: "",
+          place_of_origin: "",
+          ethnicity: "Kinh",
+          occupation: "",
+          workplace: "",
+          identity_card_number: "",
+          identity_card_date: "",
+          identity_card_place: "",
+          previous_address: "",
+          registration_date: new Date().toISOString().split('T')[0],
+          notes: "",
+        });
+      }
     }
-  }, [isOpen, type]);
+  }, [isOpen, type, initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,14 +72,32 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId }) => {
       alert("Vui lòng điền đầy đủ các trường bắt buộc (Họ, Tên, Ngày sinh, Quan hệ)");
       return;
     }
-    onSave({ ...formData, household_id: householdId });
+
+    let dataToSave = { ...formData, household_id: householdId };
+
+    // Nếu là Mới sinh, set các trường không cần thiết thành null
+    if (type === 'NewBirth') {
+      dataToSave.occupation = null;
+      dataToSave.workplace = null;
+      dataToSave.identity_card_number = null;
+      dataToSave.identity_card_date = null;
+      dataToSave.identity_card_place = null;
+    }
+    
+    // Add type for history logging
+    dataToSave.change_type = type;
+
+    onSave(dataToSave);
   };
 
-  const title = type === 'NewBirth' ? "Thêm nhân khẩu mới sinh" : "Thêm nhân khẩu chuyển đến";
+  const getTitle = () => {
+    if (initialData) return "Chỉnh sửa thông tin nhân khẩu";
+    return type === 'NewBirth' ? "Thêm nhân khẩu mới sinh" : "Thêm nhân khẩu chuyển đến";
+  };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg">
-      <div className="household-add-modal">
+    <Modal isOpen={isOpen} onClose={onClose} title={getTitle()} size="lg">
+      <div className="add-member-modal">
         <div className="form-row">
           <div className="form-group">
             <label>Họ <span className="text-red-500">*</span></label>
@@ -89,6 +125,17 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId }) => {
 
         <div className="form-row">
           <div className="form-group">
+            <label>Biệt danh</label>
+            <input
+              type="text"
+              className="form-control"
+              name="nickname"
+              value={formData.nickname}
+              onChange={handleChange}
+              placeholder="Tên gọi khác (nếu có)"
+            />
+          </div>
+          <div className="form-group">
             <label>Ngày sinh <span className="text-red-500">*</span></label>
             <input
               type="date"
@@ -98,6 +145,9 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId }) => {
               onChange={handleChange}
             />
           </div>
+        </div>
+
+        <div className="form-row">
           <div className="form-group">
             <label>Giới tính</label>
             <select
@@ -109,6 +159,16 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId }) => {
               <option value="Male">Nam</option>
               <option value="Female">Nữ</option>
             </select>
+          </div>
+          <div className="form-group">
+            <label>Dân tộc</label>
+            <input
+              type="text"
+              className="form-control"
+              name="ethnicity"
+              value={formData.ethnicity}
+              onChange={handleChange}
+            />
           </div>
         </div>
 
@@ -125,20 +185,20 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId }) => {
             />
           </div>
           <div className="form-group">
-            <label>Dân tộc</label>
+            <label>Ngày đăng ký thường trú</label>
             <input
-              type="text"
+              type="date"
               className="form-control"
-              name="ethnicity"
-              value={formData.ethnicity}
+              name="registration_date"
+              value={formData.registration_date}
               onChange={handleChange}
             />
           </div>
         </div>
 
         <div className="form-row">
-          <div className="form-group" style={{ width: '100%' }}>
-            <label>Nơi sinh / Nguyên quán</label>
+          <div className="form-group">
+            <label>Nơi sinh</label>
             <input
               type="text"
               className="form-control"
@@ -148,10 +208,44 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId }) => {
               placeholder="Nhập nơi sinh"
             />
           </div>
+          <div className="form-group">
+            <label>Nguyên quán</label>
+            <input
+              type="text"
+              className="form-control"
+              name="place_of_origin"
+              value={formData.place_of_origin}
+              onChange={handleChange}
+              placeholder="Nhập nguyên quán"
+            />
+          </div>
         </div>
 
-        {type === 'MoveIn' && (
+        {type !== 'NewBirth' && (
           <>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Nghề nghiệp</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="occupation"
+                  value={formData.occupation}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Nơi làm việc</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="workplace"
+                  value={formData.workplace}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
             <div className="form-row">
               <div className="form-group">
                 <label>CMND/CCCD</label>
@@ -164,42 +258,59 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId }) => {
                 />
               </div>
               <div className="form-group">
-                <label>Nghề nghiệp</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="occupation"
-                  value={formData.occupation}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group" style={{ width: '100%' }}>
-                <label>Địa chỉ trước khi chuyển đến</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="previous_address"
-                  value={formData.previous_address}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Ngày đăng ký thường trú</label>
+                <label>Ngày cấp</label>
                 <input
                   type="date"
                   className="form-control"
-                  name="registration_date"
-                  value={formData.registration_date}
+                  name="identity_card_date"
+                  value={formData.identity_card_date}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group full-width">
+                <label>Nơi cấp CMND/CCCD</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="identity_card_place"
+                  value={formData.identity_card_place}
                   onChange={handleChange}
                 />
               </div>
             </div>
           </>
         )}
+
+        {type === 'MoveIn' && (
+          <div className="form-row">
+            <div className="form-group full-width">
+              <label>Địa chỉ trước khi chuyển đến</label>
+              <input
+                type="text"
+                className="form-control"
+                name="previous_address"
+                value={formData.previous_address}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="form-row">
+          <div className="form-group full-width">
+            <label>Ghi chú</label>
+            <textarea
+              className="form-control"
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              rows="2"
+            />
+          </div>
+        </div>
 
         <div className="form-actions">
           <button className="btn-cancel" onClick={onClose}>
