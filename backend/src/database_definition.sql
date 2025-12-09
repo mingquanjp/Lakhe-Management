@@ -15,6 +15,7 @@ CREATE TABLE households (
     head_of_household_id INT, -- Chủ hộ
     address VARCHAR(100) NOT NULL, -- Địa chỉ
     date_created DATE DEFAULT CURRENT_DATE, -- Ngày tạo
+    deleted_at TIMESTAMP DEFAULT NULL,
     status VARCHAR(20) DEFAULT 'Active' CHECK (status IN ('Active', 'MovedOut', 'Temporary')) -- 'Active', 'MovedOut'
 );
 
@@ -23,7 +24,6 @@ CREATE TABLE residents (
     -- 1. Khóa
     resident_id SERIAL PRIMARY KEY,
     household_id INT NOT NULL,
-    
     -- 2. Thông tin cá nhân
     first_name VARCHAR(50) NOT NULL, -- Họ (Ví dụ: Nguyễn)
     last_name VARCHAR(50) NOT NULL,  -- Tên (Ví dụ: An)
@@ -52,6 +52,7 @@ CREATE TABLE residents (
     temp_end_date DATE, -- Ngày kết thúc tạm trú
     temp_reason TEXT, -- Lý do tạm trú
     -- 8. Trạng thái
+    deleted_at TIMESTAMP DEFAULT NULL,
     status VARCHAR(20) DEFAULT 'Permanent' CHECK (status IN ('Permanent', 'MovedOut', 'Deceased', 'Temporary')) , -- 'Permanent', 'MovedOut', 'Deceased', 'Temporary'
     
     -- Tạo khóa ngoại liên kết với bảng Households
