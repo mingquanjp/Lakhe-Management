@@ -13,6 +13,7 @@ import Login from "./pages/Login/Login";
 import Admin from "./pages/Admin";
 import Staff from "./pages/Staff";
 import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDashboard";
+import StatsFinanceDashboard from "./pages/Admin/StatsFinanceDashboard/StatsFinanceDashboard";
 import HouseholdDetail from "./pages/HouseholdDetail";
 import Declaration from "./pages/Declaration";
 import FormsMenu from "./pages/Admin/FormsMenu/FormsMenu";
@@ -71,10 +72,7 @@ function AppRoutes() {
         <Route index element={<PopulationDashboard />} />
         <Route path="overview" element={<PopulationDashboard />} />
         <Route path="stats/citizen" element={<PopulationDashboard />} />
-        <Route
-          path="stats/finance"
-          element={<div>Trang thống kê tài chính (Đang phát triển)</div>}
-        />
+        <Route path="stats/finance" element={<StatsFinanceDashboard />} />
         <Route path="household" element={<HouseholdDetail />} />
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />

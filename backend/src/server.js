@@ -3,6 +3,7 @@ const cors = require("cors");
 const pool = require("./config/database");
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const financeRoutes = require("./routes/financeRoutes");
 const { verifyToken, requireAdmin } = require("./middleware/authMiddleware");
 
 const app = express();
@@ -35,6 +36,7 @@ app.get("/api/test-db", async (req, res) => {
 app.use("/api/auth", authRoutes);
 // Dashboard routes
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/finance", financeRoutes);
 
 // Example protected route - requires valid JWT token
 app.get("/api/test-protected", verifyToken, (req, res) => {

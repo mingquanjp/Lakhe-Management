@@ -92,3 +92,50 @@ export const clearAuthData = () => {
   removeAuthToken();
   removeUserInfo();
 };
+
+// Finance API calls
+export const getFees = async () => {
+  try {
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/api/finance/fees`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Không thể lấy danh sách khoản thu");
+    }
+    return data;
+  } catch (error) {
+    console.error("API Error:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+export const getFinanceStats = async (feeId) => {
+  try {
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/api/finance/stats/${feeId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Không thể lấy dữ liệu thống kê tài chính"
+      );
+    }
+    return data;
+  } catch (error) {
+    console.error("API Error:", error);
+    return { success: false, message: error.message };
+  }
+};
