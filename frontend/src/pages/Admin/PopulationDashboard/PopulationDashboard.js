@@ -47,6 +47,41 @@ const TrendUpIcon = () => (
   </svg>
 );
 
+// CountUp Component for animated numbers
+const CountUp = ({ end, duration = 1000 }) => {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(0);
+
+  useEffect(() => {
+    let startTimestamp = null;
+    const startValue = countRef.current;
+    const finalValue = end;
+
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+      // Ease out quart
+      const easeProgress = 1 - Math.pow(1 - progress, 4);
+
+      const currentCount =
+        startValue + (finalValue - startValue) * easeProgress;
+      setCount(currentCount);
+
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      } else {
+        countRef.current = finalValue;
+        setCount(finalValue);
+      }
+    };
+
+    window.requestAnimationFrame(step);
+  }, [end, duration]);
+
+  return <>{Math.floor(count).toLocaleString()}</>;
+};
+
 const PopulationDashboard = () => {
   const [startDate, setStartDate] = useState("2005-08-15");
   const [endDate, setEndDate] = useState("2025-08-15");
@@ -56,6 +91,24 @@ const PopulationDashboard = () => {
 
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
+
+  const handleStartDateChange = (e) => {
+    const newDate = e.target.value;
+    if (newDate && endDate && newDate > endDate) {
+      alert("Ngày bắt đầu không được lớn hơn ngày kết thúc!");
+      return;
+    }
+    setStartDate(newDate);
+  };
+
+  const handleEndDateChange = (e) => {
+    const newDate = e.target.value;
+    if (newDate && startDate && newDate < startDate) {
+      alert("Ngày kết thúc không được nhỏ hơn ngày bắt đầu!");
+      return;
+    }
+    setEndDate(newDate);
+  };
 
   const fetchStats = async () => {
     try {
@@ -135,7 +188,7 @@ const PopulationDashboard = () => {
             type="date"
             ref={startDateRef}
             value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            onChange={handleStartDateChange}
             style={{
               position: "absolute",
               opacity: 0,
@@ -157,7 +210,7 @@ const PopulationDashboard = () => {
             type="date"
             ref={endDateRef}
             value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            onChange={handleEndDateChange}
             style={{
               position: "absolute",
               opacity: 0,
@@ -177,19 +230,15 @@ const PopulationDashboard = () => {
           <div className="card-title">Tổng số nhân khẩu</div>
           <div className="card-value-row">
             <span className="card-value">
-              {stats?.summary?.totalPopulation.toLocaleString()}
+              <CountUp end={stats?.summary?.totalPopulation || 0} />
             </span>
-            {/* Placeholder trend */}
-            {/* <span className="card-trend positive">
-              +11.01% <TrendUpIcon />
-            </span> */}
           </div>
         </Card>
         <Card className="summary-card blue-light">
           <div className="card-title">Tổng số hộ khẩu</div>
           <div className="card-value-row">
             <span className="card-value">
-              {stats?.summary?.totalHouseholds.toLocaleString()}
+              <CountUp end={stats?.summary?.totalHouseholds || 0} />
             </span>
           </div>
         </Card>
@@ -197,7 +246,7 @@ const PopulationDashboard = () => {
           <div className="card-title">Tổng số tạm trú</div>
           <div className="card-value-row">
             <span className="card-value">
-              {stats?.summary?.totalTempResidents.toLocaleString()}
+              <CountUp end={stats?.summary?.totalTempResidents || 0} />
             </span>
           </div>
         </Card>
@@ -205,7 +254,7 @@ const PopulationDashboard = () => {
           <div className="card-title">Tổng số tạm vắng</div>
           <div className="card-value-row">
             <span className="card-value">
-              {stats?.summary?.totalTempAbsences.toLocaleString()}
+              <CountUp end={stats?.summary?.totalTempAbsences || 0} />
             </span>
           </div>
         </Card>
@@ -216,61 +265,47 @@ const PopulationDashboard = () => {
         {/* Gender Chart */}
         <Card className="chart-card">
           <h3 className="chart-title">Thống kê giới tính</h3>
-          <div
-            className="gender-chart-container"
-            style={{ height: "300px", display: "flex", alignItems: "center" }}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={genderData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {genderData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="chart-legend" style={{ marginLeft: "20px" }}>
+          <div className="chart-content-wrapper">
+            <div style={{ width: "50%", height: 200 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={genderData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={0}
+                    dataKey="value"
+                    startAngle={90}
+                    endAngle={-270}
+                  >
+                    {genderData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="chart-legend-custom">
               {genderData.map((entry, index) => (
-                <div
-                  key={index}
-                  className="legend-item"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "8px",
-                  }}
-                >
+                <div key={index} className="legend-item-row">
                   <span
                     className="dot"
-                    style={{
-                      width: "10px",
-                      height: "10px",
-                      borderRadius: "50%",
-                      backgroundColor: COLORS[index],
-                      marginRight: "8px",
-                    }}
+                    style={{ backgroundColor: COLORS[index] }}
                   ></span>
-                  <span className="label" style={{ marginRight: "8px" }}>
-                    {entry.name}
-                  </span>
-                  <span className="value" style={{ fontWeight: "bold" }}>
-                    {(
-                      (entry.value / stats?.summary?.totalPopulation) *
-                      100
-                    ).toFixed(1)}
+                  <span className="label">{entry.name}</span>
+                  <span className="value">
+                    {stats?.summary?.totalPopulation > 0
+                      ? (
+                          (entry.value / stats.summary.totalPopulation) *
+                          100
+                        ).toFixed(1)
+                      : 0}
                     %
                   </span>
                 </div>
@@ -282,79 +317,90 @@ const PopulationDashboard = () => {
         {/* Age Chart */}
         <Card className="chart-card">
           <h3 className="chart-title">Thống kê nhân khẩu</h3>
-          <div className="age-chart-container" style={{ height: "300px" }}>
+          <div style={{ width: "100%", height: 250 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={ageData}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                barSize={30}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} />
-                <Tooltip cursor={{ fill: "transparent" }} />
-                <Bar
-                  dataKey="value"
-                  fill="#E0E0E0"
-                  radius={[4, 4, 0, 0]}
-                  barSize={40}
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#E0E0E0"
                 />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#828282", fontSize: 12 }}
+                  dy={10}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#828282", fontSize: 12 }}
+                />
+                <Tooltip cursor={{ fill: "transparent" }} />
+                <Bar dataKey="value" fill="#E0E0E0" radius={[4, 4, 0, 0]}>
+                  {ageData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        entry.name.includes("18-60") ? "#E0E0E0" : "#E0E0E0"
+                      }
+                    />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
         </Card>
       </div>
 
-      {/* Fluctuation Section */}
-      <div className="fluctuation-section">
-        <h3 className="section-title">Biến động</h3>
-        <div className="fluctuation-grid">
-          <Card className="fluctuation-card gray">
+      {/* Fluctuations Section */}
+      <div>
+        <h3 className="fluctuations-title">Biến động</h3>
+        <div className="fluctuations-grid">
+          <Card className="fluctuation-card">
             <div className="fluctuation-header">
-              <span>Nhân khẩu mới sinh</span>
+              <span className="fluctuation-label">Nhân khẩu mới sinh</span>
               <img src={userIcon} alt="user" className="dashboard-icon" />
             </div>
             <div className="fluctuation-value">
-              {stats?.fluctuations?.newborns.toLocaleString()}
+              <CountUp end={stats?.fluctuations?.newborns || 0} />
             </div>
           </Card>
-          <Card className="fluctuation-card gray">
+          <Card className="fluctuation-card">
             <div className="fluctuation-header">
-              <span>Chuyển tới</span>
+              <span className="fluctuation-label">Chuyển tới</span>
               <img
                 src={upArrowIcon}
-                alt="arrow down"
-                className="dashboard-icon rotate-180"
-              />
-            </div>
-            <div className="fluctuation-value">
-              {stats?.fluctuations?.movedIn.toLocaleString()}
-            </div>
-          </Card>
-          <Card className="fluctuation-card gray">
-            <div className="fluctuation-header">
-              <span>Chuyển đi</span>
-              <img
-                src={upArrowIcon}
-                alt="arrow up"
+                alt="in"
                 className="dashboard-icon"
+                style={{ transform: "rotate(180deg)" }}
               />
             </div>
             <div className="fluctuation-value">
-              {stats?.fluctuations?.movedOut.toLocaleString()}
+              <CountUp end={stats?.fluctuations?.movedIn || 0} />
             </div>
           </Card>
-          <Card className="fluctuation-card gray">
+          <Card className="fluctuation-card">
             <div className="fluctuation-header">
-              <span>Qua đời</span>
-              <img src={tombIcon} alt="deceased" className="dashboard-icon" />
+              <span className="fluctuation-label">Chuyển đi</span>
+              <img src={upArrowIcon} alt="out" className="dashboard-icon" />
             </div>
             <div className="fluctuation-value">
-              {stats?.fluctuations?.deceased.toLocaleString()}
+              <CountUp end={stats?.fluctuations?.movedOut || 0} />
+            </div>
+          </Card>
+          <Card className="fluctuation-card">
+            <div className="fluctuation-header">
+              <span className="fluctuation-label">Qua đời</span>
+              <img src={tombIcon} alt="death" className="dashboard-icon" />
+            </div>
+            <div className="fluctuation-value">
+              <CountUp end={stats?.fluctuations?.deceased || 0} />
             </div>
           </Card>
         </div>
