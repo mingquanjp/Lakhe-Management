@@ -23,7 +23,7 @@ const getFees = async (req, res) => {
 // Get statistics for a specific fee
 const getFinanceStats = async (req, res) => {
   try {
-    const { feeId } = req.query;
+    const { feeId } = req.params;
 
     if (!feeId) {
       return res.status(400).json({

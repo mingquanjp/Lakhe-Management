@@ -22,8 +22,9 @@ const getPopulationStats = async (req, res) => {
     const totalHouseholds = parseInt(totalHouseholdsQuery.rows[0].count);
 
     // Total Temporary Residents (Currently valid)
+    // Updated to match new schema: Temporary residents are in 'residents' table with status='Temporary'
     const totalTempResidentsQuery = await pool.query(
-      "SELECT COUNT(*) FROM temporary_residents WHERE end_date >= CURRENT_DATE"
+      "SELECT COUNT(*) FROM residents WHERE status = 'Temporary' AND temp_end_date >= CURRENT_DATE"
     );
     const totalTempResidents = parseInt(totalTempResidentsQuery.rows[0].count);
 

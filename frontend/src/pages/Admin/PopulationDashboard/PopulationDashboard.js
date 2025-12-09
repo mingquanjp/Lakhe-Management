@@ -121,7 +121,7 @@ const PopulationDashboard = () => {
 
   return (
     <div className="content">
-      <h2 className="population-dashboard-title">Tổng quan</h2>
+      <h2 className="population-dashboard-title">Thống kê nhân khẩu</h2>
 
       {/* Date Filter Section */}
       <div className="date-filter-section">
