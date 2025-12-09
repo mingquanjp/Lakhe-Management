@@ -12,15 +12,16 @@ import {
   splitHousehold,
 } from "../../../utils/api";
 import * as XLSX from 'xlsx';
+import { toast } from "react-toastify";
 
 const HouseholdList = () => {
   const [households, setHouseholds] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 8;
 
   const loadData = async () => {
@@ -50,10 +51,15 @@ const HouseholdList = () => {
     loadData();
   }, []);
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
   const handleSaveHousehold = async (formData) => {
     try {
       await createHousehold(formData);
-      alert("Thêm hộ khẩu thành công!");
+      toast.success("Thêm hộ khẩu thành công!");
       setIsAddModalOpen(false);
       loadData();
     } catch (error) {
@@ -63,26 +69,21 @@ const HouseholdList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (
-      window.confirm(
-        "Bạn có chắc chắn muốn xóa hộ khẩu này? Hành động này sẽ xóa cả các nhân khẩu bên trong!"
-      )
-    ) {
-      try {
-        await deleteHousehold(id);
-        alert("Xóa thành công!");
-        loadData();
-      } catch (error) {
-        console.error("Lỗi xóa:", error);
-        alert(error.message || "Không thể xóa hộ khẩu này");
-      }
-    }
-  };
+  try {
+    await deleteHousehold(id);
+    toast.success("Xóa thành công!");
+    loadData();
+  } catch (error) {
+    console.error("Lỗi xóa:", error);
+    alert(error.message || "Không thể xóa hộ khẩu này");
+  }
+};
+
 
   const handleSplitHousehold = async (splitData) => {
     try {
       await splitHousehold(splitData);
-      alert("Tách hộ thành công!");
+      toast.success("Tách hộ thành công!");
       setIsSplitModalOpen(false);
       loadData();
     } catch (error) {
@@ -118,15 +119,26 @@ const HouseholdList = () => {
     XLSX.writeFile(workbook, "Danh_Sach_Ho_Khau.xlsx");
   };
 
+  
+  const filteredHouseholds = households.filter((item) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      item.code.toLowerCase().includes(searchLower) || 
+      item.owner.toLowerCase().includes(searchLower) || 
+      item.address.toLowerCase().includes(searchLower)  
+    );
+  });
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = households
+  const currentItems = filteredHouseholds
     .slice(indexOfFirstItem, indexOfLastItem)
     .map((item, index) => ({
       ...item,
       stt: indexOfFirstItem + index + 1,
     }));
-  const totalPages = Math.ceil(households.length / itemsPerPage);
+    
+  const totalPages = Math.ceil(filteredHouseholds.length / itemsPerPage);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleSplitClick = (household) => {
@@ -141,13 +153,13 @@ const HouseholdList = () => {
         <div className="toolbar">
           <div className="search-box">
             <Search size={18} className="search-icon" />
-            <input type="text" placeholder="Search..." />
+            <input type="text" placeholder="Tìm kiếm..." value={searchTerm} onChange={handleSearchChange} />
           </div>
           <button className="btn-tool">
-            <Filter size={16} /> Filters
+            <Filter size={16} /> Lọc
           </button>
           <button className="btn-tool" onClick={handleExport}>
-            <Download size={16} /> Export
+            <Download size={16} /> Xuất Excel
           </button>
           <button
             className="btn-tool btn-add"

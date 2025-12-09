@@ -2,6 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Pages
 import Login from "./pages/Login/Login";
@@ -102,6 +104,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <ToastContainer position="bottom-right" autoClose={3000} />
         <AppRoutes />
       </Router>
     </AuthProvider>

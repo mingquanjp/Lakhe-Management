@@ -37,6 +37,20 @@ const HouseholdAddModal = ({ isOpen, onClose, onSave }) => {
     setFormData({ ...formData, memberCount: value, members: newMembers });
   };
 
+  const RELATION_OPTIONS = [
+  "Vợ",
+  "Chồng",
+  "Con",
+  "Cháu",
+  "Anh",
+  "Chị",
+  "Em",
+  "Bố",
+  "Mẹ",
+  "Ông",
+  "Bà",
+];
+
   const handleMemberChange = (index, field, value) => {
     const updatedMembers = [...formData.members];
     updatedMembers[index][field] = value;
@@ -145,17 +159,35 @@ const HouseholdAddModal = ({ isOpen, onClose, onSave }) => {
                   />
 
                   {/* 2. Quan hệ */}
-                  <input
-                    className="form-control"
-                    placeholder="Quan hệ"
-                    value={index === 0 ? "Chủ hộ" : member.relation}
-                    onChange={(e) =>
-                      index !== 0 &&
-                      handleMemberChange(index, "relation", e.target.value)
-                    }
-                    readOnly={index === 0}
-                    style={{ flex: 1, minWidth: "90px" }}
-                  />
+                  {index === 0 ? (
+                    <input
+                      className="form-control"
+                      value="Chủ hộ"
+                      readOnly
+                      style={{
+                        flex: 1,
+                        minWidth: "90px",
+                        color: "#333",
+                        fontWeight: "500",
+                      }}
+                    />
+                  ) : (
+                    <select
+                      className="form-control"
+                      value={member.relation}
+                      onChange={(e) =>
+                        handleMemberChange(index, "relation", e.target.value)
+                      }
+                      style={{ flex: 1, minWidth: "90px" }}
+                    >
+                      <option value="">Quan hệ...</option>
+                      {RELATION_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  )}
 
                   {/* 3. Ngày sinh */}
                   <input
