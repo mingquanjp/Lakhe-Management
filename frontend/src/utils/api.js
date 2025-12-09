@@ -172,3 +172,157 @@ export const splitHousehold = async (data) => {
   }
 };
 
+// ========== FEE APIs ==========
+
+// Lấy danh sách tất cả khoản thu
+export const fetchFees = async () => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy thống kê cho một khoản thu
+export const fetchFeeStatistics = async (feeId) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/${feeId}/statistics`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy danh sách hộ với trạng thái nộp phí
+export const fetchHouseholdPaymentStatus = async (feeId) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/${feeId}/households`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy lịch sử nộp phí của một hộ
+export const fetchHouseholdPaymentHistory = async (householdId) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/households/${householdId}/payments`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy danh sách nhân khẩu của một hộ
+export const fetchHouseholdResidents = async (householdId) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/households/${householdId}/residents`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Tạo thanh toán mới
+export const createPayment = async (paymentData) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/payments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(paymentData),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy thống kê tổng hợp tất cả khoản thu
+export const fetchOverallStatistics = async () => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/overall-statistics`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy tất cả hộ khẩu với tóm tắt thanh toán
+export const fetchAllHouseholdsWithPaymentSummary = async () => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/all-households`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
