@@ -10,7 +10,7 @@ const getHouseholds = async (req, res) => {
         h.date_created,
         h.status,
         h.head_of_household_id,
-        CONCAT(r.last_name, ' ', r.first_name) as owner_name,
+        CONCAT(r.first_name, ' ', r.last_name) as owner_name,
         r.identity_card_number as owner_cccd,
         (SELECT COUNT(*) FROM residents res WHERE res.household_id = h.household_id) as member_count
       FROM households h

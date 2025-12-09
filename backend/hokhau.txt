@@ -1,0 +1,39 @@
+DO $$
+DECLARE
+    new_household_id INT;
+    new_head_id INT;
+BEGIN
+    -- HỘ 1: Nguyễn Văn An
+    INSERT INTO households (household_code, address, status, date_created)
+    VALUES ('HK2024001', 'Số 10, Ngõ 1, Đường Láng, Đống Đa, Hà Nội', 'Active', NOW())
+    RETURNING household_id INTO new_household_id;
+
+    INSERT INTO residents (household_id, first_name, last_name, dob, gender, place_of_origin, identity_card_number, relationship_to_head, status, occupation)
+    VALUES (new_household_id, 'Nguyễn Văn', 'An', '1980-05-15', 'Male', 'Hà Nội', '001080000001', 'Chủ hộ', 'Permanent', 'Kỹ sư')
+    RETURNING resident_id INTO new_head_id;
+
+    UPDATE households SET head_of_household_id = new_head_id WHERE household_id = new_household_id;
+
+    INSERT INTO residents (household_id, first_name, last_name, dob, gender, place_of_origin, identity_card_number, relationship_to_head, status, occupation) VALUES 
+    (new_household_id, 'Trần Thị', 'Bình', '1982-08-20', 'Female', 'Nam Định', '001182000002', 'Vợ', 'Permanent', 'Giáo viên'),
+    (new_household_id, 'Nguyễn Văn', 'Cường', '2005-01-10', 'Male', 'Hà Nội', '001205000003', 'Con', 'Permanent', 'Sinh viên'),
+    (new_household_id, 'Nguyễn Thị', 'Dung', '2008-11-25', 'Female', 'Hà Nội', NULL, 'Con', 'Permanent', 'Học sinh'),
+    (new_household_id, 'Nguyễn Văn', 'Em', '2015-06-01', 'Male', 'Hà Nội', NULL, 'Con', 'Permanent', 'Học sinh');
+
+    -- HỘ 2: Lê Văn Hùng
+    INSERT INTO households (household_code, address, status, date_created)
+    VALUES ('HK2024002', 'P502, Chung cư B1, Cầu Giấy, Hà Nội', 'Active', NOW())
+    RETURNING household_id INTO new_household_id;
+
+    INSERT INTO residents (household_id, first_name, last_name, dob, gender, place_of_origin, identity_card_number, relationship_to_head, status, occupation)
+    VALUES (new_household_id, 'Lê Văn', 'Hùng', '1975-03-10', 'Male', 'Thái Bình', '001075000005', 'Chủ hộ', 'Permanent', 'Kinh doanh')
+    RETURNING resident_id INTO new_head_id;
+
+    UPDATE households SET head_of_household_id = new_head_id WHERE household_id = new_household_id;
+
+    INSERT INTO residents (household_id, first_name, last_name, dob, gender, place_of_origin, identity_card_number, relationship_to_head, status, occupation) VALUES 
+    (new_household_id, 'Lê Văn', 'Cụ', '1945-12-01', 'Male', 'Thái Bình', NULL, 'Bố', 'Permanent', 'Hưu trí'),
+    (new_household_id, 'Phạm Thị', 'Hạnh', '1978-09-15', 'Female', 'Hải Dương', '001078000006', 'Vợ', 'Permanent', 'Kế toán'),
+    (new_household_id, 'Lê Thị', 'Mai', '2002-07-20', 'Female', 'Hà Nội', '001202000007', 'Con', 'Permanent', 'Sinh viên'),
+    (new_household_id, 'Lê Văn', 'Nam', '2010-05-05', 'Male', 'Hà Nội', NULL, 'Con', 'Permanent', 'Học sinh');
+END $$;

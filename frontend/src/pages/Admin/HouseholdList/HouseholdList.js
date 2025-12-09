@@ -11,6 +11,7 @@ import {
   deleteHousehold,
   splitHousehold,
 } from "../../../utils/api";
+import * as XLSX from 'xlsx';
 
 const HouseholdList = () => {
   const [households, setHouseholds] = useState([]);
@@ -29,6 +30,7 @@ const HouseholdList = () => {
 
       if (response.success && response.data) {
         const formattedData = response.data.map((item) => ({
+          ...item,
           id: item.household_id,
           code: item.household_code,
           owner: item.owner_name || "Chưa có chủ hộ",
@@ -89,6 +91,33 @@ const HouseholdList = () => {
     }
   };
 
+  const handleExport = () => {
+    const dataToExport = households.map((item, index) => ({
+      "STT": index + 1,
+      "Mã Hộ": item.household_code,
+      "Chủ Hộ": item.owner_name || "Chưa có",
+      "CCCD Chủ Hộ": item.owner_cccd || "",
+      "Địa Chỉ": item.address,
+      "Số Thành Viên": item.member_count,
+      "Trạng Thái": 'Thường trú',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const wscols = [
+      { wch: 5 }, 
+      { wch: 15 },
+      { wch: 20 }, 
+      { wch: 15 },
+      { wch: 30 }, 
+      { wch: 10 }, 
+      { wch: 15 } 
+    ];
+    worksheet['!cols'] = wscols;
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachHoKhau");
+    XLSX.writeFile(workbook, "Danh_Sach_Ho_Khau.xlsx");
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = households
@@ -117,7 +146,7 @@ const HouseholdList = () => {
           <button className="btn-tool">
             <Filter size={16} /> Filters
           </button>
-          <button className="btn-tool">
+          <button className="btn-tool" onClick={handleExport}>
             <Download size={16} /> Export
           </button>
           <button
