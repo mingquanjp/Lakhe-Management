@@ -7,6 +7,7 @@ const financeRoutes = require("./routes/financeRoutes");
 const { verifyToken, requireAdmin } = require("./middleware/authMiddleware");
 const householdRoutes = require('./routes/householdRoutes');
 const residentRoutes = require("./routes/residentRoutes");
+const feeRoutes = require('./routes/feeRoutes');
 
 
 const app = express();
@@ -61,6 +62,7 @@ app.get("/api/test-admin", verifyToken, requireAdmin, (req, res) => {
 
 app.use('/api/households', householdRoutes); 
 app.use("/api/residents", residentRoutes);
+app.use('/api/fees', feeRoutes);
 
 
 app.listen(5000, () => {
