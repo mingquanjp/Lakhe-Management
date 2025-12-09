@@ -71,6 +71,7 @@ function AppRoutes() {
         <Route index element={<PopulationDashboard />} />
         <Route path="overview" element={<Overview />} />
         <Route path="household" element={<HouseholdList />} />
+        <Route path="household/:id" element={<HouseholdDetail />} />
         <Route path="householdtemporary" element={<HouseholdTemporaryList />} />     
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />

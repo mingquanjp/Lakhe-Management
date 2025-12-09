@@ -63,9 +63,9 @@ const HouseholdList = () => {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (value !== "" && parseInt(value) < 1) {
-      return; 
+      return;
     }
     setFilters((prev) => ({
       ...prev,
@@ -178,7 +178,8 @@ const HouseholdList = () => {
     setSelectedHousehold(household);
     setIsSplitModalOpen(true);
   };
-  const isFiltering = searchTerm !== "" || filters.minMembers !== "" || filters.maxMembers !== "";
+  const isFiltering =
+    searchTerm !== "" || filters.minMembers !== "" || filters.maxMembers !== "";
 
   return (
     <div className="household-page">
@@ -281,13 +282,11 @@ const HouseholdList = () => {
       <div className="table-card">
         <div className="card-top">
           <span className="card-title">
-            {loading ? (
-              "Đang tải dữ liệu..."
-            ) : isFiltering ? (
-              `Hiển thị ${filteredHouseholds.length} kết quả (Tổng: ${households.length})`
-            ) : (
-              `Tổng số: ${households.length} hộ khẩu`
-            )}
+            {loading
+              ? "Đang tải dữ liệu..."
+              : isFiltering
+              ? `Hiển thị ${filteredHouseholds.length} kết quả (Tổng: ${households.length})`
+              : `Tổng số: ${households.length} hộ khẩu`}
           </span>
         </div>
 
