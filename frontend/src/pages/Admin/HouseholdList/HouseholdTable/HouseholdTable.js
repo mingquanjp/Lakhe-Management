@@ -1,7 +1,7 @@
-import React from "react";
+﻿import React from "react";
 import "./HouseholdTable.css";
 
-const HouseholdTable = ({ data, onSplit, onDetail }) => {
+const HouseholdTable = ({ data, onSplit, onDelete, onDetail }) => {
   return (
     <div className="table-container">
       <table className="household-table">
@@ -26,17 +26,30 @@ const HouseholdTable = ({ data, onSplit, onDetail }) => {
         <tbody>
           {data.map((row, index) => (
             <tr key={index}>
-              <td>{row.id}</td>
+              <td>{row.stt}</td>
               <td>{row.code}</td>
               <td className="owner-name">{row.owner}</td>
               <td>{row.address}</td>
               <td className="text-center">{row.members}</td>
               <td className="text-center action-cell">
-                <button className="btn-action btn-split" onClick={() => onSplit && onSplit(row)}>
+                <button
+                  className="btn-action btn-split"
+                  onClick={() => onSplit && onSplit(row)}
+                >
                   Tách hộ khẩu
                 </button>
-                <button className="btn-action btn-detail" onClick={() => onDetail && onDetail(row)}>Chi tiết</button>
-                <button className="btn-action btn-delete">Xóa</button>
+                <button 
+                  className="btn-action btn-detail" 
+                  onClick={() => onDetail && onDetail(row)}
+                >
+                  Chi tiết
+                </button>
+                <button
+                  className="btn-action btn-delete"
+                  onClick={() => onDelete && onDelete(row.id)}
+                >
+                  Xóa
+                </button>
               </td>
             </tr>
           ))}

@@ -1,94 +1,105 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-// 1. Thêm import icon Split
 import { Search, Filter, Download, Split } from "lucide-react";
 import "./HouseholdList.css";
 import HouseholdTable from "./HouseholdTable";
 import Pagination from "../../../components/commons/Pagination";
 import HouseholdAddModal from "./HouseholdAddModal";
 import HouseholdSplitModal from "./HouseholdSplitModal";
+import {
+  fetchHouseholds,
+  createHousehold,
+  deleteHousehold,
+  splitHousehold,
+} from "../../../utils/api";
 
 const HouseholdList = () => {
   const navigate = useNavigate();
   const [households, setHouseholds] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
   const itemsPerPage = 8;
 
-  useEffect(() => {
-    fetchHouseholds();
-  }, []);
-
-  const fetchHouseholds = async () => {
+  const loadData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/households');
-      if (response.ok) {
-        const data = await response.json();
-        setHouseholds(data);
-      } else {
-        console.error('Failed to fetch households');
+      setLoading(true);
+      const response = await fetchHouseholds();
+
+      if (response.success && response.data) {
+        const formattedData = response.data.map((item) => ({
+          id: item.household_id,
+          code: item.household_code,
+          owner: item.owner_name || "Chưa có chủ hộ",
+          address: item.address,
+          members: parseInt(item.member_count) || 0,
+        }));
+        setHouseholds(formattedData);
       }
     } catch (error) {
-      console.error('Error fetching households:', error);
+      console.error("Failed to fetch households:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleSaveHousehold = async (formData) => {
+    try {
+      await createHousehold(formData);
+      alert("Thêm hộ khẩu thành công!");
+      setIsAddModalOpen(false);
+      loadData();
+    } catch (error) {
+      console.error("Lỗi:", error);
+      alert(error.message || "Có lỗi xảy ra khi tạo hộ khẩu");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (
+      window.confirm(
+        "Bạn có chắc chắn muốn xóa hộ khẩu này? Hành động này sẽ xóa cả các nhân khẩu bên trong!"
+      )
+    ) {
+      try {
+        await deleteHousehold(id);
+        alert("Xóa thành công!");
+        loadData();
+      } catch (error) {
+        console.error("Lỗi xóa:", error);
+        alert(error.message || "Không thể xóa hộ khẩu này");
+      }
+    }
+  };
+
+  const handleSplitHousehold = async (splitData) => {
+    try {
+      await splitHousehold(splitData);
+      alert("Tách hộ thành công!");
+      setIsSplitModalOpen(false);
+      loadData();
+    } catch (error) {
+      console.error("Lỗi tách hộ:", error);
+      alert(error.message);
     }
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = households.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = households
+    .slice(indexOfFirstItem, indexOfLastItem)
+    .map((item, index) => ({
+      ...item,
+      stt: indexOfFirstItem + index + 1,
+    }));
   const totalPages = Math.ceil(households.length / itemsPerPage);
-
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const handleSaveHousehold = async (newData) => {
-    try {
-      const response = await fetch('http://localhost:5000/api/households', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newData),
-      });
-
-      if (response.ok) {
-        alert('Thêm hộ khẩu thành công!');
-        fetchHouseholds(); // Refresh list
-        setIsAddModalOpen(false);
-      } else {
-        const errorData = await response.json();
-        alert(`Lỗi: ${errorData.message}`);
-      }
-    } catch (error) {
-      console.error('Error creating household:', error);
-      alert('Có lỗi xảy ra khi thêm hộ khẩu');
-    }
-  };
-
-  const handleSplitHousehold = async (newData) => {
-    try {
-      const response = await fetch('http://localhost:5000/api/households/split', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newData),
-      });
-
-      if (response.ok) {
-        alert('Tách hộ khẩu thành công!');
-        fetchHouseholds(); // Refresh list
-        setIsSplitModalOpen(false);
-      } else {
-        const errorData = await response.json();
-        alert(`Lỗi: ${errorData.message}`);
-      }
-    } catch (error) {
-      console.error('Error splitting household:', error);
-      alert('Có lỗi xảy ra khi tách hộ khẩu');
-    }
-  };
 
   const handleSplitClick = (household) => {
     setSelectedHousehold(household);
@@ -114,7 +125,10 @@ const HouseholdList = () => {
           <button className="btn-tool">
             <Download size={16} /> Export
           </button>
-          <button className="btn-tool btn-add" onClick={() => setIsAddModalOpen(true)}>
+          <button
+            className="btn-tool btn-add"
+            onClick={() => setIsAddModalOpen(true)}
+          >
             <Split size={16} /> Thêm hộ khẩu
           </button>
         </div>
@@ -122,25 +136,32 @@ const HouseholdList = () => {
 
       <div className="table-card">
         <div className="card-top">
-          <span className="card-title">List content</span>
+          <span className="card-title">
+            {loading
+              ? "Đang tải dữ liệu..."
+              : `Tổng số: ${households.length} hộ khẩu`}
+          </span>
         </div>
 
-        <HouseholdTable 
-          data={currentItems} 
-          onSplit={handleSplitClick} 
+        <HouseholdTable
+          data={currentItems}
+          onSplit={handleSplitClick}
+          onDelete={handleDelete}
           onDetail={handleDetailClick}
         />
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={paginate}
-        />
+        {!loading && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={paginate}
+          />
+        )}
       </div>
 
-      <HouseholdAddModal 
-        isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)} 
+      <HouseholdAddModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
         onSave={handleSaveHousehold}
         size="xl"
       />

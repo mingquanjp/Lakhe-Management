@@ -43,6 +43,7 @@ const Sidebar = () => {
       icon: People,
       subItems: [
         { id: "household", label: "Quản lý hộ khẩu", path: "/admin/household" },
+        { id: "citizen", label: "Quản lý nhân khẩu", path: "/admin/citizen" },
         { id: "form", label: "Form khai báo", path: "/admin/form" },
       ],
     },

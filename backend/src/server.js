@@ -1,9 +1,10 @@
-const express = require("express");
+﻿const express = require("express");
 const cors = require("cors");
 const pool = require("./config/database");
 const authRoutes = require("./routes/authRoutes");
 const residentRoutes = require("./routes/residentRoutes");
 const householdRoutes = require("./routes/householdRoutes");
+const historyRoutes = require("./routes/historyRoutes");
 const { verifyToken, requireAdmin } = require("./middleware/authMiddleware");
 
 const app = express();
@@ -36,6 +37,7 @@ app.get("/api/test-db", async (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/residents", residentRoutes);
 app.use("/api/households", householdRoutes);
+app.use("/api/history", historyRoutes);
 
 // Example protected route - requires valid JWT token
 app.get("/api/test-protected", verifyToken, (req, res) => {
@@ -46,15 +48,7 @@ app.get("/api/test-protected", verifyToken, (req, res) => {
   });
 });
 
-// Example admin-only route
-app.get("/api/test-admin", verifyToken, requireAdmin, (req, res) => {
-  res.json({
-    success: true,
-    message: "Chào mừng Admin!",
-    user: req.user
-  });
-});
-
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log('Server running on port ' + PORT);
 });

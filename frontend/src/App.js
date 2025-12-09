@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -11,8 +11,10 @@ import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDas
 
 import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
 import HouseholdDetail from "./pages/Admin/HouseholdList/HouseholdDetail";
+import HouseholdTemporaryList from "./pages/Admin/HouseholdTemporaryList/HouseholdTemporaryList";
 import Declaration from "./pages/Admin/ManagementTable/Declaration";
 import FormsMenu from "./pages/Admin/FormsMenu/FormsMenu";
+import Overview from "./pages/Admin/Overview/Overview";
 
 // Import Forms
 import NewHouseholdForm from "./pages/Admin/HouseholdForms/NewHouseholdForm";
@@ -24,6 +26,7 @@ import ChangeOwnerForm from "./pages/Admin/HouseholdForms/ChangeOwnerForm/Change
 // Import Staff Pages
 import FeeDashboard from "./pages/Staff/FeeDashboard/FeeDashboard";
 import FeeDetail from "./pages/Staff/FeeDetail/FeeDetail";
+import Layout from "./components/layout/Layout";
 
 // Root redirect component
 const RootRedirect = () => {
@@ -47,63 +50,52 @@ const RootRedirect = () => {
   return <Navigate to="/login" replace />;
 };
 
-function AppRoutes() {
-  return (
-    <Routes>
-      {/* Public Route */}
-      <Route path="/login" element={<Login />} />
-
-      {/* Root redirect */}
-      <Route path="/" element={<RootRedirect />} />
-
-      {/* Admin Routes - Protected */}
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <Admin />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<PopulationDashboard />} />
-        <Route path="overview" element={<PopulationDashboard />} />
-        <Route path="household" element={<HouseholdList />} />
-        <Route path="household/:id" element={<HouseholdDetail />} />
-        <Route path="citizen" element={<Declaration />} />
-        <Route path="form" element={<FormsMenu />} />
-        <Route path="form/new-household-form" element={<NewHouseholdForm />} />
-        <Route path="form/new-member-form" element={<NewMemberForm />} />
-        <Route path="form/member-status-change-form" element={<MemberStatusChangeForm />} />
-        <Route path="form/temporary-residence-form" element={<TemporaryResidenceForm />} />
-        <Route path="form/change-owner-form" element={<ChangeOwnerForm />} />
-      </Route>
-
-      {/* Staff Routes - Protected */}
-      <Route
-        path="/staff"
-        element={
-          <ProtectedRoute requiredRole="staff">
-            <Staff />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<FeeDashboard />} />
-        <Route path="fee-detail" element={<FeeDetail />} />
-      </Route>
-
-      {/* Fallback - redirect to root which will handle auth */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  );
-}
-
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<RootRedirect />} />
+
+          {/* Admin Routes - Protected */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <Admin />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Overview />} />
+            <Route path="overview" element={<Overview />} />
+            <Route path="household" element={<HouseholdList />} />
+            <Route path="household/:id" element={<HouseholdDetail />} />
+            <Route path="householdtemporary" element={<HouseholdTemporaryList />} />
+            <Route path="citizen" element={<Declaration />} />
+            <Route path="form" element={<FormsMenu />} />
+            <Route path="form/new-household-form" element={<NewHouseholdForm />} />
+            <Route path="form/new-member-form" element={<NewMemberForm />} />
+            <Route path="form/member-status-change-form" element={<MemberStatusChangeForm />} />
+            <Route path="form/temporary-residence-form" element={<TemporaryResidenceForm />} />
+            <Route path="form/change-owner-form" element={<ChangeOwnerForm />} />
+          </Route>
+
+          {/* Staff Routes - Protected */}
+          <Route
+            path="/staff"
+            element={
+              <ProtectedRoute requiredRole="staff">
+                <Staff />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<FeeDashboard />} />
+            <Route path="fee-detail" element={<FeeDetail />} />
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
