@@ -390,6 +390,36 @@
 }
 
 .pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 14px;
   color: #666;
+}
+
+.pagination-input {
+  width: 60px;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.pagination-input:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+}
+
+.pagination-input::-webkit-inner-spin-button,
+.pagination-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.pagination-input {
+  appearance: textfield;
+  -moz-appearance: textfield;
 }

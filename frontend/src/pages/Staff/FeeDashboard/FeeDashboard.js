@@ -362,9 +362,35 @@ const FeeDashboard = () => {
                       >
                         ← Trước
                       </button>
-                      <span className="pagination-info">
-                        Trang {currentPage} / {totalPages}
-                      </span>
+                      <div className="pagination-info">
+                        <span>Trang </span>
+                        <input
+                          type="number"
+                          className="pagination-input"
+                          min="1"
+                          max={totalPages}
+                          value={currentPage}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (value >= 1 && value <= totalPages) {
+                              setCurrentPage(value);
+                            }
+                          }}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              const value = parseInt(e.target.value);
+                              if (value >= 1 && value <= totalPages) {
+                                setCurrentPage(value);
+                              } else if (value < 1) {
+                                setCurrentPage(1);
+                              } else if (value > totalPages) {
+                                setCurrentPage(totalPages);
+                              }
+                            }
+                          }}
+                        />
+                        <span> / {totalPages}</span>
+                      </div>
                       <button 
                         className="pagination-btn"
                         onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
