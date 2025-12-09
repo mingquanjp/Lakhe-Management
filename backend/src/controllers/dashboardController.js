@@ -8,55 +8,68 @@ const getPopulationStats = async (req, res) => {
     const start = startDate || "2005-08-15";
     const end = endDate || "2025-08-15";
 
-    // 1. Summary Cards (Current Totals)
-    // Total Population (Permanent Residents)
+    // 1. Summary Cards (Snapshot at End Date or Activity within Range)
+
+    // Total Population (Permanent Residents registered before End Date)
+    // Note: This is an approximation of "Population at that time" based on registration date.
+    // It excludes people who registered after the End Date.
     const totalPopulationQuery = await pool.query(
-      "SELECT COUNT(*) FROM residents WHERE status = 'Permanent'"
+      "SELECT COUNT(*) FROM residents WHERE status = 'Permanent' AND registration_date <= $1",
+      [end]
     );
     const totalPopulation = parseInt(totalPopulationQuery.rows[0].count);
 
-    // Total Households (Active)
+    // Total Households (Active households created before End Date)
     const totalHouseholdsQuery = await pool.query(
-      "SELECT COUNT(*) FROM households WHERE status = 'Active'"
+      "SELECT COUNT(*) FROM households WHERE status = 'Active' AND date_created <= $1",
+      [end]
     );
     const totalHouseholds = parseInt(totalHouseholdsQuery.rows[0].count);
 
-    // Total Temporary Residents (Currently valid)
-    // Updated to match new schema: Temporary residents are in 'residents' table with status='Temporary'
+    // Total Temporary Residents (Valid during the selected range)
+    // Logic: Overlap between [temp_start, temp_end] and [start, end]
+    // temp_start <= end AND temp_end >= start
     const totalTempResidentsQuery = await pool.query(
-      "SELECT COUNT(*) FROM residents WHERE status = 'Temporary' AND temp_end_date >= CURRENT_DATE"
+      "SELECT COUNT(*) FROM residents WHERE status = 'Temporary' AND temp_start_date <= $2 AND temp_end_date >= $1",
+      [start, end]
     );
     const totalTempResidents = parseInt(totalTempResidentsQuery.rows[0].count);
 
-    // Total Temporary Absences (Currently valid)
+    // Total Temporary Absences (Valid during the selected range)
+    // Logic: Overlap between [start_date, end_date] and [start, end]
     const totalTempAbsencesQuery = await pool.query(
-      "SELECT COUNT(*) FROM temporary_absences WHERE end_date >= CURRENT_DATE"
+      "SELECT COUNT(*) FROM temporary_absences WHERE start_date <= $2 AND end_date >= $1",
+      [start, end]
     );
     const totalTempAbsences = parseInt(totalTempAbsencesQuery.rows[0].count);
 
     // 2. Charts
-    // Gender Statistics
+    // Gender Statistics (Based on population at End Date)
     const genderStatsQuery = await pool.query(
-      "SELECT gender, COUNT(*) FROM residents WHERE status = 'Permanent' GROUP BY gender"
+      "SELECT gender, COUNT(*) FROM residents WHERE status = 'Permanent' AND registration_date <= $1 GROUP BY gender",
+      [end]
     );
     const genderStats = genderStatsQuery.rows;
 
-    // Age Statistics
-    const ageStatsQuery = await pool.query(`
+    // Age Statistics (Age calculated at End Date)
+    const ageStatsQuery = await pool.query(
+      `
       SELECT
         CASE
-          WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 0 AND 5 THEN '0-5'
-          WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 6 AND 10 THEN '6-10'
-          WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 11 AND 14 THEN '11-14'
-          WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 15 AND 17 THEN '15-17'
-          WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 18 AND 60 THEN '18-60'
+          WHEN EXTRACT(YEAR FROM AGE($1, dob)) BETWEEN 0 AND 5 THEN '0-5'
+          WHEN EXTRACT(YEAR FROM AGE($1, dob)) BETWEEN 6 AND 10 THEN '6-10'
+          WHEN EXTRACT(YEAR FROM AGE($1, dob)) BETWEEN 11 AND 14 THEN '11-14'
+          WHEN EXTRACT(YEAR FROM AGE($1, dob)) BETWEEN 15 AND 17 THEN '15-17'
+          WHEN EXTRACT(YEAR FROM AGE($1, dob)) BETWEEN 18 AND 60 THEN '18-60'
           ELSE '60+'
         END as age_group,
         COUNT(*) as count
       FROM residents
-      WHERE status = 'Permanent'
+      WHERE status = 'Permanent' AND registration_date <= $1
       GROUP BY age_group
-    `);
+    `,
+      [end]
+    );
     const ageStats = ageStatsQuery.rows;
 
     // 3. Fluctuations (Within Date Range)
