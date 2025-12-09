@@ -18,6 +18,9 @@ import NewMemberForm from "./pages/Admin/HouseholdForms/NewMemberForm";
 import MemberStatusChangeForm from "./pages/Admin/HouseholdForms/MemberStatusChangeForm";
 import TemporaryResidenceForm from "./pages/Admin/HouseholdForms/TemporaryResidenceForm";
 import ChangeOwnerForm from "./pages/Admin/HouseholdForms/ChangeOwnerForm/ChangeOwnerForm";
+import Overview from "./pages/Admin/Overview/Overview";
+import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
+import HouseholdTemporaryList from "./pages/Admin/HouseholdTemporaryList/HouseholdTemporaryList";
 
 // Import Staff Pages - SỬA ĐỔI TẠI ĐÂY
 import AccountantDashboard from "./pages/Staff/FeeDashboard/AccountantDashboard";
@@ -66,8 +69,9 @@ function AppRoutes() {
         }
       >
         <Route index element={<PopulationDashboard />} />
-        <Route path="overview" element={<PopulationDashboard />} />
-        <Route path="household" element={<HouseholdDetail />} />
+        <Route path="overview" element={<Overview />} />
+        <Route path="household" element={<HouseholdList />} />
+        <Route path="householdtemporary" element={<HouseholdTemporaryList />} />     
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />
         <Route path="form/new-household-form" element={<NewHouseholdForm />} />

@@ -1,5 +1,4 @@
 // backend/src/routes/householdRoutes.js
-
 const express = require('express');
 const router = express.Router();
 const { verifyToken, requireAdmin } = require('../middleware/authMiddleware');
