@@ -262,7 +262,7 @@ export const getFinanceStats = async (feeId) => {
 export const fetchFees = async () => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/fees`, { // ← SỬA: Đổi từ /api/fees thành /api/fees/fees để match route
+    const response = await fetch(`${API_BASE_URL}/api/fees`, { 
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -281,7 +281,7 @@ export const fetchFees = async () => {
 export const fetchFeeStatistics = async (feeId) => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/fees/${feeId}/statistics`, {
+    const response = await fetch(`${API_BASE_URL}/api/fees/${feeId}/statistics`, { // ✅ FIX
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -300,7 +300,7 @@ export const fetchFeeStatistics = async (feeId) => {
 export const fetchHouseholdPaymentStatus = async (feeId) => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/fees/${feeId}/households`, {
+    const response = await fetch(`${API_BASE_URL}/api/fees/${feeId}/households`, { // ✅ FIX
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -319,7 +319,7 @@ export const fetchHouseholdPaymentStatus = async (feeId) => {
 export const fetchHouseholdPaymentHistory = async (householdId) => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/fees/households/${householdId}/payments`, {
+    const response = await fetch(`${API_BASE_URL}/api/fees/households/${householdId}/payments`, { // ✅ FIX
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -338,7 +338,7 @@ export const fetchHouseholdPaymentHistory = async (householdId) => {
 export const fetchHouseholdResidents = async (householdId) => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/fees/households/${householdId}/residents`, {
+    const response = await fetch(`${API_BASE_URL}/api/fees/households/${householdId}/residents`, { // ✅ FIX
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -377,7 +377,7 @@ export const createPayment = async (paymentData) => {
 export const fetchOverallStatistics = async () => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/fees/overall-statistics`, {
+    const response = await fetch(`${API_BASE_URL}/api/fees/overall-statistics`, { // ✅ FIX
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -396,7 +396,7 @@ export const fetchOverallStatistics = async () => {
 export const fetchAllHouseholdsWithPaymentSummary = async () => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/fees/all-households`, {
+    const response = await fetch(`${API_BASE_URL}/api/fees/all-households`, { // ✅ FIX
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
