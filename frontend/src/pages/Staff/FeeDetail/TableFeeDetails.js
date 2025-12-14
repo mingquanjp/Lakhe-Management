@@ -9,8 +9,10 @@ import {
   getFeeById, 
   getFeeSummary, 
   getAllHouseholdsForFee,
-  createPayment 
+  createPayment,
+  updatePayment 
 } from '../../../services/feeService';
+import { exportToExcelWithHeaders, formatDateForExcel, formatCurrencyForExcel } from '../../../utils/excelExport';
 import './TableFeeDetails.css';
 
 const TableFeeDetail = () => {
@@ -26,6 +28,8 @@ const TableFeeDetail = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [paymentMode, setPaymentMode] = useState('create'); // 'create' hoặc 'edit'
+  const [editingPayment, setEditingPayment] = useState(null); // Lưu payment đang edit
   const itemsPerPage = 6;
   
   // ← THÊM: Fetch all fees và redirect nếu không có feeId
@@ -131,8 +135,20 @@ const TableFeeDetail = () => {
   // Xử lý khi click vào "Ghi nhận" hoặc "Xem chi tiết"
   const handleViewDetail = (household) => {
     if (household.payment_status === 'Đã nộp') {
-      alert(`Thông tin thanh toán:\nSố tiền: ${formatCurrency(household.amount_paid)}\nNgày nộp: ${formatDate(household.payment_date)}\nGhi chú: ${household.notes || 'Không có'}`);
+      // Mở modal ở chế độ EDIT với dữ liệu hiện có
+      setPaymentMode('edit');
+      setEditingPayment({
+        payment_id: household.payment_id, // Cần thêm payment_id từ API
+        amount_paid: household.amount_paid,
+        payment_date: household.payment_date,
+        notes: household.notes
+      });
+      setSelectedHousehold(household);
+      setIsPaymentModalOpen(true);
     } else {
+      // Mở modal ở chế độ CREATE
+      setPaymentMode('create');
+      setEditingPayment(null);
       setSelectedHousehold(household);
       setIsPaymentModalOpen(true);
     }
@@ -140,28 +156,54 @@ const TableFeeDetail = () => {
 
   const handlePaymentSubmit = async (paymentData) => {
     try {
-      // Xác định số tiền:
-      // - Nếu là Mandatory: dùng currentFee.amount
-      // - Nếu là Voluntary: dùng paymentData.amount (người dùng nhập)
       const amountToPay = currentFee.fee_type === 'Mandatory' 
         ? currentFee.amount 
         : paymentData.amount;
 
-      const response = await createPayment({
-        fee_id: parseInt(feeId),
-        household_id: selectedHousehold.household_id,
-        amount_paid: amountToPay,
-        notes: paymentData.note
-      });
+      if (paymentMode === 'edit') {
+        // CẬP NHẬT thanh toán
+        const response = await updatePayment(editingPayment.payment_id, {
+          amount_paid: amountToPay,
+          notes: paymentData.note,
+          payment_date: paymentData.paymentDate // ← THÊM
+        });
 
-      if (response.success) {
-        setIsPaymentModalOpen(false);
-        alert('Ghi nhận thanh toán thành công!');
-        fetchFeeData();
+        if (response.success) {
+          setIsPaymentModalOpen(false);
+          setPaymentMode('create');
+          setEditingPayment(null);
+          setSelectedHousehold(null);
+          
+          // Force refresh
+          await fetchFeeData();
+          
+          alert('Cập nhật thanh toán thành công!');
+        }
+      } else {
+        // TẠO MỚI thanh toán
+        const response = await createPayment({
+          fee_id: parseInt(feeId),
+          household_id: selectedHousehold.household_id,
+          amount_paid: amountToPay,
+          notes: paymentData.note,
+          payment_date: paymentData.paymentDate // ← THÊM
+        });
+
+        if (response.success) {
+          setIsPaymentModalOpen(false);
+          setPaymentMode('create');
+          setEditingPayment(null);
+          setSelectedHousehold(null);
+          
+          // Force refresh
+          await fetchFeeData();
+          
+          alert('Ghi nhận thanh toán thành công!');
+        }
       }
     } catch (err) {
       alert(`Lỗi: ${err.message}`);
-      console.error('Error creating payment:', err);
+      console.error('Error with payment:', err);
     }
   };
 
@@ -244,6 +286,56 @@ const TableFeeDetail = () => {
     });
     return newRow;
   });
+
+  const handleExportExcel = () => {
+    try {
+      // Chuẩn bị data để export
+      const exportData = filteredData.map(row => ({
+        household_code: row.household_code,
+        head_name: row.head_name,
+        address: row.address,
+        member_count: row.member_count || 0,
+        amount_paid: row.amount_paid ? formatCurrencyForExcel(row.amount_paid) : '-',
+        payment_status: row.payment_status,
+        payment_date: formatDateForExcel(row.payment_date),
+        notes: row.notes || '-'
+      }));
+
+      // Định nghĩa headers tiếng Việt
+      const headers = {
+        household_code: 'Số hộ khẩu',
+        head_name: 'Họ và tên chủ hộ',
+        address: 'Địa chỉ',
+        member_count: 'Số nhân khẩu',
+        amount_paid: 'Số tiền đã nộp (VND)',
+        payment_status: 'Trạng thái',
+        payment_date: 'Ngày nộp',
+        notes: 'Ghi chú'
+      };
+
+      // Tên file với tên khoản thu và ngày xuất
+      const today = new Date().toISOString().split('T')[0];
+      const fileName = `${currentFee.fee_name}_${today}`.replace(/\s+/g, '_');
+      const sheetName = currentFee.fee_name.substring(0, 30); // Excel sheet name max 31 chars
+
+      // Export
+      const success = exportToExcelWithHeaders(
+        exportData, 
+        headers, 
+        fileName, 
+        sheetName
+      );
+
+      if (success) {
+        alert('Xuất Excel thành công!');
+      } else {
+        alert('Có lỗi khi xuất Excel. Vui lòng thử lại.');
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Có lỗi khi xuất Excel: ' + error.message);
+    }
+  };
 
   if (loading) {
     return <Loading />;
@@ -344,7 +436,7 @@ const TableFeeDetail = () => {
               <Button 
                 variant="primary" 
                 size="small"
-                onClick={() => {/* TODO: Export to Excel */}}
+                onClick={handleExportExcel} // ← Thay đổi dòng này
               >
                 Xuất Excel
               </Button>
@@ -374,20 +466,30 @@ const TableFeeDetail = () => {
       {/* Modal ghi nhận thanh toán */}
       <Modal
         isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
-        title="Ghi nhận đợt thu"
+        onClose={() => {
+          setIsPaymentModalOpen(false);
+          setPaymentMode('create');
+          setEditingPayment(null);
+        }}
+        title={paymentMode === 'edit' ? 'Chỉnh sửa thông tin thanh toán' : 'Ghi nhận đợt thu'}
       >
         {selectedHousehold && (
           <PaymentForm
+            mode={paymentMode} // ← THÊM prop mode
+            initialData={editingPayment} // ← THÊM dữ liệu ban đầu
             householdData={{
               ownerName: selectedHousehold.head_name || 'Chưa có chủ hộ',
               amount: currentFee.amount ? formatCurrency(currentFee.amount) : 'Tự nguyện',
               householdNumber: selectedHousehold.household_code,
               household_id: selectedHousehold.household_id
             }}
-            feeType={currentFee.fee_type} // ← THÊM feeType
+            feeType={currentFee.fee_type}
             onSubmit={handlePaymentSubmit}
-            onCancel={() => setIsPaymentModalOpen(false)}
+            onCancel={() => {
+              setIsPaymentModalOpen(false);
+              setPaymentMode('create');
+              setEditingPayment(null);
+            }}
           />
         )}
       </Modal>

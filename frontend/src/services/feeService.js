@@ -1,5 +1,3 @@
-// frontend/src/services/feeService.js
-
 import { getAuthToken } from '../utils/api';
 const API_BASE_URL = 'http://localhost:5000';
 
@@ -10,33 +8,27 @@ const getHeaders = () => {
     'Authorization': `Bearer ${token}`
   };
 };
-
 export const getAllFees = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/fees`, {
       method: 'GET',
       headers: getHeaders()
     });
-
     // Kiểm tra response trước khi parse JSON
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
       throw new Error('Server không trả về JSON. Có thể backend chưa chạy hoặc chưa đăng nhập.');
     }
-
     const data = await response.json();
-    
     if (!response.ok) {
       throw new Error(data.message || 'Lỗi khi lấy danh sách khoản thu');
     }
-    
     return data;
   } catch (error) {
     console.error('Error fetching fees:', error);
     throw error;
   }
 };
-
 /**
  * Lấy chi tiết một khoản thu
  * GET /api/fees/:feeId
@@ -191,7 +183,7 @@ export const getFeeSummary = async (feeId) => {
  */
 export const createPayment = async (paymentData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/payments`, {
+    const response = await fetch(`${API_BASE_URL}/api/fees/payments`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(paymentData)
@@ -209,7 +201,54 @@ export const createPayment = async (paymentData) => {
     throw error;
   }
 };
+/**
+ * Cập nhật thông tin thanh toán
+ * PUT /api/fees/payments/:paymentId
+ */
+export const updatePayment = async (paymentId, paymentData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/payments/${paymentId}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(paymentData)
+    });
 
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Lỗi khi cập nhật thanh toán');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error updating payment:', error);
+    throw error;
+  }
+};
+
+/**
+ * Xóa thanh toán (nếu cần)
+ * DELETE /api/fees/payments/:paymentId
+ */
+export const deletePayment = async (paymentId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/payments/${paymentId}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Lỗi khi xóa thanh toán');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error deleting payment:', error);
+    throw error;
+  }
+};
 /**
  * Lấy lịch sử thanh toán của một hộ khẩu
  * GET /api/payments/household/:householdId

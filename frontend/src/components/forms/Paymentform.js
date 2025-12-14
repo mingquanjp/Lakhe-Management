@@ -2,13 +2,23 @@ import React, { useState } from 'react';
 import { Button } from '../commons';
 import './Form.css';
 
-const PaymentForm = ({ householdData, feeType, onSubmit, onCancel }) => {
+const PaymentForm = ({ 
+  householdData, 
+  feeType, 
+  mode = 'create', // ← THÊM
+  initialData = null, // ← THÊM
+  onSubmit, 
+  onCancel 
+}) => {
   const isVoluntary = feeType === 'Voluntary';
+  const isEditMode = mode === 'edit';
   
   const [formData, setFormData] = useState({
-    paymentDate: new Date().toISOString().split('T')[0],
-    amount: '', // Thêm trường amount cho tự nguyện
-    note: ''
+    paymentDate: initialData?.payment_date 
+      ? new Date(initialData.payment_date).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0],
+    amount: initialData?.amount_paid?.toString() || '',
+    note: initialData?.notes || ''
   });
 
   const handleChange = (e) => {
@@ -27,10 +37,10 @@ const PaymentForm = ({ householdData, feeType, onSubmit, onCancel }) => {
       alert('Vui lòng nhập số tiền hợp lệ');
       return;
     }
-
     onSubmit({
-      ...formData,
-      amount: isVoluntary ? parseFloat(formData.amount) : null, // Truyền amount nếu là tự nguyện
+      paymentDate: formData.paymentDate, // ← Đã có
+      amount: isVoluntary ? parseFloat(formData.amount) : null,
+      note: formData.note,
       household_id: householdData.household_id
     });
   };
@@ -38,7 +48,9 @@ const PaymentForm = ({ householdData, feeType, onSubmit, onCancel }) => {
   return (
     <form className="create-fee-form" onSubmit={handleSubmit}>
       <div className="form-description">
-        Điền chi tiết thông tin thu của hộ khẩu
+        {isEditMode 
+          ? 'Chỉnh sửa thông tin thu của hộ khẩu' 
+          : 'Điền chi tiết thông tin thu của hộ khẩu'}
       </div>
 
       {/* Số hộ khẩu - Disabled */}
@@ -149,18 +161,20 @@ const PaymentForm = ({ householdData, feeType, onSubmit, onCancel }) => {
 
       {/* Form Actions */}
       <div className="form-actions">
-        <Button 
-          type="button" 
-          variant="outline" 
+        <Button
+          type="button"
+          variant="outline"
+          size="medium"
           onClick={onCancel}
         >
           Hủy
         </Button>
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           variant="primary"
+          size="medium"
         >
-          Xác nhận
+          {isEditMode ? 'Cập nhật' : 'Xác nhận'}
         </Button>
       </div>
     </form>

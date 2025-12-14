@@ -53,7 +53,7 @@ const StaffSidebar = () => {
       id: "detail",
       label: "Chi tiết các đợt thu",
       icon: detailIcon,
-      page: "/staff/table-detail",
+      path: "/staff/table-detail",
     }
   ];
 

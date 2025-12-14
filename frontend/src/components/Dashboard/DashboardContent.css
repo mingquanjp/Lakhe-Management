@@ -77,6 +77,7 @@
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.2s;
+  position: relative;
 }
 
 .fee-card-modern:hover {
@@ -95,6 +96,7 @@
   align-items: flex-start;
   margin-bottom: 20px;
   gap: 12px;
+  padding-right: 40px; /* Thêm padding để tránh đè lên nút xóa */
 }
 
 .fee-card-title {
@@ -103,16 +105,19 @@
   margin: 0;
   color: #1e293b;
   line-height: 1.4;
+  flex: 1;
 }
 
 /* ← SỬA: Badge màu sắc */
 .fee-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
+  padding: 6px 14px;
+  border-radius: 16px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .fee-badge.mandatory {
@@ -228,6 +233,85 @@
   text-align: center;
   padding: 48px 0;
   color: #64748b;
+}
+
+/* Nút xóa góc phải*/
+.fee-delete-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #fff;
+  border: 2px solid #ff4757;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  padding: 0;
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.fee-card-modern:hover .fee-delete-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.fee-delete-btn:hover {
+  background: #ff4757;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+}
+
+.fee-delete-btn:active {
+  transform: scale(0.9);
+}
+
+/* Modal xác nhận xóa */
+.delete-confirm-content {
+  padding: 20px 0;
+}
+
+.delete-confirm-message {
+  font-size: 16px;
+  color: #2c3e50;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.delete-confirm-message strong {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.delete-confirm-warning {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: #856404;
+  border-radius: 4px;
+}
+
+.delete-confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.delete-confirm-btn {
+  background: #e74c3c !important;
+  color: white !important;
+}
+
+.delete-confirm-btn:hover {
+  background: #c0392b !important;
 }
 
 /* Responsive */

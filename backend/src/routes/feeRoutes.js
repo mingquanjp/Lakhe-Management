@@ -16,7 +16,8 @@ const {
   getHouseholdPaymentStatus,
   getHouseholdResidents,
   getOverallStatistics,
-  getAllHouseholdsWithPaymentSummary
+  getAllHouseholdsWithPaymentSummary,
+  updatePayment
 } = require('../controllers/feeController');
 
 // Overall statistics (phải đặt trước các routes có params)
@@ -40,5 +41,5 @@ router.get('/households/:id/residents', verifyToken, getHouseholdResidents);
 // Payment routes
 router.post('/payments', verifyToken, createPayment);
 router.get('/payments/household/:householdId', verifyToken, getHouseholdPaymentHistory);
-
+router.put('/payments/:paymentId', verifyToken, updatePayment);
 module.exports = router;

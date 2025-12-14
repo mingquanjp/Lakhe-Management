@@ -1,156 +1,187 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import "./FeeDetail.css";
-import { Card, Button, Loading } from "../../../components/commons";
+import { Card, Button } from "../../../components/commons";
 import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
 import { searchIcon } from "../../../assets/icons";
 import HouseholdDetailModal from "./HouseholdDetailModal";
-import { 
-  fetchFees, 
-  fetchFeeStatistics, 
-  fetchHouseholdPaymentStatus 
-} from "../../../utils/api";
+import { fetchOverallStatistics, fetchAllHouseholdsWithPaymentSummary } from "../../../utils/api";
 
 const FeeDetail = () => {
-  const { feeId: urlFeeId } = useParams();
-  const navigate = useNavigate();
-  
-  // State management
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [allFees, setAllFees] = useState([]);
-  const [selectedFeeId, setSelectedFeeId] = useState(urlFeeId || null);
-  const [feeStatistics, setFeeStatistics] = useState(null);
-  const [households, setHouseholds] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
+  const [statistics, setStatistics] = useState(null);
+  const [households, setHouseholds] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch all fees on mount
+  // Search, Filter, Sort states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Fetch data khi component mount
   useEffect(() => {
-    const loadFees = async () => {
-      try {
-        const response = await fetchFees();
-        if (response.success && response.data) {
-          setAllFees(response.data);
-          // Set first fee as default if no URL param
-          if (!selectedFeeId && response.data.length > 0) {
-            setSelectedFeeId(response.data[0].fee_id);
-          }
-        }
-      } catch (err) {
-        console.error("Error loading fees:", err);
-        setError("Không thể tải danh sách khoản thu");
-      }
-    };
-    loadFees();
-  }, []); // Run once on mount
-
-  // Fetch fee details when selectedFeeId changes
-  useEffect(() => {
-    if (!selectedFeeId) return;
-
-    const loadFeeDetails = async () => {
+    const loadData = async () => {
       setLoading(true);
       try {
-        const [statsResponse, householdsResponse] = await Promise.all([
-          fetchFeeStatistics(selectedFeeId),
-          fetchHouseholdPaymentStatus(selectedFeeId)
+        const [statsRes, householdsRes] = await Promise.all([
+          fetchOverallStatistics(),
+          fetchAllHouseholdsWithPaymentSummary()
         ]);
-
-        if (statsResponse.success) {
-          setFeeStatistics(statsResponse.data);
+        
+        if (statsRes.success) {
+          setStatistics(statsRes.data);
         }
-
-        if (householdsResponse.success) {
-          setHouseholds(householdsResponse.data || []);
+        if (householdsRes.success) {
+          setHouseholds(householdsRes.data);
         }
-
-        setError(null);
       } catch (err) {
-        console.error("Error loading fee details:", err);
-        setError("Không thể tải thông tin khoản thu");
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
+    loadData();
+  }, []);
 
-    loadFeeDetails();
-  }, [selectedFeeId]);
-
-  // Handle fee selection change
-  const handleFeeChange = (e) => {
-    const newFeeId = e.target.value;
-    setSelectedFeeId(newFeeId);
-    navigate(`/staff/fee/${newFeeId}`);
+  // Format số tiền
+  const formatMoney = (amount) => {
+    if (!amount) return "0 VND";
+    return new Intl.NumberFormat('vi-VN').format(amount) + " VND";
   };
 
-  // Sorting logic
+  // Handle sort
   const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
     }
     setSortConfig({ key, direction });
+    setCurrentPage(1); // Reset to first page when sorting
   };
 
-  const getSortIcon = (key) => {
-    if (sortConfig.key !== key) return '⇅';
-    return sortConfig.direction === 'asc' ? '▲' : '▼';
-  };
-
-  // Filter and sort data
+  // Filter and sort data (all data, not paginated - for export)
   const filteredAndSortedData = useMemo(() => {
-    let filtered = households.filter(household => {
-      const searchLower = searchTerm.toLowerCase();
-      return (
-        household.household_code?.toLowerCase().includes(searchLower) ||
-        household.owner_name?.toLowerCase().includes(searchLower) ||
-        household.address?.toLowerCase().includes(searchLower)
-      );
-    });
+    let data = households.map(h => ({
+      household_id: h.household_id,
+      household_code: h.household_code,
+      first_name: h.first_name || "",
+      last_name: h.last_name || "",
+      owner_name: h.owner_name || "Chưa có chủ hộ",
+      address: h.address,
+      member_count: parseInt(h.member_count) || 0,
+      total_paid: parseInt(h.total_paid) || 0,
+      status: h.status
+    }));
 
+    // Apply search filter
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      data = data.filter(item =>
+        item.household_code.toLowerCase().includes(term) ||
+        item.owner_name.toLowerCase().includes(term) ||
+        item.address.toLowerCase().includes(term)
+      );
+    }
+
+    // Apply status filter
+    if (filterStatus !== "all") {
+      data = data.filter(item => item.status === filterStatus);
+    }
+
+    // Apply sorting
     if (sortConfig.key) {
-      filtered.sort((a, b) => {
-        const aVal = a[sortConfig.key];
-        const bVal = b[sortConfig.key];
+      data.sort((a, b) => {
+        let aVal, bVal;
         
-        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
+        // Special handling for Vietnamese name sorting (by last_name first, then first_name)
+        if (sortConfig.key === "owner_name") {
+          aVal = (a.last_name || "") + " " + (a.first_name || "");
+          bVal = (b.last_name || "") + " " + (b.first_name || "");
+        } else {
+          aVal = a[sortConfig.key];
+          bVal = b[sortConfig.key];
+        }
+        
+        // Handle null/undefined
+        aVal = aVal ?? "";
+        bVal = bVal ?? "";
+        
+        // Numeric comparison for numbers
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+        }
+        
+        // String comparison using localeCompare for proper Vietnamese sorting
+        const comparison = String(aVal).localeCompare(String(bVal), 'vi');
+        return sortConfig.direction === "asc" ? comparison : -comparison;
       });
     }
 
-    return filtered;
-  }, [households, searchTerm, sortConfig]);
+    return data;
+  }, [households, searchTerm, filterStatus, sortConfig]);
 
-  // Stats cards data
-  const stats = useMemo(() => {
-    if (!feeStatistics?.statistics) return [];
-    
-    const { statistics } = feeStatistics;
-    return [
-      {
-        value: `${(statistics.total_paid || 0).toLocaleString('vi-VN')} VND`,
-        label: "Tổng tiền đã thu",
-      },
-      {
-        value: `${(statistics.expected_total || 0).toLocaleString('vi-VN')} VND`,
-        label: "Tổng tiền thu dự kiến",
-      },
-      {
-        value: (statistics.paid_households || 0).toLocaleString('vi-VN'),
-        label: "Số hộ đã nộp",
-      },
-      {
-        value: (statistics.unpaid_households || 0).toLocaleString('vi-VN'),
-        label: "Số hộ còn nợ",
-      },
-    ];
-  }, [feeStatistics]);
+  // Paginated data for display
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedData, currentPage]);
 
-  // Table columns definition
+  // Total pages
+  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus]);
+
+  // Export to CSV (exports ALL filtered data, not just current page)
+  const handleExport = () => {
+    const headers = ["Số hộ khẩu", "Họ tên chủ hộ", "Địa chỉ", "Số thành viên", "Tổng đã nộp", "Trạng thái"];
+    const csvData = filteredAndSortedData.map(row => [
+      row.household_code,
+      row.owner_name,
+      row.address,
+      row.member_count,
+      row.total_paid,
+      row.status === "paid" ? "Đã nộp đủ" : "Còn nợ"
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...csvData.map(row => row.map(cell => `"${cell}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `danh_sach_ho_khau_thu_phi.csv`;
+    link.click();
+  };
+
+  // Stats từ API
+  const stats = statistics ? [
+    { value: formatMoney(statistics.total_paid), label: "Tổng tiền đã thu" },
+    { value: formatMoney(statistics.expected_total), label: "Tổng tiền thu dự kiến" },
+    { value: statistics.total_households.toString(), label: "Tổng số hộ khẩu" },
+    { value: statistics.active_fees.toString(), label: "Số khoản thu đang hoạt động" },
+  ] : [
+    { value: "0 VND", label: "Tổng tiền đã thu" },
+    { value: "0 VND", label: "Tổng tiền thu dự kiến" },
+    { value: "0", label: "Tổng số hộ khẩu" },
+    { value: "0", label: "Số khoản thu đang hoạt động" },
+  ];
+
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) return "▼";
+    return sortConfig.direction === "asc" ? "▲" : "▼";
+  };
+
   const tableColumns = [
     { 
       key: "household_code", 
@@ -183,6 +214,27 @@ const FeeDetail = () => {
       )
     },
     { 
+      key: "member_count", 
+      title: "Số thành viên",
+      headerRender: () => (
+        <span onClick={() => handleSort("member_count")} style={{ cursor: "pointer" }}>
+          Số TV
+          <span className="sort-arrow">{getSortIcon("member_count")}</span>
+        </span>
+      )
+    },
+    { 
+      key: "total_paid", 
+      title: "Tổng đã nộp",
+      headerRender: () => (
+        <span onClick={() => handleSort("total_paid")} style={{ cursor: "pointer" }}>
+          Tổng đã nộp
+          <span className="sort-arrow">{getSortIcon("total_paid")}</span>
+        </span>
+      ),
+      render: (value) => formatMoney(value)
+    },
+    { 
       key: "status", 
       title: "Trạng thái",
       headerRender: () => (
@@ -194,22 +246,12 @@ const FeeDetail = () => {
       render: (value, row) => (
         <span
           className={`status-badge ${
-            value === "paid" ? "status-paid" : "status-owing"
+            row.status === "paid" ? "status-paid" : "status-owing"
           }`}
         >
-          {value === "paid" ? "• Đã nộp" : "• Còn nợ"}
+          {row.status === "paid" ? "• Đã nộp đủ" : "• Còn nợ"}
         </span>
       )
-    },
-    { 
-      key: "payment_date", 
-      title: "Ngày nộp",
-      render: (value) => value ? new Date(value).toLocaleDateString('vi-VN') : '-'
-    },
-    { 
-      key: "amount_paid", 
-      title: "Số tiền",
-      render: (value) => value ? `${value.toLocaleString('vi-VN')} VND` : '-'
     },
     { 
       key: "details", 
@@ -230,106 +272,143 @@ const FeeDetail = () => {
     }
   ];
 
-  if (loading && !feeStatistics) {
-    return (
-      <div className="content">
-        <Loading />
-      </div>
-    );
-  }
-
   if (error) {
-    return (
-      <div className="content">
-        <Card>
-          <div className="error-message">{error}</div>
-          <Button onClick={() => navigate('/staff/fees')}>Quay lại</Button>
-        </Card>
-      </div>
-    );
+    return <div className="content"><p>Lỗi: {error}</p></div>;
   }
 
   return (
     <div className="content">
-      {/* Dropdown chọn đợt thu */}
-      {allFees.length > 0 && (
-        <div className="fee-selector-section">
-          <label htmlFor="feeSelect">Chọn đợt thu: </label>
-          <select 
-            id="feeSelect"
-            value={selectedFeeId || ''} 
-            onChange={handleFeeChange}
-            className="fee-select-dropdown"
-          >
-            {allFees.map(fee => (
-              <option key={fee.fee_id} value={fee.fee_id}>
-                {fee.fee_name} ({new Date(fee.start_date).toLocaleDateString('vi-VN')})
-              </option>
+          {/* Stat Cards */}
+          <div className="stats-grid">
+            {stats.map((stat, index) => (
+              <div key={index} className="stat-card">
+                <div className="stat-value">{stat.value}</div>
+                <div className="stat-label">{stat.label}</div>
+              </div>
             ))}
-          </select>
-        </div>
-      )}
-
-      {/* Stat Cards */}
-      {stats.length > 0 && (
-        <div className="stats-grid">
-          {stats.map((stat, index) => (
-            <div key={index} className="stat-card">
-              <div className="stat-value">{stat.value}</div>
-              <div className="stat-label">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Detailed Statistical Table */}
-      <Card
-        title="Bảng thống kê chi tiết"
-        actions={
-          <div className="table-actions">
-            <div className="table-search">
-              <img src={searchIcon} alt="Search" className="search-icon" />
-              <input
-                type="text"
-                placeholder="Tìm kiếm..."
-                className="table-search-input"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Button variant="outline" size="small">
-              Filters
-            </Button>
-            <Button variant="outline" size="small">
-              Export
-            </Button>
           </div>
-        }
-      >
-        <div className="table-wrapper">
-          {loading ? (
-            <Loading />
-          ) : (
-            <EnhancedTable 
-              columns={tableColumns} 
-              data={filteredAndSortedData} 
-              className="staff-table" 
-            />
-          )}
-        </div>
-      </Card>
 
-      {/* Household Detail Modal */}
-      {selectedHousehold && (
-        <HouseholdDetailModal
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setSelectedHousehold(null);
-          }}
-          household={selectedHousehold}
-        />
-      )}
+          {/* Detailed Statistical Table */}
+          <Card
+            title="Danh sách hộ khẩu"
+            subtitle={`(${filteredAndSortedData.length} hộ)`}
+            actions={
+              <div className="table-actions">
+                <div className="table-search">
+                  <img src={searchIcon} alt="Search" className="search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm..."
+                    className="table-search-input"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div className="filter-dropdown-container">
+                  <Button 
+                    variant="outline" 
+                    size="small"
+                    onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                  >
+                    Lọc {filterStatus !== "all" && `(${filterStatus === "paid" ? "Đã nộp đủ" : "Còn nợ"})`}
+                  </Button>
+                  {showFilterDropdown && (
+                    <div className="filter-dropdown">
+                      <div 
+                        className={`filter-option ${filterStatus === "all" ? "active" : ""}`}
+                        onClick={() => { setFilterStatus("all"); setShowFilterDropdown(false); }}
+                      >
+                        Tất cả
+                      </div>
+                      <div 
+                        className={`filter-option ${filterStatus === "paid" ? "active" : ""}`}
+                        onClick={() => { setFilterStatus("paid"); setShowFilterDropdown(false); }}
+                      >
+                        Đã nộp đủ
+                      </div>
+                      <div 
+                        className={`filter-option ${filterStatus === "owing" ? "active" : ""}`}
+                        onClick={() => { setFilterStatus("owing"); setShowFilterDropdown(false); }}
+                      >
+                        Còn nợ
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <Button variant="outline" size="small" onClick={handleExport}>
+                  Xuất CSV
+                </Button>
+              </div>
+            }
+          >
+            <div className="table-wrapper">
+              {loading ? (
+                <p>Đang tải dữ liệu...</p>
+              ) : (
+                <>
+                  <EnhancedTable columns={tableColumns} data={paginatedData} className="staff-table" />
+                  
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="pagination">
+                      <button 
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        ← Trước
+                      </button>
+                      <div className="pagination-info">
+                        <span>Trang </span>
+                        <input
+                          type="number"
+                          className="pagination-input"
+                          min="1"
+                          max={totalPages}
+                          value={currentPage}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (value >= 1 && value <= totalPages) {
+                              setCurrentPage(value);
+                            }
+                          }}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              const value = parseInt(e.target.value);
+                              if (value >= 1 && value <= totalPages) {
+                                setCurrentPage(value);
+                              } else if (value < 1) {
+                                setCurrentPage(1);
+                              } else if (value > totalPages) {
+                                setCurrentPage(totalPages);
+                              }
+                            }
+                          }}
+                        />
+                        <span> / {totalPages}</span>
+                      </div>
+                      <button 
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        Sau →
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </Card>
+
+      <HouseholdDetailModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedHousehold(null);
+        }}
+        household={selectedHousehold}
+      />
     </div>
   );
 };

@@ -236,11 +236,11 @@ const deleteFee = async (req, res) => {
 
 /**
  * Ghi nhận thanh toán
- * POST /api/payments
+ * POST /api/fees/payments
  */
 const createPayment = async (req, res) => {
   try {
-    const { fee_id, household_id, amount_paid, notes } = req.body;
+    const { fee_id, household_id, amount_paid, notes, payment_date } = req.body; // ← THÊM payment_date
     const collected_by_user_id = req.user?.user_id || req.user?.userId || 1;
     
     // Validation
@@ -251,8 +251,11 @@ const createPayment = async (req, res) => {
       });
     }
 
-    // Convert amount_paid thành integer (loại bỏ phần thập phân)
+    // Convert amount_paid thành integer
     const amountInteger = Math.round(parseFloat(amount_paid));
+
+    // Xử lý payment_date: nếu không có thì dùng ngày hiện tại
+    const paymentDateValue = payment_date || new Date().toISOString().split('T')[0];
 
     // Kiểm tra khoản thu có tồn tại không
     const feeCheck = await pool.query('SELECT * FROM fees WHERE fee_id = $1', [fee_id]);
@@ -284,13 +287,14 @@ const createPayment = async (req, res) => {
       const updateQuery = `
         UPDATE payment_history 
         SET amount_paid = amount_paid + $1, 
-            payment_date = CURRENT_TIMESTAMP,
-            notes = COALESCE($2, notes)
-        WHERE fee_id = $3 AND household_id = $4
+            payment_date = $2::date, 
+            notes = COALESCE($3, notes),
+            collected_by_user_id = $4
+        WHERE fee_id = $5 AND household_id = $6
         RETURNING *
       `;
       const result = await pool.query(updateQuery, [
-        amountInteger, notes, fee_id, household_id
+        amountInteger, paymentDateValue, notes, collected_by_user_id, fee_id, household_id
       ]);
 
       return res.status(200).json({
@@ -300,11 +304,12 @@ const createPayment = async (req, res) => {
       });
     }
 
+    // INSERT với payment_date từ frontend
     const result = await pool.query(
-      `INSERT INTO payment_history (fee_id, household_id, amount_paid, collected_by_user_id, notes)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO payment_history (fee_id, household_id, amount_paid, collected_by_user_id, notes, payment_date)
+       VALUES ($1, $2, $3, $4, $5, $6::date)
        RETURNING *`,
-      [fee_id, household_id, amountInteger, collected_by_user_id, notes]
+      [fee_id, household_id, amountInteger, collected_by_user_id, notes, paymentDateValue]
     );
 
     res.status(201).json({
@@ -552,26 +557,27 @@ const getAllHouseholdsForFee = async (req, res) => {
         message: 'Không tìm thấy khoản thu'
       });
     }
-
+    
     const result = await pool.query(
-      `SELECT 
-        h.household_id,
-        h.household_code,
-        h.address,
-        CONCAT(r.first_name, ' ', r.last_name) as head_name,
-        (SELECT COUNT(*) FROM residents WHERE household_id = h.household_id AND status = 'Permanent') as member_count,
-        ph.amount_paid,
-        ph.payment_date,
-        ph.notes,
-        CASE 
-          WHEN ph.payment_id IS NOT NULL THEN 'Đã nộp'
-          ELSE 'Chưa nộp'
-        END as payment_status
-       FROM households h
-       LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
-       LEFT JOIN payment_history ph ON h.household_id = ph.household_id AND ph.fee_id = $1
-       WHERE h.status = 'Active'
-       ORDER BY h.household_code`,
+     `SELECT 
+    h.household_id,
+    h.household_code,
+    h.address,
+    CONCAT(r.first_name, ' ', r.last_name) as head_name,
+    (SELECT COUNT(*) FROM residents WHERE household_id = h.household_id AND status = 'Permanent') as member_count,
+    ph.payment_id, -- ← THÊM dòng này
+    ph.amount_paid,
+    ph.payment_date,
+    ph.notes,
+    CASE 
+      WHEN ph.payment_id IS NOT NULL THEN 'Đã nộp'
+      ELSE 'Chưa nộp'
+    END as payment_status
+   FROM households h
+   LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
+   LEFT JOIN payment_history ph ON h.household_id = ph.household_id AND ph.fee_id = $1
+   WHERE h.status = 'Active'
+   ORDER BY h.household_code`,
       [feeId]
     );
 
@@ -632,7 +638,8 @@ const getFeeStatistics = async (req, res) => {
            (h.status = 'Active' AND r.status = 'Permanent' AND $1 >= h.date_created)
            OR
            -- Hộ tạm trú: chỉ tính nếu fee nằm trong khoảng thời gian tạm trú
-           (r.status = 'Temporary' 
+           (h.status = 'Temporary' 
+            AND r.status = 'Temporary'
             AND r.temp_start_date IS NOT NULL 
             AND r.temp_end_date IS NOT NULL
             AND $1 <= r.temp_end_date
@@ -721,7 +728,8 @@ const getHouseholdPaymentStatus = async (req, res) => {
           (h.status = 'Active' AND r.status = 'Permanent' AND f.start_date >= h.date_created)
           OR
           -- Hộ tạm trú: chỉ tính phí nếu fee nằm trong khoảng thời gian tạm trú
-          (r.status = 'Temporary' 
+          (h.status = 'Temporary' 
+           AND r.status = 'Temporary'
            AND r.temp_start_date IS NOT NULL 
            AND r.temp_end_date IS NOT NULL
            AND f.start_date <= r.temp_end_date
@@ -814,8 +822,9 @@ const getOverallStatistics = async (req, res) => {
              -- Hộ thường trú: chỉ tính nếu fee bắt đầu sau ngày hộ chuyển đến
              (h.status = 'Active' AND r.status = 'Permanent' AND f.start_date >= h.date_created)
              OR
-             -- Hộ tạm trú: chỉ tính nếu fee nằm trong khoảng thời gian tạm trú
-             (r.status = 'Temporary' 
+             -- Hộ tạm trú: chỉ tính nếu fee nằm trong khoảng thời gian tạm trú của resident
+             (h.status = 'Temporary' 
+              AND r.status = 'Temporary'
               AND r.temp_start_date IS NOT NULL 
               AND r.temp_end_date IS NOT NULL
               AND f.start_date <= r.temp_end_date
@@ -889,8 +898,9 @@ const getAllHouseholdsWithPaymentSummary = async (req, res) => {
             -- Hộ thường trú: chỉ tính phí nếu fee bắt đầu sau ngày hộ chuyển đến
             (h.status = 'Active' AND r.status = 'Permanent' AND f.start_date >= h.date_created)
             OR
-            -- Hộ tạm trú: chỉ tính phí nếu fee nằm trong khoảng thời gian tạm trú
-            (r.status = 'Temporary' 
+            -- Hộ tạm trú: chỉ tính nếu fee nằm trong khoảng thời gian tạm trú
+            (h.status = 'Temporary' 
+             AND r.status = 'Temporary'
              AND r.temp_start_date IS NOT NULL 
              AND r.temp_end_date IS NOT NULL
              AND f.start_date <= r.temp_end_date
@@ -939,6 +949,70 @@ const getAllHouseholdsWithPaymentSummary = async (req, res) => {
   }
 };
 
+/**
+ * Cập nhật thông tin thanh toán
+ * PUT /api/fees/payments/:paymentId
+ */
+const updatePayment = async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+    const { amount_paid, notes, payment_date } = req.body; // ← THÊM payment_date
+    const updated_by_user_id = req.user?.user_id || req.user?.userId;
+
+    // Validation
+    if (!amount_paid || amount_paid <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Số tiền phải lớn hơn 0'
+      });
+    }
+
+    // Kiểm tra payment có tồn tại không
+    const checkPayment = await pool.query(
+      'SELECT * FROM payment_history WHERE payment_id = $1',
+      [paymentId]
+    );
+
+    if (checkPayment.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy bản ghi thanh toán'
+      });
+    }
+
+    // Convert amount_paid thành integer
+    const amountInteger = Math.round(parseFloat(amount_paid));
+    
+    // Xử lý payment_date
+    const paymentDateValue = payment_date || new Date().toISOString().split('T')[0];
+
+    // Update payment với payment_date
+    const result = await pool.query(
+      `UPDATE payment_history 
+       SET amount_paid = $1,
+           notes = $2,
+           payment_date = $3::date,
+           collected_by_user_id = $4
+       WHERE payment_id = $5
+       RETURNING *`,
+      [amountInteger, notes, paymentDateValue, updated_by_user_id, paymentId]
+    );
+
+    res.json({
+      success: true,
+      message: 'Cập nhật thanh toán thành công',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error updating payment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi cập nhật thanh toán',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   // Fee management
   createFee,
@@ -959,5 +1033,6 @@ module.exports = {
   getHouseholdPaymentStatus,
   getHouseholdResidents,
   getOverallStatistics,
-  getAllHouseholdsWithPaymentSummary
+  getAllHouseholdsWithPaymentSummary,
+  updatePayment
 };

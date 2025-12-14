@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Modal, Loading } from '../commons';
 import { Link } from 'react-router-dom';
 import CreateFeeForm from '../forms/CreateFeeForm';
-import { getAllFees, createFee } from '../../services/feeService';
+import { getAllFees, createFee, deleteFee } from '../../services/feeService';
 import './DashboardContent.css';
 
 const DashboardContent = () => {
@@ -11,6 +11,7 @@ const DashboardContent = () => {
   const [fees, setFees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState({ isOpen: false, fee: null });
 
   // Lấy danh sách khoản thu khi component mount
   useEffect(() => {
@@ -58,6 +59,32 @@ const DashboardContent = () => {
       alert(`Lỗi: ${err.message}`);
       console.error('Error creating fee:', err);
     }
+  };
+
+  // Xử lý xóa khoản thu
+  const handleDeleteClick = (fee) => {
+    setDeleteConfirmModal({ isOpen: true, fee });
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const feeToDelete = deleteConfirmModal.fee;
+      const response = await deleteFee(feeToDelete.fee_id);
+      
+      if (response.success) {
+        alert('Xóa đợt thu thành công!');
+        setDeleteConfirmModal({ isOpen: false, fee: null });
+        // Refresh danh sách
+        fetchFees();
+      }
+    } catch (err) {
+      alert(`Lỗi khi xóa: ${err.message}`);
+      console.error('Error deleting fee:', err);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmModal({ isOpen: false, fee: null });
   };
 
   // Lọc khoản thu đang diễn ra và đã diễn ra
@@ -120,7 +147,11 @@ const DashboardContent = () => {
           <div className="fee-grid">
             {getOngoingFees().length > 0 ? (
               getOngoingFees().map(fee => (
-                <FeeCard key={fee.fee_id} fee={fee} />
+                <FeeCard 
+                  key={fee.fee_id} 
+                  fee={fee} 
+                  onDelete={() => handleDeleteClick(fee)}
+                />
               ))
             ) : (
               <p className="no-data">Không có đợt thu nào đang diễn ra</p>
@@ -133,7 +164,12 @@ const DashboardContent = () => {
           <div className="fee-history-grid">
             {getCompletedFees().length > 0 ? (
               getCompletedFees().map(fee => (
-                <FeeCard key={fee.fee_id} fee={fee} isCompleted={true} />
+                <FeeCard 
+                  key={fee.fee_id} 
+                  fee={fee} 
+                  isCompleted={true}
+                  onDelete={() => handleDeleteClick(fee)}
+                />
               ))
             ) : (
               <p className="no-data">Không có đợt thu nào đã kết thúc</p>
@@ -153,13 +189,44 @@ const DashboardContent = () => {
           onCancel={() => setIsModalOpen(false)}
         />
       </Modal>
+
+      {/* Modal xác nhận xóa */}
+      <Modal 
+        isOpen={deleteConfirmModal.isOpen} 
+        onClose={handleCancelDelete}
+        title="Xác nhận xóa đợt thu"
+      >
+        <div className="delete-confirm-content">
+          <p className="delete-confirm-message">
+            Bạn có chắc chắn muốn xóa đợt thu <strong>"{deleteConfirmModal.fee?.fee_name}"</strong> không?
+          </p>
+          <p className="delete-confirm-warning">
+            Hành động này sẽ xóa vĩnh viễn đợt thu và tất cả dữ liệu thanh toán liên quan. Không thể hoàn tác!
+          </p>
+          <div className="delete-confirm-actions">
+            <Button 
+              variant="outline" 
+              onClick={handleCancelDelete}
+            >
+              Hủy
+            </Button>
+            <Button 
+              variant="danger" 
+              onClick={handleConfirmDelete}
+              className="delete-confirm-btn"
+            >
+              Xóa đợt thu
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
 
-// ← SỬA: Lấy total_households từ API
-const FeeCard = ({ fee, isCompleted }) => {
-  const totalHouseholds = parseInt(fee.total_households) || 0; // ← LẤY TỪ DATABASE
+// Component FeeCard với nút xóa
+const FeeCard = ({ fee, isCompleted, onDelete }) => {
+  const totalHouseholds = parseInt(fee.total_households) || 0;
   const paidHouseholds = parseInt(fee.total_payments) || 0;
   const totalCollected = parseFloat(fee.total_collected) || 0;
   
@@ -185,6 +252,18 @@ const FeeCard = ({ fee, isCompleted }) => {
 
   return (
     <Card className={`fee-card-modern ${isCompleted ? 'completed' : ''}`}>
+      {/* Nút xóa góc phải */}
+      <button 
+        className="fee-delete-btn" 
+        onClick={(e) => {
+          e.preventDefault();
+          onDelete();
+        }}
+        title="Xóa đợt thu"
+      >
+        🗑️
+      </button>
+
       {/* Header */}
       <div className="fee-card-header">
         <h3 className="fee-card-title">{fee.fee_name}</h3>
