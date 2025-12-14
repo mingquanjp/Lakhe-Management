@@ -1,3 +1,80 @@
+.detail-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.detail-card-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e9ecef;
+  background-color: #fff;
+}
+
+.detail-card-header.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #32325d;
+  margin: 0;
+}
+
+.detail-card-body {
+  padding: 24px;
+}
+
+.detail-card-body.p-0 {
+  padding: 0;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 13px;
+  color: #8898aa;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.info-value {
+  font-size: 16px;
+  color: #32325d;
+  font-weight: 500;
+}
+
+.btn-add-member {
+  background-color: #5e72e4;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-member:hover {
+  background-color: #4e62d4;
+  transform: translateY(-1px);
+}
+
 .type-selection-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -97,6 +174,22 @@
 
 .btn-detail {
   background: linear-gradient(90deg, #28a745, #5cb85c);
+}
+
+.btn-delete {
+  background: linear-gradient(90deg, #dc3545, #e4606d);
+}
+
+.header-actions {
+  display: flex;
+  gap: 16px; /* Tăng khoảng cách giữa các nút ở header */
+  align-items: center;
+}
+
+.table-actions {
+  display: flex;
+  gap: 12px; /* Tăng khoảng cách giữa nút Sửa và Xóa */
+  align-items: center;
 }
 
 .btn-delete {

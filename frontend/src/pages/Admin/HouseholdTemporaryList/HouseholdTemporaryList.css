@@ -95,3 +95,26 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 6px rgba(45, 206, 137, 0.3); 
 }
+
+.detail-modal-content {
+  padding: 10px;
+}
+
+.detail-row {
+  margin-bottom: 12px;
+  font-size: 15px;
+  color: #333;
+  display: flex;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row strong {
+  min-width: 150px;
+  color: #555;
+  font-weight: 600;
+}

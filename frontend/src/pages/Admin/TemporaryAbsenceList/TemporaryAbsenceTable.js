@@ -1,7 +1,7 @@
 import React from "react";
 import "./TemporaryAbsenceList.css";
 
-const TemporaryAbsenceTable = ({ data }) => {
+const TemporaryAbsenceTable = ({ data, onDetail }) => {
   const formatDate = (dateString) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString('vi-VN');
@@ -43,7 +43,12 @@ const TemporaryAbsenceTable = ({ data }) => {
               <td>{formatDate(row.end_date)}</td>
               <td>{row.reason}</td>
               <td className="text-center action-cell">
-                <button className="btn-action btn-detail">Chi tiết</button>
+                <button 
+                  className="btn-action btn-detail"
+                  onClick={() => onDetail(row)}
+                >
+                  Chi tiết
+                </button>
               </td>
             </tr>
           ))}

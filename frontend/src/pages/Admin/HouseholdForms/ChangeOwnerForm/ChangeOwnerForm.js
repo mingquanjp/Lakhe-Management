@@ -126,7 +126,7 @@ const ChangeOwnerForm = () => {
                     name="currentOwner"
                     value={formData.currentOwner}
                     readOnly
-                    className="bg-gray-100"
+                    className="input-field bg-gray-100"
                 />
                 
                 <div className="input-group">

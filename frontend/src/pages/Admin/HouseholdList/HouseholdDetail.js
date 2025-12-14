@@ -169,7 +169,7 @@ const HouseholdDetail = () => {
         dob: new Date(member.dob).toLocaleDateString('vi-VN'),
         statusDisplay: <StatusBadge status={member.status} />,
         actions: (
-            <div className="flex gap-4">
+            <div className="table-actions">
                 <button 
                     className="btn-action btn-detail"
                     onClick={() => handleEditClick(member)}
@@ -193,7 +193,7 @@ const HouseholdDetail = () => {
         <div className="p-6">
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold text-gray-800">Chi tiết hộ khẩu: {household.household_code}</h1>
-                <div className="flex gap-2">
+                <div className="header-actions">
                     <Button 
                         variant="secondary" 
                         onClick={fetchHistory}
@@ -209,44 +209,48 @@ const HouseholdDetail = () => {
                 </div>
             </div>
 
-            <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                <h2 className="text-lg font-semibold mb-2">Thông tin chung</h2>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <span className="text-gray-500">Chủ hộ: </span>
-                        <span className="ml-2 font-medium">{household.owner_name}</span>
-                    </div>
-                    <div>
-                        <span className="text-gray-500">Địa chỉ: </span>
-                        <span className="ml-2 font-medium">{household.address}</span>
-                    </div>
-                    <div>
-                        <span className="text-gray-500">Ngày tạo: </span>
-                        <span className="ml-2 font-medium">{new Date(household.date_created).toLocaleDateString('vi-VN')}</span>
+            <div className="detail-card">
+                <div className="detail-card-header">
+                    <h2 className="detail-card-title">Thông tin chung</h2>
+                </div>
+                <div className="detail-card-body">
+                    <div className="info-grid">
+                        <div className="info-item">
+                            <span className="info-label">Chủ hộ:</span>
+                            <span className="info-value">{household.owner_name}</span>
+                        </div>
+                        <div className="info-item">
+                            <span className="info-label">Địa chỉ:</span>
+                            <span className="info-value">{household.address}</span>
+                        </div>
+                        <div className="info-item">
+                            <span className="info-label">Ngày tạo:</span>
+                            <span className="info-value">{new Date(household.date_created).toLocaleDateString('vi-VN')}</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <Card className="bg-white shadow-sm border border-gray-100">
-                <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-                    <h2 className="text-lg font-semibold text-gray-800">Danh sách nhân khẩu</h2>
-                    <div className="flex gap-2">
-                        <Button 
-                            variant="primary" 
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-sm"
-                            onClick={handleOpenTypeSelection}
-                        >
-                            + Thêm nhân khẩu mới
-                        </Button>
-                    </div>
+            <div className="detail-card">
+                <div className="detail-card-header flex-between">
+                    <h2 className="detail-card-title">Danh sách nhân khẩu</h2>
+                    <Button 
+                        variant="primary" 
+                        className="btn-add-member"
+                        onClick={handleOpenTypeSelection}
+                    >
+                        + Thêm nhân khẩu mới
+                    </Button>
                 </div>
                 
-                <Table 
-                    columns={columns} 
-                    data={tableData} 
-                    className="w-full"
-                />
-            </Card>
+                <div className="detail-card-body p-0">
+                    <Table 
+                        columns={columns} 
+                        data={tableData} 
+                        className="w-full"
+                    />
+                </div>
+            </div>
 
             {/* Modal chọn loại thêm mới */}
             <Modal 

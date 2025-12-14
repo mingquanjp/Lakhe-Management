@@ -23,27 +23,39 @@ async function createUser() {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Insert user into database
-    const result = await pool.query(
-      'INSERT INTO users (username, password, full_name, role) VALUES ($1, $2, $3, $4) RETURNING user_id, username, full_name, role',
-      [username, hashedPassword, full_name, role]
-    );
+    // Insert or Update user
+    const checkUser = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
 
-    console.log('✅ User created successfully!');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('User ID:', result.rows[0].user_id);
-    console.log('Username:', result.rows[0].username);
-    console.log('Full Name:', result.rows[0].full_name);
-    console.log('Role:', result.rows[0].role);
+    if (checkUser.rows.length > 0) {
+      // Update existing user
+      const updateResult = await pool.query(
+        'UPDATE users SET password = $1, full_name = $2, role = $3 WHERE username = $4 RETURNING user_id, username, full_name, role',
+        [hashedPassword, full_name, role, username]
+      );
+      console.log('✅ User updated successfully!');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('User ID:', updateResult.rows[0].user_id);
+      console.log('Username:', updateResult.rows[0].username);
+      console.log('Full Name:', updateResult.rows[0].full_name);
+      console.log('Role:', updateResult.rows[0].role);
+    } else {
+      // Insert new user
+      const insertResult = await pool.query(
+        'INSERT INTO users (username, password, full_name, role) VALUES ($1, $2, $3, $4) RETURNING user_id, username, full_name, role',
+        [username, hashedPassword, full_name, role]
+      );
+      console.log('✅ User created successfully!');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('User ID:', insertResult.rows[0].user_id);
+      console.log('Username:', insertResult.rows[0].username);
+      console.log('Full Name:', insertResult.rows[0].full_name);
+      console.log('Role:', insertResult.rows[0].role);
+    }
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     
     process.exit(0);
   } catch (error) {
-    if (error.code === '23505') {
-      console.error('Username đã tồn tại!');
-    } else {
-      console.error('Error creating user:', error.message);
-    }
+    console.error('Error processing user:', error.message);
     process.exit(1);
   }
 }

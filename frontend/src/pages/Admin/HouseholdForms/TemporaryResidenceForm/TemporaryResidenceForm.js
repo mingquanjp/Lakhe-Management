@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
 import './TemporaryResidenceForm.css';
 
 const TemporaryResidenceForm = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         type: 'temporary_residence',
         fullName: '',
@@ -76,7 +78,7 @@ const TemporaryResidenceForm = () => {
                 const result = await response.json();
                 if (result.success) {
                     alert('Đăng ký tạm trú thành công!');
-                    // Reset form or redirect
+                    navigate('/admin/temporary-household');
                 } else {
                     alert('Lỗi: ' + result.message + (result.error ? `\nChi tiết: ${result.error}` : ''));
                 }
@@ -105,6 +107,7 @@ const TemporaryResidenceForm = () => {
                 const result = await response.json();
                 if (result.success) {
                     alert('Khai báo tạm vắng thành công!');
+                    navigate('/admin/temporary-absence');
                 } else {
                     alert('Lỗi: ' + result.message + (result.error ? `\nChi tiết: ${result.error}` : ''));
                 }
