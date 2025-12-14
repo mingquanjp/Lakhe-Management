@@ -5,8 +5,8 @@ import './Form.css';
 const PaymentForm = ({ 
   householdData, 
   feeType, 
-  mode = 'create', // ← THÊM
-  initialData = null, // ← THÊM
+  mode = 'create',
+  initialData = null, 
   onSubmit, 
   onCancel 
 }) => {
