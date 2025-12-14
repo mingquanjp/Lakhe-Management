@@ -31,6 +31,7 @@
   min-width: auto !important;
   color: #6b7280 !important;
 }
+
 .user-info {
   display: flex;
   align-items: center;
@@ -62,6 +63,18 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
 }
 
 .icon-button:hover {

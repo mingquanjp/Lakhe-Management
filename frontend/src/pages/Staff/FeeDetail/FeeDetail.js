@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./FeeDetail.css";
 import { Card, Button, Loading } from "../../../components/commons";
@@ -6,174 +6,215 @@ import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
 import { searchIcon } from "../../../assets/icons";
 import HouseholdDetailModal from "./HouseholdDetailModal";
 import { 
-  getAllFees,
-  getFeeSummary, 
-  getAllHouseholdsForFee 
-} from "../../../services/feeService";
+  fetchFees, 
+  fetchFeeStatistics, 
+  fetchHouseholdPaymentStatus 
+} from "../../../utils/api";
 
 const FeeDetail = () => {
-  const { feeId } = useParams();
+  const { feeId: urlFeeId } = useParams();
   const navigate = useNavigate();
   
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedHousehold, setSelectedHousehold] = useState(null);
-  const [selectedFeeId, setSelectedFeeId] = useState(null);
-  const [allFees, setAllFees] = useState([]);
-  const [feeSummary, setFeeSummary] = useState(null);
-  const [householdsData, setHouseholdsData] = useState([]);
+  // State management
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [allFees, setAllFees] = useState([]);
+  const [selectedFeeId, setSelectedFeeId] = useState(urlFeeId || null);
+  const [feeStatistics, setFeeStatistics] = useState(null);
+  const [households, setHouseholds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedHousehold, setSelectedHousehold] = useState(null);
 
-  // Lấy danh sách tất cả khoản thu khi component mount
+  // Fetch all fees on mount
   useEffect(() => {
-    fetchAllFees();
-  }, []);
+    const loadFees = async () => {
+      try {
+        const response = await fetchFees();
+        if (response.success && response.data) {
+          setAllFees(response.data);
+          // Set first fee as default if no URL param
+          if (!selectedFeeId && response.data.length > 0) {
+            setSelectedFeeId(response.data[0].fee_id);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading fees:", err);
+        setError("Không thể tải danh sách khoản thu");
+      }
+    };
+    loadFees();
+  }, []); // Run once on mount
 
-  const fetchAllFees = async () => {
-    try {
+  // Fetch fee details when selectedFeeId changes
+  useEffect(() => {
+    if (!selectedFeeId) return;
+
+    const loadFeeDetails = async () => {
       setLoading(true);
-      const response = await getAllFees();
-      
-      if (response.success && response.data.length > 0) {
-        setAllFees(response.data);
-        
-        // Nếu có feeId từ URL, dùng nó, nếu không thì chọn fee đầu tiên
-        const initialFeeId = feeId || response.data[0].fee_id;
-        setSelectedFeeId(initialFeeId);
-        
-        await fetchFeeData(initialFeeId);
-      } else {
-        setError('Chưa có khoản thu nào');
-      }
-    } catch (err) {
-      setError(err.message);
-      console.error('Error fetching fees:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const [statsResponse, householdsResponse] = await Promise.all([
+          fetchFeeStatistics(selectedFeeId),
+          fetchHouseholdPaymentStatus(selectedFeeId)
+        ]);
 
-  // Lấy thống kê và danh sách hộ cho một khoản thu cụ thể
-  const fetchFeeData = async (feeIdParam) => {
-    try {
-      setLoading(true);
-      
-      // Lấy tổng hợp thống kê
-      const summaryResponse = await getFeeSummary(feeIdParam);
-      if (summaryResponse.success) {
-        setFeeSummary(summaryResponse.data);
-      }
+        if (statsResponse.success) {
+          setFeeStatistics(statsResponse.data);
+        }
 
-      // Lấy danh sách tất cả hộ (cả đã nộp và chưa nộp)
-      const householdsResponse = await getAllHouseholdsForFee(feeIdParam);
-      if (householdsResponse.success) {
-        setHouseholdsData(householdsResponse.data);
-      }
-    } catch (err) {
-      setError(err.message);
-      console.error('Error fetching fee data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (householdsResponse.success) {
+          setHouseholds(householdsResponse.data || []);
+        }
 
-  // Xử lý khi thay đổi dropdown chọn đợt thu
-  const handleFeeChange = async (e) => {
+        setError(null);
+      } catch (err) {
+        console.error("Error loading fee details:", err);
+        setError("Không thể tải thông tin khoản thu");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadFeeDetails();
+  }, [selectedFeeId]);
+
+  // Handle fee selection change
+  const handleFeeChange = (e) => {
     const newFeeId = e.target.value;
     setSelectedFeeId(newFeeId);
-    await fetchFeeData(newFeeId);
+    navigate(`/staff/fee/${newFeeId}`);
   };
 
-  // Format tiền VND
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(amount);
+  // Sorting logic
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
   };
 
-  // Cấu trúc stat cards từ feeSummary
-  const stats = feeSummary ? [
-    {
-      value: formatCurrency(feeSummary.total_collected),
-      label: "Tổng tiền đã thu",
-    },
-    {
-      value: feeSummary.expected_total 
-        ? formatCurrency(feeSummary.expected_total) 
-        : "Không giới hạn",
-      label: "Tổng tiền thu dự kiến",
-    },
-    {
-      value: feeSummary.paid_households,
-      label: "Số hộ đã nộp",
-    },
-    {
-      value: feeSummary.unpaid_households,
-      label: "Số hộ còn nợ",
-    },
-  ] : [];
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) return '⇅';
+    return sortConfig.direction === 'asc' ? '▲' : '▼';
+  };
 
+  // Filter and sort data
+  const filteredAndSortedData = useMemo(() => {
+    let filtered = households.filter(household => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        household.household_code?.toLowerCase().includes(searchLower) ||
+        household.owner_name?.toLowerCase().includes(searchLower) ||
+        household.address?.toLowerCase().includes(searchLower)
+      );
+    });
+
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        const aVal = a[sortConfig.key];
+        const bVal = b[sortConfig.key];
+        
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [households, searchTerm, sortConfig]);
+
+  // Stats cards data
+  const stats = useMemo(() => {
+    if (!feeStatistics?.statistics) return [];
+    
+    const { statistics } = feeStatistics;
+    return [
+      {
+        value: `${(statistics.total_paid || 0).toLocaleString('vi-VN')} VND`,
+        label: "Tổng tiền đã thu",
+      },
+      {
+        value: `${(statistics.expected_total || 0).toLocaleString('vi-VN')} VND`,
+        label: "Tổng tiền thu dự kiến",
+      },
+      {
+        value: (statistics.paid_households || 0).toLocaleString('vi-VN'),
+        label: "Số hộ đã nộp",
+      },
+      {
+        value: (statistics.unpaid_households || 0).toLocaleString('vi-VN'),
+        label: "Số hộ còn nợ",
+      },
+    ];
+  }, [feeStatistics]);
+
+  // Table columns definition
   const tableColumns = [
     { 
       key: "household_code", 
       title: "Số hộ khẩu",
       headerRender: () => (
-        <>
+        <span onClick={() => handleSort("household_code")} style={{ cursor: "pointer" }}>
           Số hộ khẩu
-          <span className="sort-arrow">▼</span>
-        </>
+          <span className="sort-arrow">{getSortIcon("household_code")}</span>
+        </span>
       )
     },
     { 
-      key: "head_name", 
+      key: "owner_name", 
       title: "Họ tên chủ hộ",
       headerRender: () => (
-        <>
+        <span onClick={() => handleSort("owner_name")} style={{ cursor: "pointer" }}>
           Họ tên chủ hộ
-          <span className="sort-arrow">▼</span>
-        </>
+          <span className="sort-arrow">{getSortIcon("owner_name")}</span>
+        </span>
       )
     },
     { 
       key: "address", 
       title: "Địa chỉ",
       headerRender: () => (
-        <>
+        <span onClick={() => handleSort("address")} style={{ cursor: "pointer" }}>
           Địa chỉ
-          <span className="sort-arrow">▼</span>
-        </>
-      )
-    },
-    { 
-      key: "payment_status", 
-      title: "Trạng thái",
-      headerRender: () => (
-        <>
-          Trạng thái
-          <span className="sort-arrow">▼</span>
-        </>
-      ),
-      render: (value) => (
-        <span
-          className={`status-badge ${
-            value === "Đã nộp" ? "status-paid" : "status-owing"
-          }`}
-        >
-          {value === "Đã nộp" ? "• Đã nộp" : "• Còn nợ"}
+          <span className="sort-arrow">{getSortIcon("address")}</span>
         </span>
       )
     },
     { 
-      key: "details", 
-      title: "Thông tin cụ thể",
+      key: "status", 
+      title: "Trạng thái",
       headerRender: () => (
-        <>
-          Thông tin cụ thể
-          <span className="sort-arrow">▼</span>
-        </>
+        <span onClick={() => handleSort("status")} style={{ cursor: "pointer" }}>
+          Trạng thái
+          <span className="sort-arrow">{getSortIcon("status")}</span>
+        </span>
       ),
+      render: (value, row) => (
+        <span
+          className={`status-badge ${
+            value === "paid" ? "status-paid" : "status-owing"
+          }`}
+        >
+          {value === "paid" ? "• Đã nộp" : "• Còn nợ"}
+        </span>
+      )
+    },
+    { 
+      key: "payment_date", 
+      title: "Ngày nộp",
+      render: (value) => value ? new Date(value).toLocaleDateString('vi-VN') : '-'
+    },
+    { 
+      key: "amount_paid", 
+      title: "Số tiền",
+      render: (value) => value ? `${value.toLocaleString('vi-VN')} VND` : '-'
+    },
+    { 
+      key: "details", 
+      title: "Chi tiết",
+      headerRender: () => "Chi tiết",
       render: (value, row) => (
         <Button
           variant="outline"
@@ -183,42 +224,30 @@ const FeeDetail = () => {
             setIsModalOpen(true);
           }}
         >
-          Xem chi tiết
+          Xem
         </Button>
-      )
-    },
-    {
-      title: "",
-      headerRender: () => null,
-      render: () => (
-        <button className="table-menu-btn">⋮</button>
       )
     }
   ];
 
-  // Lọc dữ liệu theo search term
-  const filteredData = householdsData.filter(household =>
-    household.head_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    household.household_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    household.address?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (loading && !feeSummary) {
-    return <Loading />;
+  if (loading && !feeStatistics) {
+    return (
+      <div className="content">
+        <Loading />
+      </div>
+    );
   }
 
   if (error) {
     return (
       <div className="content">
-        <div className="error-message">
-          <p>Lỗi: {error}</p>
-          <Button onClick={fetchAllFees}>Thử lại</Button>
-        </div>
+        <Card>
+          <div className="error-message">{error}</div>
+          <Button onClick={() => navigate('/staff/fees')}>Quay lại</Button>
+        </Card>
       </div>
     );
   }
-
-  const currentFee = allFees.find(f => f.fee_id === parseInt(selectedFeeId));
 
   return (
     <div className="content">
@@ -234,7 +263,7 @@ const FeeDetail = () => {
           >
             {allFees.map(fee => (
               <option key={fee.fee_id} value={fee.fee_id}>
-                {fee.fee_name}
+                {fee.fee_name} ({new Date(fee.start_date).toLocaleDateString('vi-VN')})
               </option>
             ))}
           </select>
@@ -242,7 +271,7 @@ const FeeDetail = () => {
       )}
 
       {/* Stat Cards */}
-      {feeSummary && (
+      {stats.length > 0 && (
         <div className="stats-grid">
           {stats.map((stat, index) => (
             <div key={index} className="stat-card">
@@ -256,7 +285,6 @@ const FeeDetail = () => {
       {/* Detailed Statistical Table */}
       <Card
         title="Bảng thống kê chi tiết"
-        subtitle={currentFee ? `Chi tiết thu phí: ${currentFee.fee_name} (${filteredData.length} hộ)` : 'Chi tiết thu phí'}
         actions={
           <div className="table-actions">
             <div className="table-search">
@@ -281,32 +309,29 @@ const FeeDetail = () => {
         <div className="table-wrapper">
           {loading ? (
             <Loading />
-          ) : filteredData.length > 0 ? (
+          ) : (
             <EnhancedTable 
               columns={tableColumns} 
-              data={filteredData} 
+              data={filteredAndSortedData} 
               className="staff-table" 
             />
-          ) : (
-            <div className="no-data">
-              <p>Không có dữ liệu</p>
-            </div>
           )}
         </div>
       </Card>
 
       {/* Household Detail Modal */}
-      <HouseholdDetailModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedHousehold(null);
-        }}
-        household={selectedHousehold}
-      />
+      {selectedHousehold && (
+        <HouseholdDetailModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedHousehold(null);
+          }}
+          household={selectedHousehold}
+        />
+      )}
     </div>
   );
 };
 
 export default FeeDetail;
-
