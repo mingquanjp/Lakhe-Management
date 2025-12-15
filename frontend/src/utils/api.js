@@ -419,3 +419,114 @@ export const fetchAllHouseholdsWithPaymentSummary = async () => {
     throw error;
   }
 };
+export const fetchOverviewStats = async () => {
+  const token = getAuthToken(); 
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/overview`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Lỗi khi lấy dữ liệu thống kê');
+    }
+
+    return data; 
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const fetchTemporaryHouseholds = async (searchTerm = '') => {
+  const token = getAuthToken();
+  
+  let url = `${API_BASE_URL}/api/households/temporary`;
+  if (searchTerm) {
+    url += `?search=${encodeURIComponent(searchTerm)}`;
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Lỗi khi lấy danh sách tạm trú');
+    }
+
+    return data; 
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchTemporaryHouseholdDetail = async (id) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/households/temporary/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createTemporaryHousehold = async (data) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/households/temporary`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data),
+    });
+
+    const resData = await response.json();
+    if (!response.ok) throw new Error(resData.message);
+    return resData;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchOverview = async () => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/overview`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -1,7 +1,10 @@
 import React from "react";
 import "./HouseholdTemporaryTable.css";
+import { useNavigate } from "react-router-dom";
 
-const HouseholdTemporaryTable = ({ data }) => {
+const HouseholdTemporaryTable = ({ data, onDelete }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="table-container">
       <table className="household-table">
@@ -16,7 +19,7 @@ const HouseholdTemporaryTable = ({ data }) => {
         <thead>
           <tr>
             <th>Số thứ tự</th>
-            <th>Số hộ khẩu</th>
+            <th>Mã hộ tạm trú</th>
             <th>Chủ hộ</th>
             <th>Địa chỉ</th>
             <th className="text-center">Số nhân khẩu</th>
@@ -26,17 +29,40 @@ const HouseholdTemporaryTable = ({ data }) => {
         <tbody>
           {data.map((row, index) => (
             <tr key={index}>
-              <td>{row.id}</td>
+              <td>{row.stt || index + 1}</td>
               <td>{row.code}</td>
               <td className="owner-name">{row.owner}</td>
               <td>{row.address}</td>
               <td className="text-center">{row.members}</td>
               <td className="text-center action-cell">
-                <button className="btn-action btn-detail">Chi tiết</button>
-                <button className="btn-action btn-delete">Xóa</button>
+                <button
+                  className="btn-action btn-detail"
+                  onClick={() => {
+                    navigate(`/admin/householdtemporary/${row.id}`);
+                  }}
+                >
+                  Chi tiết
+                </button>
+                <button
+                  className="btn-action btn-delete"
+                  onClick={() => onDelete && onDelete(row.id)}
+                >
+                  Xóa
+                </button>
               </td>
             </tr>
           ))}
+          {data.length === 0 && (
+            <tr>
+              <td
+                colSpan="6"
+                className="text-center"
+                style={{ padding: "20px", color: "#666" }}
+              >
+                Không có dữ liệu hiển thị
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

@@ -4,7 +4,7 @@ const residentController = require('../controllers/residentController');
 const { verifyToken, requireAdmin } = require('../middleware/authMiddleware');
 
 // Protect all routes
-//router.use(verifyToken);
+router.use(verifyToken);
 
 // CRUD Residents
 router.post('/', residentController.createResident);

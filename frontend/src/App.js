@@ -7,6 +7,8 @@ import {
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Pages
 import Login from "./pages/Login/Login";
@@ -27,6 +29,7 @@ import ChangeOwnerForm from "./pages/Admin/HouseholdForms/ChangeOwnerForm/Change
 import Overview from "./pages/Admin/Overview/Overview";
 import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
 import HouseholdTemporaryList from "./pages/Admin/HouseholdTemporaryList/HouseholdTemporaryList";
+
 
 // Import Staff Pages
 import FeeDashboard from "./pages/Staff/FeeDashboard/FeeDashboard";
@@ -75,10 +78,17 @@ function AppRoutes() {
         <Route index element={<PopulationDashboard />} />
         <Route path="overview" element={<Overview />} />
         <Route path="household" element={<HouseholdList />} />
+<<<<<<< HEAD
+        <Route path="household/:id" element={<HouseholdDetail />} />
+        <Route path="householdtemporary" element={<HouseholdTemporaryList />} />
+        <Route path="householdtemporary/:id" element={<HouseholdDetail />} />     
+        
+=======
         <Route path="householdtemporary" element={<HouseholdTemporaryList />} /> 
         <Route path="stats/citizen" element={<PopulationDashboard />} />
         <Route path="stats/finance" element={<StatsFinanceDashboard />} />
         <Route path="household" element={<HouseholdDetail />} />
+>>>>>>> 58a90a305e410ceb29d741ed5a51867cff6771f0
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />
         <Route path="form/new-household-form" element={<NewHouseholdForm />} />
@@ -117,6 +127,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <ToastContainer position="bottom-right" autoClose={3000} />
         <AppRoutes />
       </Router>
     </AuthProvider>

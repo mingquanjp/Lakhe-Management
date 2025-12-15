@@ -1,7 +1,9 @@
 import React from "react";
 import "./HouseholdTable.css";
+import { useNavigate } from "react-router-dom";
 
 const HouseholdTable = ({ data, onSplit, onDelete }) => {
+  const navigate = useNavigate();
   return (
     <div className="table-container">
       <table className="household-table">
@@ -38,7 +40,15 @@ const HouseholdTable = ({ data, onSplit, onDelete }) => {
                 >
                   Tách hộ khẩu
                 </button>
-                <button className="btn-action btn-detail">Chi tiết</button>
+                <button
+                  className="btn-action btn-detail"
+                  onClick={() => {
+                    navigate(`/admin/household/${row.id}`);
+                  }}
+                >
+                  Chi tiết
+                </button>
+
                 <button
                   className="btn-action btn-delete"
                   onClick={() => onDelete(row.id)}
