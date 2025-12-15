@@ -89,13 +89,13 @@ CREATE TABLE temporary_absences (
 );
 
 -- 6. Bảng Change_History (Lịch sử biến động)
--- Bảng Log ghi lại ai làm gì, thay đổi hộ nào
+-- Bảng Log ghi lại ai làm gì, thay đổi hộ nào, thay đổi ai, thay đổi gì (có cả thay đổi phí)
 CREATE TABLE change_history (
     history_id SERIAL PRIMARY KEY, 
-    household_id INT NOT NULL, -- Hộ khẩu
-    resident_id INT, -- Nhân khẩu
+    household_id INT, -- Hộ khẩu (Nếu là NULL thì là thay đổi phí)
+    resident_id INT, -- Nhân khẩu (Nếu là NULL thì là thay đổi hộ khẩu hoặc phí)
     change_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Ngày thay đổi
-    change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('Split', 'MoveOut', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold')), -- 'Split', 'MoveOut', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold'
+    change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('Split', 'MoveOut', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold', 'CreateFee', 'UpdateFee', 'DeleteFee')), -- 'Split', 'MoveOut', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold', 'CreateFee', 'UpdateFee', 'DeleteFee'
     changed_by_user_id INT NOT NULL, -- Người thực hiện thay đổi
     
     CONSTRAINT fk_history_household FOREIGN KEY (household_id) REFERENCES households(household_id),
