@@ -93,26 +93,25 @@ export const clearAuthData = () => {
   removeUserInfo();
 };
 
-
 export const fetchHouseholds = async () => {
   const token = getAuthToken();
-  
+
   try {
     const response = await fetch(`${API_BASE_URL}/api/households`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Lỗi khi lấy danh sách hộ khẩu');
+      throw new Error(data.message || "Lỗi khi lấy danh sách hộ khẩu");
     }
 
-    return data; 
+    return data;
   } catch (error) {
     throw error;
   }
@@ -122,10 +121,10 @@ export const createHousehold = async (householdData) => {
   const token = getAuthToken();
   try {
     const response = await fetch(`${API_BASE_URL}/api/households`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(householdData),
     });
@@ -133,7 +132,7 @@ export const createHousehold = async (householdData) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Lỗi khi tạo hộ khẩu');
+      throw new Error(data.message || "Lỗi khi tạo hộ khẩu");
     }
 
     return data;
@@ -146,10 +145,10 @@ export const deleteHousehold = async (id) => {
   const token = getAuthToken();
   try {
     const response = await fetch(`${API_BASE_URL}/api/households/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -163,16 +162,17 @@ export const deleteHousehold = async (id) => {
 
 export const fetchResidents = async (householdId) => {
   const token = getAuthToken();
-  const url = householdId 
+  // Nếu có householdId thì thêm vào đường dẫn query
+  const url = householdId
     ? `${API_BASE_URL}/api/residents?household_id=${householdId}`
     : `${API_BASE_URL}/api/residents`;
-    
+
   try {
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -188,10 +188,10 @@ export const splitHousehold = async (data) => {
   const token = getAuthToken();
   try {
     const response = await fetch(`${API_BASE_URL}/api/households/split`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
@@ -202,7 +202,6 @@ export const splitHousehold = async (data) => {
     throw error;
   }
 };
-
 
 // Finance API calls
 export const getFees = async () => {
@@ -248,6 +247,9 @@ export const getFinanceStats = async (feeId) => {
   } catch (error) {
     console.error("API Error:", error);
     return { success: false, message: error.message };
+  }
+};
+
 // ========== FEE APIs ==========
 
 // Lấy danh sách tất cả khoản thu
@@ -255,10 +257,10 @@ export const fetchFees = async () => {
   const token = getAuthToken();
   try {
     const response = await fetch(`${API_BASE_URL}/api/fees`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
     const data = await response.json();
@@ -273,13 +275,16 @@ export const fetchFees = async () => {
 export const fetchFeeStatistics = async (feeId) => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/${feeId}/statistics`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/fees/${feeId}/statistics`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     const data = await response.json();
     if (!response.ok) throw new Error(data.message);
     return data;
@@ -292,13 +297,16 @@ export const fetchFeeStatistics = async (feeId) => {
 export const fetchHouseholdPaymentStatus = async (feeId) => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/${feeId}/households`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/fees/${feeId}/households`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     const data = await response.json();
     if (!response.ok) throw new Error(data.message);
     return data;
@@ -311,13 +319,16 @@ export const fetchHouseholdPaymentStatus = async (feeId) => {
 export const fetchHouseholdPaymentHistory = async (householdId) => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/households/${householdId}/payments`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/fees/households/${householdId}/payments`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     const data = await response.json();
     if (!response.ok) throw new Error(data.message);
     return data;
@@ -330,13 +341,16 @@ export const fetchHouseholdPaymentHistory = async (householdId) => {
 export const fetchHouseholdResidents = async (householdId) => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/households/${householdId}/residents`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/fees/households/${householdId}/residents`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     const data = await response.json();
     if (!response.ok) throw new Error(data.message);
     return data;
@@ -350,10 +364,10 @@ export const createPayment = async (paymentData) => {
   const token = getAuthToken();
   try {
     const response = await fetch(`${API_BASE_URL}/api/fees/payments`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(paymentData),
     });
@@ -369,13 +383,16 @@ export const createPayment = async (paymentData) => {
 export const fetchOverallStatistics = async () => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/fees/overall-statistics`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/fees/overall-statistics`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     const data = await response.json();
     if (!response.ok) throw new Error(data.message);
     return data;
@@ -389,10 +406,10 @@ export const fetchAllHouseholdsWithPaymentSummary = async () => {
   const token = getAuthToken();
   try {
     const response = await fetch(`${API_BASE_URL}/api/fees/all-households`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
     const data = await response.json();
