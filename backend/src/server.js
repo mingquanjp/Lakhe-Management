@@ -5,7 +5,7 @@ const authRoutes = require("./routes/authRoutes");
 const { verifyToken, requireAdmin } = require("./middleware/authMiddleware");
 const householdRoutes = require('./routes/householdRoutes');
 const residentRoutes = require("./routes/residentRoutes");
-
+const overviewRoutes = require("./routes/overviewRoutes");
 
 const app = express();
 app.use(cors());
@@ -56,6 +56,7 @@ app.get("/api/test-admin", verifyToken, requireAdmin, (req, res) => {
 
 app.use('/api/households', householdRoutes); 
 app.use("/api/residents", residentRoutes);
+app.use("/api/overview", overviewRoutes);
 
 
 app.listen(5000, () => {

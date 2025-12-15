@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Modal from "../../../../components/commons/Modal/Modal";
 import "./HouseholdAddModal.css";
+import { toast } from "react-toastify";
 
 const HouseholdAddModal = ({ isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -59,7 +60,7 @@ const HouseholdAddModal = ({ isOpen, onClose, onSave }) => {
 
   const handleSubmit = () => {
     if (!formData.household_code || !formData.address) {
-      alert("Vui lòng nhập Mã hộ khẩu và Địa chỉ!");
+      toast.warning("Vui lòng nhập Mã hộ khẩu và Địa chỉ!");
       return;
     }
     if (onSave) onSave(formData);

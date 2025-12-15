@@ -73,6 +73,15 @@ ADD CONSTRAINT fk_head_of_household
 FOREIGN KEY (head_of_household_id) 
 REFERENCES residents(resident_id);
 
+
+-- Thêm cột deleted_at cho Households
+ALTER TABLE households 
+ADD COLUMN deleted_at TIMESTAMP DEFAULT NULL;
+
+-- Thêm cột deleted_at cho Residents
+ALTER TABLE residents 
+ADD COLUMN deleted_at TIMESTAMP DEFAULT NULL; 
+
 -- 5. Bảng Temporary_Absences (Tạm vắng)
 CREATE TABLE temporary_absences (
     absence_id SERIAL PRIMARY KEY, 

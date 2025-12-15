@@ -264,18 +264,6 @@ const HouseholdList = () => {
               style={{ width: "80px", height: "36px" }}
             />
           </div>
-
-          <button
-            onClick={clearFilters}
-            className="btn-tool"
-            style={{
-              marginLeft: "auto",
-              color: "#ff4d4f",
-              border: "1px solid #ff4d4f",
-            }}
-          >
-            <X size={16} /> Xóa bộ lọc
-          </button>
         </div>
       )}
 
