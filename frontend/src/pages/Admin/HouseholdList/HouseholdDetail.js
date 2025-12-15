@@ -319,12 +319,14 @@ const HouseholdDetail = () => {
                                                 item.change_type === 'NewBirth' ? 'badge-success' :
                                                 item.change_type === 'Death' ? 'badge-danger' :
                                                 item.change_type === 'MoveOut' ? 'badge-warning' :
+                                                item.change_type === 'UpdateInfo' ? 'badge-info' :
                                                 'badge-info'
                                             }`}>
                                                 {item.change_type === 'NewBirth' ? 'Mới sinh' :
                                                  item.change_type === 'Death' ? 'Khai tử' :
                                                  item.change_type === 'MoveOut' ? 'Chuyển đi' :
-                                                 item.change_type === 'Split' ? 'Tách hộ' : item.change_type}
+                                                 item.change_type === 'Split' ? 'Tách hộ' : 
+                                                 item.change_type === 'UpdateInfo' ? 'Cập nhật' : item.change_type}
                                             </span>
                                         </td>
                                         <td>{item.changed_by || 'Admin'}</td>

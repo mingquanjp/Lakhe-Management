@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Search, Filter, Download } from "lucide-react";
+import { Search, Download } from "lucide-react";
 import "./HouseholdTemporaryList.css";
 import HouseholdTemporaryTable from "./HouseholdTemporaryTable";
 import Pagination from "../../../components/commons/Pagination";
 import Modal from "../../../components/commons/Modal";
+import { exportToCSV } from "../../../utils/exportUtils";
 
 const HouseholdTemporaryList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState("");
+
   const itemsPerPage = 8;
 
   useEffect(() => {
@@ -28,6 +33,33 @@ const HouseholdTemporaryList = () => {
     }
   };
 
+  // Filter logic
+  const filteredData = data.filter(item => {
+    const fullName = `${item.last_name} ${item.first_name}`.toLowerCase();
+    const searchLower = searchTerm.toLowerCase();
+    
+    const matchesSearch = 
+      fullName.includes(searchLower) ||
+      (item.temporary_address && item.temporary_address.toLowerCase().includes(searchLower)) ||
+      (item.identity_card_number && item.identity_card_number.includes(searchLower));
+    
+    return matchesSearch;
+  });
+
+  const handleExport = () => {
+    const exportData = filteredData.map(item => ({
+      "Họ tên": `${item.last_name} ${item.first_name}`,
+      "Ngày sinh": new Date(item.birth_date).toLocaleDateString('vi-VN'),
+      "CMND/CCCD": item.identity_card_number,
+      "Địa chỉ tạm trú": item.temporary_address,
+      "Chủ hộ": item.host_name,
+      "Từ ngày": new Date(item.start_date).toLocaleDateString('vi-VN'),
+      "Đến ngày": new Date(item.end_date).toLocaleDateString('vi-VN'),
+      "Lý do": item.reason
+    }));
+    exportToCSV(exportData, "Danh_sach_tam_tru");
+  };
+
   const handleDetailClick = (item) => {
     setSelectedItem(item);
     setIsModalOpen(true);
@@ -40,8 +72,8 @@ const HouseholdTemporaryList = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -52,12 +84,14 @@ const HouseholdTemporaryList = () => {
         <div className="toolbar">
           <div className="search-box">
             <Search size={18} className="search-icon" />
-            <input type="text" placeholder="Search..." />
+            <input 
+              type="text" 
+              placeholder="Tìm kiếm..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-          <button className="btn-tool">
-            <Filter size={16} /> Filters
-          </button>
-          <button className="btn-tool">
+          <button className="btn-tool" onClick={handleExport}>
             <Download size={16} /> Export
           </button>
         </div>
@@ -65,7 +99,7 @@ const HouseholdTemporaryList = () => {
 
       <div className="table-card">
         <div className="card-top">
-          <span className="card-title">Danh sách tạm trú</span>
+          <span className="card-title">Danh sách tạm trú ({filteredData.length})</span>
         </div>
 
         <HouseholdTemporaryTable 

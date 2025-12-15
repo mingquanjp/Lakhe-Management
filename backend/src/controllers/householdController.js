@@ -186,6 +186,9 @@ const deleteHousehold = async (req, res) => {
       [id]
     );
 
+    // Xóa các ràng buộc khóa ngoại
+    await client.query("DELETE FROM change_history WHERE household_id = $1", [id]);
+
     await client.query("DELETE FROM residents WHERE household_id = $1", [id]);
 
     await client.query("DELETE FROM households WHERE household_id = $1", [id]);
@@ -283,6 +286,11 @@ const splitHousehold = async (req, res) => {
         `-> Hộ cũ (ID: ${original_household_id}) đã rỗng. Tiến hành xóa...`
       );
 
+      // Xóa các ràng buộc khóa ngoại trước khi xóa hộ
+      await client.query("DELETE FROM change_history WHERE household_id = $1", [
+        original_household_id,
+      ]);
+      
       await client.query(
         "UPDATE households SET head_of_household_id = NULL WHERE household_id = $1",
         [original_household_id]
@@ -329,7 +337,7 @@ const getHouseholdById = async (req, res) => {
 
         const residentsQuery = `
             SELECT * FROM residents 
-            WHERE household_id = $1 AND status = 'Permanent'
+            WHERE household_id = $1
             ORDER BY resident_id ASC
         `;
         const residentsResult = await pool.query(residentsQuery, [id]);

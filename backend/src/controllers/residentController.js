@@ -239,22 +239,20 @@ const updateResident = async (req, res) => {
 
     const updatedResident = result.rows[0];
 
-    // Log history if status changed
+    // Log history
     try {
+        let changeType = 'UpdateInfo';
+
         if (updates.status) {
-            let changeType = null;
             if (updates.status === 'Deceased') changeType = 'Death';
             else if (updates.status === 'MovedOut') changeType = 'MoveOut';
-            // else if (updates.status === 'Permanent') ... maybe re-entry?
-
-            if (changeType) {
-                await pool.query(
-                    `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
-                     VALUES ($1, $2, $3, $4)`,
-                    [updatedResident.household_id, id, changeType, 1]
-                );
-            }
         }
+
+        await pool.query(
+            `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
+             VALUES ($1, $2, $3, $4)`,
+            [updatedResident.household_id, id, changeType, 1]
+        );
     } catch (histError) {
         console.error('Error logging history:', histError);
     }

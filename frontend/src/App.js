@@ -69,7 +69,7 @@ function App() {
           >
             <Route index element={<Overview />} />
             <Route path="overview" element={<Overview />} />
-            <Route path="household" element={<HouseholdList />} />
+            {/* <Route path="household" element={<HouseholdList />} /> */}
             <Route path="household/:id" element={<HouseholdDetail />} />
             <Route path="temporary-household" element={<HouseholdTemporaryList />} />
             <Route path="temporary-absence" element={<TemporaryAbsenceList />} />

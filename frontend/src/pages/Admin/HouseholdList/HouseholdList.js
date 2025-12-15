@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Filter, Download, Split } from "lucide-react";
+import { Search, Download, Split } from "lucide-react";
 import "./HouseholdList.css";
 import HouseholdTable from "./HouseholdTable";
 import Pagination from "../../../components/commons/Pagination";
@@ -12,6 +12,7 @@ import {
   deleteHousehold,
   splitHousehold,
 } from "../../../utils/api";
+import { exportToCSV } from "../../../utils/exportUtils";
 
 const HouseholdList = () => {
   const navigate = useNavigate();
@@ -21,6 +22,10 @@ const HouseholdList = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState("");
+
   const itemsPerPage = 8;
 
   const loadData = async () => {
@@ -48,6 +53,26 @@ const HouseholdList = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Filter logic
+  const filteredHouseholds = households.filter(item => {
+    const matchesSearch = 
+      item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.owner.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.address.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesSearch;
+  });
+
+  const handleExport = () => {
+    const exportData = filteredHouseholds.map(item => ({
+      "Mã hộ khẩu": item.code,
+      "Chủ hộ": item.owner,
+      "Địa chỉ": item.address,
+      "Số thành viên": item.members
+    }));
+    exportToCSV(exportData, "Danh_sach_ho_khau");
+  };
 
   const handleSaveHousehold = async (formData) => {
     try {
@@ -92,13 +117,13 @@ const HouseholdList = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = households
+  const currentItems = filteredHouseholds
     .slice(indexOfFirstItem, indexOfLastItem)
     .map((item, index) => ({
       ...item,
       stt: indexOfFirstItem + index + 1,
     }));
-  const totalPages = Math.ceil(households.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredHouseholds.length / itemsPerPage);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleSplitClick = (household) => {
@@ -117,12 +142,14 @@ const HouseholdList = () => {
         <div className="toolbar">
           <div className="search-box">
             <Search size={18} className="search-icon" />
-            <input type="text" placeholder="Search..." />
+            <input 
+              type="text" 
+              placeholder="Tìm kiếm..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-          <button className="btn-tool">
-            <Filter size={16} /> Filters
-          </button>
-          <button className="btn-tool">
+          <button className="btn-tool" onClick={handleExport}>
             <Download size={16} /> Export
           </button>
           <button
@@ -139,7 +166,7 @@ const HouseholdList = () => {
           <span className="card-title">
             {loading
               ? "Đang tải dữ liệu..."
-              : `Tổng số: ${households.length} hộ khẩu`}
+              : `Tổng số: ${filteredHouseholds.length} hộ khẩu`}
           </span>
         </div>
 
