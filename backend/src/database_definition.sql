@@ -95,7 +95,7 @@ CREATE TABLE change_history (
     household_id INT NOT NULL, -- Hộ khẩu
     resident_id INT, -- Nhân khẩu
     change_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Ngày thay đổi
-    change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('Split', 'MoveOut', 'Death', 'NewBirth', 'Added', 'Removed')), -- 'Split', 'MoveOut', 'Death', 'NewBirth'
+    change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('Split', 'MoveOut', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold')), -- 'Split', 'MoveOut', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold'
     changed_by_user_id INT NOT NULL, -- Người thực hiện thay đổi
     
     CONSTRAINT fk_history_household FOREIGN KEY (household_id) REFERENCES households(household_id),
