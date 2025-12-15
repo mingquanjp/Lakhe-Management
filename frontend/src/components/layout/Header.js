@@ -1,14 +1,32 @@
 import "./Header.css";
-import React, { useState } from "react";
+import React from "react";
 import logoLK from "../../assets/images/logoLK.png";
-import {
-  toggleIcon,
-  searchIcon
-} from "../../assets/icons";
+import { toggleIcon } from "../../assets/icons";
 import { Button } from "../commons";
+import { useAuth } from "../../context/AuthContext";
+
+// Hàm lấy chữ cái đầu và cuối từ họ tên
+const getInitials = (fullName) => {
+  if (!fullName) return "U";
+  
+  const nameParts = fullName.trim().split(/\s+/);
+  if (nameParts.length === 1) {
+    return nameParts[0].charAt(0).toUpperCase();
+  }
+  
+  // Lấy chữ cái đầu tiên của họ và chữ cái đầu tiên của tên
+  const firstInitial = nameParts[0].charAt(0).toUpperCase();
+  const lastInitial = nameParts[nameParts.length - 1].charAt(0).toUpperCase();
+  
+  return firstInitial + lastInitial;
+};
 
 const Header = () => {
-  const [searchValue, setSearchValue] = useState("");
+  const { user } = useAuth();
+  
+  // Lấy thông tin user
+  const displayName = user?.full_name || "Người dùng";
+  const initials = getInitials(displayName);
 
   return (
     <header className="header">
@@ -37,25 +55,10 @@ const Header = () => {
       </div>
 
       <div className="header-right">
-        <div className="search-container">
-          <img src={searchIcon} alt="Search" className="search-icon-img" />
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Search"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-          <span className="search-shortcut">/</span>
-        </div>
-
         <div className="user-info">
-          <span className="user-name">Minh Quân</span>
+          <span className="user-name">{displayName}</span>
           <div className="user-avatar">
-            <img
-              src="https://ui-avatars.com/api/?name=Minh+Quan&background=4A90E2&color=fff&size=48"
-              alt="User Avatar"
-            />
+            <span className="avatar-initials">{initials}</span>
           </div>
         </div>
       </div>

@@ -1,13 +1,13 @@
 // API Base URL
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = "http://localhost:5000";
 
 // Login API call
 export const loginAPI = async (username, password) => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ username, password }),
     });
@@ -15,7 +15,7 @@ export const loginAPI = async (username, password) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Đăng nhập thất bại');
+      throw new Error(data.message || "Đăng nhập thất bại");
     }
 
     return data;
@@ -26,33 +26,65 @@ export const loginAPI = async (username, password) => {
 
 // Store auth token in localStorage
 export const setAuthToken = (token) => {
-  localStorage.setItem('token', token);
+  localStorage.setItem("token", token);
 };
 
 // Get auth token from localStorage
 export const getAuthToken = () => {
-  return localStorage.getItem('token');
+  return localStorage.getItem("token");
 };
 
 // Remove auth token from localStorage
 export const removeAuthToken = () => {
-  localStorage.removeItem('token');
+  localStorage.removeItem("token");
 };
 
 // Store user info in localStorage
 export const setUserInfo = (user) => {
-  localStorage.setItem('user', JSON.stringify(user));
+  localStorage.setItem("user", JSON.stringify(user));
 };
 
 // Get user info from localStorage
 export const getUserInfo = () => {
-  const user = localStorage.getItem('user');
+  const user = localStorage.getItem("user");
   return user ? JSON.parse(user) : null;
+};
+
+// Dashboard API calls
+export const getDashboardStats = async (startDate, endDate) => {
+  try {
+    const token = getAuthToken();
+    const queryParams = new URLSearchParams({
+      startDate: startDate || "",
+      endDate: endDate || "",
+    }).toString();
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/dashboard/population?${queryParams}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Không thể lấy dữ liệu thống kê");
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Remove user info from localStorage
 export const removeUserInfo = () => {
-  localStorage.removeItem('user');
+  localStorage.removeItem("user");
 };
 
 // Clear all auth data
@@ -171,6 +203,205 @@ export const splitHousehold = async (data) => {
   }
 };
 
+
+// Finance API calls
+export const getFees = async () => {
+  try {
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/api/finance/fees`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Không thể lấy danh sách khoản thu");
+    }
+    return data;
+  } catch (error) {
+    console.error("API Error:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+export const getFinanceStats = async (feeId) => {
+  try {
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/api/finance/stats/${feeId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Không thể lấy dữ liệu thống kê tài chính"
+      );
+    }
+    return data;
+  } catch (error) {
+    console.error("API Error:", error);
+    return { success: false, message: error.message };
+// ========== FEE APIs ==========
+
+// Lấy danh sách tất cả khoản thu
+export const fetchFees = async () => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy thống kê cho một khoản thu
+export const fetchFeeStatistics = async (feeId) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/${feeId}/statistics`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy danh sách hộ với trạng thái nộp phí
+export const fetchHouseholdPaymentStatus = async (feeId) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/${feeId}/households`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy lịch sử nộp phí của một hộ
+export const fetchHouseholdPaymentHistory = async (householdId) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/households/${householdId}/payments`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy danh sách nhân khẩu của một hộ
+export const fetchHouseholdResidents = async (householdId) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/households/${householdId}/residents`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Tạo thanh toán mới
+export const createPayment = async (paymentData) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/payments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(paymentData),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy thống kê tổng hợp tất cả khoản thu
+export const fetchOverallStatistics = async () => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/overall-statistics`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy tất cả hộ khẩu với tóm tắt thanh toán
+export const fetchAllHouseholdsWithPaymentSummary = async () => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fees/all-households`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
 export const fetchOverviewStats = async () => {
   const token = getAuthToken(); 
   

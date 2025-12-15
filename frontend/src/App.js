@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
@@ -10,6 +15,7 @@ import Login from "./pages/Login/Login";
 import Admin from "./pages/Admin";
 import Staff from "./pages/Staff";
 import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDashboard";
+import StatsFinanceDashboard from "./pages/Admin/StatsFinanceDashboard/StatsFinanceDashboard";
 import HouseholdDetail from "./pages/HouseholdDetail";
 import Declaration from "./pages/Declaration";
 import FormsMenu from "./pages/Admin/FormsMenu/FormsMenu";
@@ -72,16 +78,29 @@ function AppRoutes() {
         <Route index element={<PopulationDashboard />} />
         <Route path="overview" element={<Overview />} />
         <Route path="household" element={<HouseholdList />} />
+<<<<<<< HEAD
         <Route path="household/:id" element={<HouseholdDetail />} />
         <Route path="householdtemporary" element={<HouseholdTemporaryList />} />
         <Route path="householdtemporary/:id" element={<HouseholdDetail />} />     
         
+=======
+        <Route path="householdtemporary" element={<HouseholdTemporaryList />} /> 
+        <Route path="stats/citizen" element={<PopulationDashboard />} />
+        <Route path="stats/finance" element={<StatsFinanceDashboard />} />
+        <Route path="household" element={<HouseholdDetail />} />
+>>>>>>> 58a90a305e410ceb29d741ed5a51867cff6771f0
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />
         <Route path="form/new-household-form" element={<NewHouseholdForm />} />
         <Route path="form/new-member-form" element={<NewMemberForm />} />
-        <Route path="form/member-status-change-form" element={<MemberStatusChangeForm />} />
-        <Route path="form/temporary-residence-form" element={<TemporaryResidenceForm />} />
+        <Route
+          path="form/member-status-change-form"
+          element={<MemberStatusChangeForm />}
+        />
+        <Route
+          path="form/temporary-residence-form"
+          element={<TemporaryResidenceForm />}
+        />
         <Route path="form/change-owner-form" element={<ChangeOwnerForm />} />
       </Route>
 
