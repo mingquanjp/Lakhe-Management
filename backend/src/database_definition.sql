@@ -110,7 +110,8 @@ CREATE TABLE fees (
     fee_type VARCHAR(20) NOT NULL CHECK (fee_type IN ('Mandatory', 'Voluntary')), -- 'Mandatory', 'Voluntary'
     amount BIGINT CHECK (amount >= 0), -- Số tiền (NULL nếu là tự nguyện đóng góp tùy tâm)
     start_date DATE NOT NULL, -- Ngày bắt đầu
-    end_date DATE -- Ngày kết thúc
+    end_date DATE, -- Ngày kết thúc
+    deleted_at TIMESTAMP DEFAULT NULL -- Soft delete
 );
 
 -- 8. Bảng Payment_History (Lịch sử nộp tiền - Bảng trung gian N-N)
