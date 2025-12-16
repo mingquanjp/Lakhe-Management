@@ -83,8 +83,16 @@ const CountUp = ({ end, duration = 1000 }) => {
 };
 
 const PopulationDashboard = () => {
-  const [startDate, setStartDate] = useState("2005-08-15");
-  const [endDate, setEndDate] = useState("2025-08-15");
+  // Calculate default dates
+  const today = new Date();
+  const defaultEnd = today.toISOString().split('T')[0];
+  
+  const twentyYearsAgo = new Date();
+  twentyYearsAgo.setFullYear(twentyYearsAgo.getFullYear() - 20);
+  const defaultStart = twentyYearsAgo.toISOString().split('T')[0];
+
+  const [startDate, setStartDate] = useState(defaultStart);
+  const [endDate, setEndDate] = useState(defaultEnd);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
