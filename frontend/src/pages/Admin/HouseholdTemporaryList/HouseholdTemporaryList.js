@@ -1,30 +1,30 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import { Search, Download, Split } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, Filter, Download, Split} from "lucide-react";
 import "./HouseholdTemporaryList.css";
 import HouseholdTemporaryTable from "./HouseholdTemporaryTable/HouseholdTemporaryTable";
 import Pagination from "../../../components/commons/Pagination";
-import Modal from "../../../components/commons/Modal";
 import HouseholdTemporaryAddModal from "./HouseholdTemporaryAddModal/HouseholdTemporaryAddModal";
 import {
   fetchTemporaryHouseholds,
   deleteHousehold,
   createTemporaryHousehold,
 } from "../../../utils/api";
-import { exportToCSV } from "../../../utils/exportUtils";
+import * as XLSX from "xlsx";
 import { toast } from "react-toastify";
 
 const HouseholdTemporaryList = () => {
   const [households, setHouseholds] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
+  const [showFilter, setShowFilter] = useState(false);
+  const [filters, setFilters] = useState({
+    minMembers: "",
+    maxMembers: "",
+  });
+
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  
-  // Detail Modal State
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
   const itemsPerPage = 8;
 
   const loadData = async () => {
@@ -36,7 +36,7 @@ const HouseholdTemporaryList = () => {
       }
     } catch (error) {
       console.error("Failed to fetch temporary households:", error);
-      // alert("Không thể tải danh sách hộ tạm trú.");
+      alert("Không thể tải danh sách hộ tạm trú.");
     } finally {
       setLoading(false);
     }
@@ -49,6 +49,7 @@ const HouseholdTemporaryList = () => {
   const handleSaveHousehold = async (newData) => {
     try {
       await createTemporaryHousehold(newData);
+
       toast.success("Thêm hộ khẩu tạm trú thành công!");
       loadData();
       setIsAddModalOpen(false);
@@ -59,20 +60,43 @@ const HouseholdTemporaryList = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    if (value !== "" && parseInt(value) < 1) {
+      return;
+    }
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setCurrentPage(1);
+  };
+
   const filteredHouseholds = households.filter((item) => {
     const searchLower = searchTerm.toLowerCase();
-    const createdDate = item.date_created ? new Date(item.date_created).toLocaleDateString("vi-VN") : "";
-    const expiredDate = item.expiration_date ? new Date(item.expiration_date).toLocaleDateString("vi-VN") : "";
-
     const matchesSearch =
       (item.code && item.code.toLowerCase().includes(searchLower)) ||
       (item.owner && item.owner.toLowerCase().includes(searchLower)) ||
-      (item.address && item.address.toLowerCase().includes(searchLower)) ||
-      (item.members !== undefined && item.members.toString().includes(searchLower)) ||
-      (createdDate && createdDate.includes(searchLower)) ||
-      (expiredDate && expiredDate.includes(searchLower));
+      (item.address && item.address.toLowerCase().includes(searchLower));
 
-    return matchesSearch;
+    let matchesMembers = true;
+    const memberCount = parseInt(item.members) || 0;
+
+    if (filters.minMembers !== "") {
+      matchesMembers =
+        matchesMembers && memberCount >= parseInt(filters.minMembers);
+    }
+    if (filters.maxMembers !== "") {
+      matchesMembers =
+        matchesMembers && memberCount <= parseInt(filters.maxMembers);
+    }
+
+    return matchesSearch && matchesMembers;
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -80,23 +104,14 @@ const HouseholdTemporaryList = () => {
   const currentItems = filteredHouseholds.slice(
     indexOfFirstItem,
     indexOfLastItem
-  ).map((item, index) => ({
-      ...item,
-      stt: indexOfFirstItem + index + 1,
-      // Ensure fields match Table expectations
-      id: item.id,
-      code: item.code,
-      owner: item.owner,
-      address: item.address,
-      members: item.members
-  }));
-
+  );
   const totalPages = Math.ceil(filteredHouseholds.length / itemsPerPage);
+
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleExport = () => {
     const dataToExport = filteredHouseholds.map((item, index) => ({
-      "STT": index + 1,
+      STT: index + 1,
       "Mã Hộ": item.code,
       "Chủ Hộ": item.owner || "Chưa có",
       "CCCD Chủ Hộ": item.owner_cccd || "",
@@ -107,67 +122,79 @@ const HouseholdTemporaryList = () => {
         : "",
       "Trạng Thái": "Tạm trú",
     }));
-    exportToCSV(dataToExport, "Danh_Sach_Ho_Khau_Tam_Tru");
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const wscols = [
+      { wch: 5 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 15 },
+      { wch: 40 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+    ];
+    worksheet["!cols"] = wscols;
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachTamTru");
+    XLSX.writeFile(workbook, "Danh_Sach_Ho_Khau_Tam_Tru.xlsx");
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa hộ tạm trú này?")) {
-        try {
-        await deleteHousehold(id);
-        toast.success("Xóa hộ tạm trú thành công!");
-        loadData();
-        } catch (error) {
-        console.error("Lỗi xóa:", error);
-        toast.error(
-            error?.response?.data?.message ||
-            error.message ||
-            "Không thể xóa hộ tạm trú"
-        );
-        }
+    try {
+      await deleteHousehold(id);
+
+      toast.success("Xóa hộ tạm trú thành công!");
+      loadData();
+    } catch (error) {
+      console.error("Lỗi xóa:", error);
+
+      toast.error(
+        error?.response?.data?.message ||
+          error.message ||
+          "Không thể xóa hộ tạm trú"
+      );
     }
   };
 
-  const handleDetailClick = (item) => {
-    // Fetch full detail if needed, or just show what we have
-    // Since the list might not have all details (like reason, dates), we might need to fetch.
-    // But for now, let's assume we navigate to detail page OR show modal.
-    // The User wanted a Modal.
-    // But the data in 'households' list is summary data (from getTemporaryHouseholds).
-    // We might need to fetch detail by ID to show in Modal.
-    // For simplicity and conflict resolution, I'll use the Detail Modal but maybe just show available info or fetch it.
-    // Actually, the User's previous code fetched from /residents/list/temporary-residence which returned flat resident list.
-    // Now we have Households.
-    // I will navigate to Detail Page as per Incoming pattern for consistency, OR fetch detail for Modal.
-    // Let's try to fetch detail for Modal to keep User's "Popup" preference if possible.
-    // But I don't have the fetchDetail function imported.
-    // I'll stick to navigating to Detail Page if that's what Incoming did, OR just show what we have.
-    // Incoming Table used `navigate`.
-    // I will use `navigate` to `householdtemporary/:id` which uses `HouseholdDetail` component.
-    // This unifies the UI.
-    // Wait, `HouseholdDetail` component is for Permanent Households. Does it support Temporary?
-    // The route `householdtemporary/:id` points to `HouseholdDetail`.
-    // So `HouseholdDetail` must handle it.
-    // I will pass `onDetail` to Table to handle navigation.
-    setSelectedItem(item); // Just in case we want to use it
-  };
+  const isFiltering =
+    searchTerm !== "" || filters.minMembers !== "" || filters.maxMembers !== "";
 
   return (
     <div className="household-page">
       <div className="page-header">
-        <h2 className="page-title">Quản lý tạm trú</h2>
+        <h2 className="page-title">Danh sách hộ khẩu tạm trú</h2>
         <div className="toolbar">
           <div className="search-box">
             <Search size={18} className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm..." 
+            <input
+              type="text"
+              placeholder="Tìm kiếm..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
           </div>
-          <button className="btn-tool" onClick={handleExport}>
-            <Download size={16} /> Export
+
+          <button
+            className={`btn-tool ${showFilter ? "active" : ""}`}
+            onClick={() => setShowFilter(!showFilter)}
+            style={
+              showFilter
+                ? {
+                    backgroundColor: "#e6f7ff",
+                    borderColor: "#1890ff",
+                    color: "#1890ff",
+                  }
+                : {}
+            }
+          >
+            <Filter size={16} /> Lọc
           </button>
+
+          <button className="btn-tool" onClick={handleExport}>
+            <Download size={16} /> Xuất Excel
+          </button>
+
           <button
             className="btn-tool btn-add"
             onClick={() => setIsAddModalOpen(true)}
@@ -177,30 +204,87 @@ const HouseholdTemporaryList = () => {
         </div>
       </div>
 
+      {showFilter && (
+        <div
+          className="filter-panel"
+          style={{
+            backgroundColor: "#f8f9fa",
+            padding: "15px",
+            borderRadius: "8px",
+            marginBottom: "20px",
+            border: "1px solid #eee",
+            display: "flex",
+            gap: "20px",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontWeight: 500, fontSize: "14px" }}>
+              Số nhân khẩu:
+            </span>
+            <input
+              type="number"
+              name="minMembers"
+              placeholder="Min"
+              min="1"
+              value={filters.minMembers}
+              onChange={handleFilterChange}
+              className="form-control"
+              style={{
+                width: "80px",
+                height: "36px",
+                padding: "0 10px",
+                border: "1px solid #d9d9d9",
+                borderRadius: "4px",
+              }}
+            />
+            <span>-</span>
+            <input
+              type="number"
+              name="maxMembers"
+              placeholder="Max"
+              min="1"
+              value={filters.maxMembers}
+              onChange={handleFilterChange}
+              className="form-control"
+              style={{
+                width: "80px",
+                height: "36px",
+                padding: "0 10px",
+                border: "1px solid #d9d9d9",
+                borderRadius: "4px",
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="table-card">
         <div className="card-top">
           <span className="card-title">
             {loading
               ? "Đang tải dữ liệu..."
-              : `Tổng số: ${filteredHouseholds.length} hộ khẩu`}
+              : isFiltering
+              ? `Hiển thị ${filteredHouseholds.length} kết quả (Tổng: ${households.length})`
+              : `Tổng số: ${households.length} hộ khẩu`}
           </span>
         </div>
 
         {loading ? (
-           <div style={{ padding: "20px", textAlign: "center" }}>
-             Đang tải dữ liệu...
-           </div>
-         ) : filteredHouseholds.length === 0 ? (
-           <div style={{ padding: "20px", textAlign: "center", color: "#666" }}>
-             Không tìm thấy kết quả nào phù hợp.
-           </div>
-         ) : (
-           <HouseholdTemporaryTable
-             data={currentItems}
-             onDelete={handleDelete}
-             // onDetail is handled by Table using navigate, or we can pass it
-           />
-         )}
+          <div style={{ padding: "20px", textAlign: "center" }}>
+            Đang tải dữ liệu...
+          </div>
+        ) : filteredHouseholds.length === 0 ? (
+          <div style={{ padding: "20px", textAlign: "center", color: "#666" }}>
+            Không tìm thấy kết quả nào phù hợp.
+          </div>
+        ) : (
+          <HouseholdTemporaryTable
+            data={currentItems}
+            onDelete={handleDelete}
+          />
+        )}
 
         {!loading && filteredHouseholds.length > 0 && (
           <Pagination

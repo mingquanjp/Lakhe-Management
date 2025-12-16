@@ -145,8 +145,24 @@ const HouseholdList = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          <button
+            className={`btn-tool ${showFilter ? "active" : ""}`}
+            onClick={() => setShowFilter(!showFilter)}
+            style={
+              showFilter
+                ? {
+                    backgroundColor: "#e6f7ff",
+                    borderColor: "#1890ff",
+                    color: "#1890ff",
+                  }
+                : {}
+            }
+          >
+            <Filter size={16} /> Lọc
+          </button>
+
           <button className="btn-tool" onClick={handleExport}>
-            <Download size={16} /> Export
+            <Download size={16} /> Xuất Excel
           </button>
           <button
             className="btn-tool btn-add"

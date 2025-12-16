@@ -122,26 +122,8 @@ CREATE TABLE temporary_absences
         REFERENCES residents(resident_id)
 );
 
--- 6. Bảng Change_History (Lịch sử biến động)
-CREATE TABLE change_history
-(
-    history_id SERIAL PRIMARY KEY,
-    household_id INT,
-    -- Hộ khẩu (Nếu là NULL thì là thay đổi phí)
-    resident_id INT,
-    -- Nhân khẩu (Nếu là NULL thì là thay đổi hộ khẩu hoặc phí)
-    change_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    -- Ngày thay đổi
-    change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('Split', 'MoveOut', 'Death', 'NewBirth', 'UpdateInfo', 'Added', 'Removed', 'ChangeHeadOfHousehold', 'CreateFee', 'UpdateFee', 'DeleteFee')),
-    changed_by_user_id INT NOT NULL,
-    -- Người thực hiện thay đổi
 
-    CONSTRAINT fk_history_household FOREIGN KEY (household_id) REFERENCES households(household_id),
-    CONSTRAINT fk_history_resident FOREIGN KEY (resident_id) REFERENCES residents(resident_id),
-    CONSTRAINT fk_history_user FOREIGN KEY (changed_by_user_id) REFERENCES users(user_id)
-);
-
--- 7. Bảng Fees (Danh mục khoản thu)
+-- 6. Bảng Fees (Danh mục khoản thu)
 CREATE TABLE fees
 (
     fee_id SERIAL PRIMARY KEY,
@@ -159,7 +141,7 @@ CREATE TABLE fees
     -- Soft delete
 );
 
--- 8. Bảng Payment_History (Lịch sử nộp tiền - Bảng trung gian N-N)
+-- 7. Bảng Payment_History (Lịch sử nộp tiền - Bảng trung gian N-N)
 CREATE TABLE payment_history
 (
     payment_id SERIAL PRIMARY KEY,
@@ -177,4 +159,30 @@ CREATE TABLE payment_history
     CONSTRAINT fk_payment_fee FOREIGN KEY (fee_id) REFERENCES fees(fee_id),
     CONSTRAINT fk_payment_household FOREIGN KEY (household_id) REFERENCES households(household_id),
     CONSTRAINT fk_payment_user FOREIGN KEY (collected_by_user_id) REFERENCES users(user_id)
+);
+
+-- 8. Bảng Change_History (Lịch sử biến động)
+-- Bảng Log ghi lại ai làm gì, thay đổi hộ nào, thay đổi ai, thay đổi gì (có cả thay đổi phí)
+CREATE TABLE change_history
+(
+    history_id SERIAL PRIMARY KEY,
+    household_id INT,
+    -- Hộ khẩu (Nếu là NULL thì là thay đổi phí)
+    resident_id INT,
+    -- Nhân khẩu (Nếu là NULL thì là thay đổi hộ khẩu hoặc phí)
+    fee_id INT,
+    -- Phí (Nếu là NULL thì là thay đổi hộ khẩu hoặc nhân khẩu)
+    change_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- Ngày thay đổi
+    change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('Split', 'MoveOut', 'Temporary', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold', 'CreateFee', 'UpdateFee', 'DeleteFee')),
+    -- 'Split', 'MoveOut', 'Temporary', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold', 'CreateFee', 'UpdateFee', 'DeleteFee'
+    changed_by_user_id INT NOT NULL,
+    -- Người thực hiện thay đổi
+    notes TEXT,
+    -- Ghi chú
+
+    CONSTRAINT fk_history_household FOREIGN KEY (household_id) REFERENCES households(household_id),
+    CONSTRAINT fk_history_resident FOREIGN KEY (resident_id) REFERENCES residents(resident_id),
+    CONSTRAINT fk_history_user FOREIGN KEY (changed_by_user_id) REFERENCES users(user_id),
+    CONSTRAINT fk_history_fee FOREIGN KEY (fee_id) REFERENCES fees(fee_id)
 );
