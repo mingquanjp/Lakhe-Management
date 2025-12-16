@@ -24,6 +24,12 @@
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   position: relative;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.date-input-group:hover {
+  border-color: #2f80ed;
+  box-shadow: 0px 4px 8px rgba(47, 128, 237, 0.1);
 }
 
 .date-label {
@@ -44,6 +50,19 @@
   border-radius: 16px !important;
   border: none !important;
   height: 120px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+}
+
+.summary-card:active {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
 .summary-card .card-content {
@@ -98,11 +117,11 @@
 
 .chart-card {
   border-radius: 16px !important;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05) !important;
+  transition: box-shadow 0.3s ease !important;
 }
 
-.chart-card .card-content {
-  padding: 24px !important;
+.chart-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
 }
 
 .chart-title {
@@ -112,182 +131,99 @@
   margin-bottom: 24px;
 }
 
-/* Gender Chart (Donut) */
-.gender-chart-container {
+.chart-content-wrapper {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 48px;
-  height: 200px;
+  justify-content: space-between;
 }
 
-.donut-chart {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  background: conic-gradient(#f2c94c 0% 39.5%, #56ccf2 39.5% 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.donut-hole {
-  width: 100px;
-  height: 100px;
-  background: #ffffff;
-  border-radius: 50%;
-}
-
-.chart-legend {
+.chart-legend-custom {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  min-width: 120px;
 }
 
-.legend-item {
+.legend-item-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   font-size: 14px;
+  color: #333;
 }
 
-.legend-item .dot {
+.legend-item-row .dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
 }
 
-.legend-item .dot.male {
-  background-color: #f2c94c;
-}
-
-.legend-item .dot.female {
-  background-color: #56ccf2;
-}
-
-.legend-item .label {
-  color: #1a1a1a;
-  font-weight: 500;
-  min-width: 40px;
-}
-
-.legend-item .value {
-  color: #4f4f4f;
-}
-
-/* Age Chart (Bar) */
-.age-chart-container {
-  display: flex;
-  height: 200px;
-  position: relative;
-  padding-left: 40px; /* Space for Y-axis */
-}
-
-.y-axis {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  font-size: 10px;
-  color: #828282;
-  height: 100%;
-  padding-bottom: 24px; /* Align with bars */
-}
-
-.bar-chart {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  width: 100%;
-  height: 100%;
-  padding-bottom: 24px; /* Space for labels */
-}
-
-.bar-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+.legend-item-row .label {
   flex: 1;
 }
 
-.bar-track {
-  width: 32px;
-  height: 100%;
-  background-color: #f2f7ff;
-  border-radius: 4px;
-  display: flex;
-  align-items: flex-end;
-  position: relative;
+.legend-item-row .value {
+  font-weight: 600;
 }
 
-.bar-fill {
-  width: 100%;
-  background-color: #2f80ed;
-  border-radius: 4px;
-  transition: height 0.3s ease;
-}
-
-.bar-label {
-  font-size: 10px;
-  color: #828282;
-  text-align: center;
-}
-
-/* Fluctuation Section */
-.section-title {
-  font-size: 18px;
+/* Fluctuations Section */
+.fluctuations-title {
+  font-size: 14px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #828282;
   margin-bottom: 16px;
+  text-transform: uppercase;
 }
 
-.fluctuation-grid {
+.fluctuations-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
 }
 
 .fluctuation-card {
-  border-radius: 16px !important;
+  background: #e0e0e0; /* Default gray */
+  border-radius: 12px !important;
   border: none !important;
+  height: 100px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer;
+}
+
+.fluctuation-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
 }
 
 .fluctuation-card .card-content {
-  padding: 20px !important;
+  padding: 16px 20px !important;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.fluctuation-card.gray {
-  background-color: #e0e0e0; /* Light gray background */
+  justify-content: space-between;
+  height: 100%;
 }
 
 .fluctuation-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+}
+
+.fluctuation-label {
   font-size: 14px;
-  font-weight: 500;
-  color: #1a1a1a;
+  font-weight: 600;
+  color: #333;
 }
 
 .fluctuation-value {
   font-size: 24px;
   font-weight: 700;
   color: #1a1a1a;
+  margin-top: 8px;
 }
 
 .dashboard-icon {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-}
-
-.rotate-180 {
-  transform: rotate(180deg);
+  width: 20px;
+  height: 20px;
 }

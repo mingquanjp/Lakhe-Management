@@ -1,9 +1,12 @@
 ﻿const express = require('express');
 const router = express.Router();
 const residentController = require('../controllers/residentController');
+const { verifyToken, requireAdmin } = require('../middleware/authMiddleware');
 
-// router.use(verifyToken); // Commented out as per Develop
+// Protect all routes
+router.use(verifyToken);
 
+// CRUD Residents
 router.post('/', residentController.createResident);
 router.get('/', residentController.getAllResidents);
 router.get('/:id', residentController.getResidentById);

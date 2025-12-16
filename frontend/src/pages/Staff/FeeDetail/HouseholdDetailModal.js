@@ -1,52 +1,62 @@
-import React, { useState } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import "./HouseholdDetailModal.css";
 import { Modal } from "../../../components/commons";
 import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
+import { fetchHouseholdPaymentHistory, fetchHouseholdResidents } from "../../../utils/api";
 
 const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
   const [activeTab, setActiveTab] = useState("payment");
+  const [paymentData, setPaymentData] = useState([]);
+  const [demographicData, setDemographicData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch data khi modal mở và có household
+  useEffect(() => {
+    if (!isOpen || !household?.household_id) return;
+
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const [paymentsRes, residentsRes] = await Promise.all([
+          fetchHouseholdPaymentHistory(household.household_id),
+          fetchHouseholdResidents(household.household_id)
+        ]);
+
+        if (paymentsRes.success) {
+          setPaymentData(paymentsRes.data.map((p, index) => ({
+            stt: index + 1,
+            feeName: p.fee_name,
+            feeType: p.fee_type === 'Mandatory' ? 'mandatory' : 'donation',
+            required: p.required_amount || 0,
+            paid: p.paid_amount || 0,
+            paymentDate: p.payment_date 
+              ? new Date(p.payment_date).toLocaleDateString('vi-VN') 
+              : 'NULL',
+            status: p.status
+          })));
+        }
+
+        if (residentsRes.success) {
+          setDemographicData(residentsRes.data.map((r, index) => ({
+            stt: index + 1,
+            name: r.full_name,
+            birthDate: r.dob ? new Date(r.dob).toLocaleDateString('vi-VN') : '',
+            relationship: r.relationship_to_head,
+            residenceStatus: r.residence_status === 'Temporary' ? 'temporary' 
+              : r.absence_destination ? 'absent' : 'permanent'
+          })));
+        }
+      } catch (err) {
+        console.error('Error loading household data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [isOpen, household]);
 
   if (!household) return null;
-
-  // Payment history data
-  const paymentData = [
-    {
-      stt: 1,
-      feeName: "Phí vệ sinh năm 2024",
-      feeType: "mandatory",
-      required: 360000,
-      paid: 360000,
-      paymentDate: "07/01/2025",
-      status: "paid"
-    },
-    {
-      stt: 2,
-      feeName: "Ngày thương binh liệt sỹ 27/07 năm 2025",
-      feeType: "donation",
-      required: 0,
-      paid: 100000,
-      paymentDate: "20/07/2025",
-      status: "paid"
-    },
-    {
-      stt: 3,
-      feeName: "Phí vệ sinh năm 2025",
-      feeType: "mandatory",
-      required: 360000,
-      paid: 0,
-      paymentDate: "NULL",
-      status: "owing"
-    },
-    {
-      stt: 4,
-      feeName: "Tết trung thu 2025",
-      feeType: "donation",
-      required: 0,
-      paid: 50000,
-      paymentDate: "22/08/2025",
-      status: "paid"
-    }
-  ];
 
   const paymentColumns = [
     { key: "stt", title: "STT" },
@@ -60,56 +70,25 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
         </span>
       )
     },
-    { key: "required", title: "Phải nộp" },
-    { key: "paid", title: "Đã nộp" },
+    { 
+      key: "required", 
+      title: "Phải nộp",
+      render: (value) => new Intl.NumberFormat('vi-VN').format(value)
+    },
+    { 
+      key: "paid", 
+      title: "Đã nộp",
+      render: (value) => new Intl.NumberFormat('vi-VN').format(value)
+    },
     { key: "paymentDate", title: "Ngày nộp" },
     {
       key: "status",
       title: "Trạng thái",
       render: (value) => (
         <span className={`badge ${value === "paid" ? "badge-paid" : "badge-owing"}`}>
-          {value === "paid" ? "• Đã nộp" : "• Còn nợ"}
+          {value === "paid" ? "• Đã nộp" : value === "optional" ? "• Tùy chọn" : "• Còn nợ"}
         </span>
       )
-    }
-  ];
-
-  // Demographic data
-  const demographicData = [
-    {
-      stt: 1,
-      name: "Nguyễn Minh Quân",
-      birthDate: "36/36/2036",
-      relationship: "Chủ hộ",
-      residenceStatus: "permanent"
-    },
-    {
-      stt: 2,
-      name: "Phạm Phương Linh",
-      birthDate: "36/36/2036",
-      relationship: "Vợ",
-      residenceStatus: "permanent"
-    },
-    {
-      stt: 3,
-      name: "Nguyễn Minh Tùng",
-      birthDate: "36/36/2036",
-      relationship: "Con trai",
-      residenceStatus: "permanent"
-    },
-    {
-      stt: 4,
-      name: "Phạm Minh Mai",
-      birthDate: "36/36/2036",
-      relationship: "Con gái",
-      residenceStatus: "temporary"
-    },
-    {
-      stt: 5,
-      name: "Nguyễn Minh Long",
-      birthDate: "36/36/2036",
-      relationship: "Con trai",
-      residenceStatus: "absent"
     }
   ];
 
@@ -149,25 +128,17 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
           <div className="household-info-row">
             <div className="info-item">
               <span className="info-label">Số hộ khẩu:</span>
-              <span className="info-value">{household.householdId}</span>
+              <span className="info-value">{household.household_code || household.householdId}</span>
             </div>
             <div className="info-item">
               <span className="info-label">Họ và tên chủ hộ:</span>
-              <span className="info-value">{household.ownerName}</span>
+              <span className="info-value">{household.owner_name || household.ownerName}</span>
             </div>
           </div>
           <div className="household-info-row">
             <div className="info-item">
               <span className="info-label">Địa chỉ:</span>
-              <span className="info-value">{household.houseNumber}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Xã:</span>
-              <span className="info-value">Yên Sơn</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Huyện:</span>
-              <span className="info-value">Quốc Oai</span>
+              <span className="info-value">{household.address || household.houseNumber}</span>
             </div>
           </div>
         </div>
@@ -189,7 +160,9 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
         </div>
 
             <div className="tab-content-wrapper">
-          {activeTab === "payment" ? (
+          {loading ? (
+            <p>Đang tải dữ liệu...</p>
+          ) : activeTab === "payment" ? (
             <div className="table-container">
               <EnhancedTable columns={paymentColumns} data={paymentData} className="detail-table" />
             </div>
@@ -205,4 +178,3 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
 };
 
 export default HouseholdDetailModal;
-

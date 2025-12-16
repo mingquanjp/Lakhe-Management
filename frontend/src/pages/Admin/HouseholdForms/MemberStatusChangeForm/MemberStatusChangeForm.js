@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from "react";
+import { useState, useEffect, useRef } from "react";
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
 import './MemberStatusChangeForm.css';

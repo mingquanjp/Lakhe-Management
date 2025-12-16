@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from "react";
+import { useState } from "react";
 import Card from '../../../components/commons/Card/Card';
 import Table from '../../../components/commons/Table/Table';
 import Button from '../../../components/commons/Button/Button';

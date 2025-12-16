@@ -1,13 +1,16 @@
-﻿import React from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Pages
 import Login from "./pages/Login/Login";
 import Admin from "./pages/Admin";
 import Staff from "./pages/Staff";
 import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDashboard";
+import StatsFinanceDashboard from "./pages/Admin/StatsFinanceDashboard/StatsFinanceDashboard";
 
 import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
 import HouseholdDetail from "./pages/Admin/HouseholdList/HouseholdDetail";
@@ -50,51 +53,71 @@ const RootRedirect = () => {
   return <Navigate to="/login" replace />;
 };
 
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public Route */}
+      <Route path="/login" element={<Login />} />
+
+      {/* Root redirect */}
+      <Route path="/" element={<RootRedirect />} />
+
+      {/* Admin Routes - Protected */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Admin />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Overview />} />
+        <Route path="overview" element={<Overview />} />
+        <Route path="stats/citizen" element={<PopulationDashboard />} />
+        <Route path="stats/finance" element={<StatsFinanceDashboard />} />
+        
+        <Route path="household" element={<HouseholdList />} />
+        <Route path="household/:id" element={<HouseholdDetail />} />
+        
+        <Route path="householdtemporary" element={<HouseholdTemporaryList />} />
+        <Route path="householdtemporary/:id" element={<HouseholdDetail />} />     
+        <Route path="temporary-household" element={<HouseholdTemporaryList />} />
+        <Route path="temporary-absence" element={<TemporaryAbsenceList />} />
+        
+        <Route path="citizen" element={<Declaration />} />
+        <Route path="form" element={<FormsMenu />} />
+        <Route path="form/new-household-form" element={<NewHouseholdForm />} />
+        <Route path="form/new-member-form" element={<NewMemberForm />} />
+        <Route path="form/member-status-change-form" element={<MemberStatusChangeForm />} />
+        <Route path="form/temporary-residence-form" element={<TemporaryResidenceForm />} />
+        <Route path="form/change-owner-form" element={<ChangeOwnerForm />} />
+      </Route>
+
+      {/* Staff Routes - Protected */}
+      <Route
+        path="/staff"
+        element={
+          <ProtectedRoute requiredRole="staff">
+            <Staff />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<FeeDashboard />} />
+        <Route path="fee-detail" element={<FeeDetail />} />
+      </Route>
+
+      {/* Fallback - redirect to root which will handle auth */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<RootRedirect />} />
-
-          {/* Admin Routes - Protected */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <Admin />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Overview />} />
-            <Route path="overview" element={<Overview />} />
-            {/* <Route path="household" element={<HouseholdList />} /> */}
-            <Route path="household/:id" element={<HouseholdDetail />} />
-            <Route path="temporary-household" element={<HouseholdTemporaryList />} />
-            <Route path="temporary-absence" element={<TemporaryAbsenceList />} />
-            <Route path="citizen" element={<Declaration />} />
-            <Route path="form" element={<FormsMenu />} />
-            <Route path="form/new-household-form" element={<NewHouseholdForm />} />
-            <Route path="form/new-member-form" element={<NewMemberForm />} />
-            <Route path="form/member-status-change-form" element={<MemberStatusChangeForm />} />
-            <Route path="form/temporary-residence-form" element={<TemporaryResidenceForm />} />
-            <Route path="form/change-owner-form" element={<ChangeOwnerForm />} />
-          </Route>
-
-          {/* Staff Routes - Protected */}
-          <Route
-            path="/staff"
-            element={
-              <ProtectedRoute requiredRole="staff">
-                <Staff />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<FeeDashboard />} />
-            <Route path="fee-detail" element={<FeeDetail />} />
-          </Route>
-        </Routes>
+        <ToastContainer position="bottom-right" autoClose={3000} />
+        <AppRoutes />
       </Router>
     </AuthProvider>
   );

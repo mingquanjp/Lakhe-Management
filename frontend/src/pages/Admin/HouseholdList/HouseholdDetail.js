@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from 'react-router-dom';
 import Card from '../../../components/commons/Card/Card';
 import Table from '../../../components/commons/Table/Table';

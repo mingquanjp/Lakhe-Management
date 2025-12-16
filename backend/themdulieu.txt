@@ -1,0 +1,91 @@
+-- 2. TẠO ADMIN (USERS)
+INSERT INTO users (username, password, full_name, role) 
+VALUES ('admin', '123456', 'Quản Trị Viên', 'admin');
+
+-- 3. TẠO HỘ KHẨU (HOUSEHOLDS)
+-- Hộ 1: Tạo từ 3 tháng trước (Dữ liệu nền)
+INSERT INTO households (household_code, address, date_created, status) 
+VALUES ('HK001', 'Số 1, Đường A', CURRENT_DATE - INTERVAL '3 months', 'Active');
+
+-- Hộ 2: Tạo từ 1 tháng trước (Dữ liệu nền)
+INSERT INTO households (household_code, address, date_created, status) 
+VALUES ('HK002', 'Số 10, Ngõ B', CURRENT_DATE - INTERVAL '1 month' - INTERVAL '1 day', 'Active');
+
+-- Hộ 3: Mới tạo HÔM QUA (Để test chỉ số tăng trưởng Hộ khẩu trong tháng này)
+INSERT INTO households (household_code, address, date_created, status) 
+VALUES ('HK003', 'Số 5, Phố C', CURRENT_DATE - INTERVAL '1 day', 'Active');
+
+-- Hộ 4: Đã chuyển đi (Không nên đếm)
+INSERT INTO households (household_code, address, date_created, status) 
+VALUES ('HK004', 'Số 99, Đường X', CURRENT_DATE - INTERVAL '5 months', 'MovedOut');
+
+-- 4. TẠO NHÂN KHẨU (RESIDENTS)
+
+-- === HỘ 1 (Gia đình chuẩn: Ông, Bố, Mẹ, Con) ===
+-- Ông (Trên 60 tuổi, Nam, Đăng ký lâu rồi)
+INSERT INTO residents (household_id, first_name, last_name, dob, gender, relationship_to_head, status, registration_date)
+VALUES (1, 'Nguyễn', 'Văn Ông', CURRENT_DATE - INTERVAL '65 years', 'Male', 'Chủ hộ', 'Permanent', CURRENT_DATE - INTERVAL '3 months');
+
+-- Bố (Lao động, Nam)
+INSERT INTO residents (household_id, first_name, last_name, dob, gender, relationship_to_head, status, registration_date)
+VALUES (1, 'Nguyễn', 'Văn Bố', CURRENT_DATE - INTERVAL '40 years', 'Male', 'Con', 'Permanent', CURRENT_DATE - INTERVAL '3 months');
+
+-- Mẹ (Lao động, Nữ)
+INSERT INTO residents (household_id, first_name, last_name, dob, gender, relationship_to_head, status, registration_date)
+VALUES (1, 'Trần', 'Thị Mẹ', CURRENT_DATE - INTERVAL '38 years', 'Female', 'Vợ', 'Permanent', CURRENT_DATE - INTERVAL '3 months');
+
+-- Con (Trẻ em, Nữ)
+INSERT INTO residents (household_id, first_name, last_name, dob, gender, relationship_to_head, status, registration_date)
+VALUES (1, 'Nguyễn', 'Thị Bé', CURRENT_DATE - INTERVAL '10 years', 'Female', 'Cháu', 'Permanent', CURRENT_DATE - INTERVAL '3 months');
+
+
+-- === HỘ 2 (Độc thân) ===
+-- Thanh niên (Lao động, Nam, Đăng ký tháng trước)
+INSERT INTO residents (household_id, first_name, last_name, dob, gender, relationship_to_head, status, registration_date)
+VALUES (2, 'Lê', 'Văn An', CURRENT_DATE - INTERVAL '25 years', 'Male', 'Chủ hộ', 'Permanent', CURRENT_DATE - INTERVAL '1 month' - INTERVAL '2 days');
+
+
+-- === HỘ 3 (Mới chuyển đến tháng này -> Test Tăng trưởng Nhân khẩu) ===
+-- Vợ chồng trẻ mới cưới chuyển đến hôm qua
+INSERT INTO residents (household_id, first_name, last_name, dob, gender, relationship_to_head, status, registration_date)
+VALUES (3, 'Phạm', 'Văn Mới', CURRENT_DATE - INTERVAL '28 years', 'Male', 'Chủ hộ', 'Permanent', CURRENT_DATE - INTERVAL '1 day');
+
+INSERT INTO residents (household_id, first_name, last_name, dob, gender, relationship_to_head, status, registration_date)
+VALUES (3, 'Hoàng', 'Thị Tươi', CURRENT_DATE - INTERVAL '26 years', 'Female', 'Vợ', 'Permanent', CURRENT_DATE - INTERVAL '1 day');
+
+
+-- === DỮ LIỆU RÁC (Không nên đếm vào tổng) ===
+-- Người đã mất
+INSERT INTO residents (household_id, first_name, last_name, dob, gender, relationship_to_head, status, registration_date, deleted_at)
+VALUES (1, 'Nguyễn', 'Văn Cụ', '1920-01-01', 'Male', 'Cụ', 'Deceased', '2020-01-01', NOW());
+
+
+-- 5. CẬP NHẬT CHỦ HỘ (HEAD_OF_HOUSEHOLD)
+-- Link ngược lại ID vừa tạo vào bảng Households
+UPDATE households SET head_of_household_id = 1 WHERE household_id = 1;
+UPDATE households SET head_of_household_id = 5 WHERE household_id = 2;
+UPDATE households SET head_of_household_id = 6 WHERE household_id = 3;
+
+
+-- 6. TẠO TẠM TRÚ (TEMPORARY RESIDENTS)
+-- Case 1: Tạm trú cũ (Bắt đầu từ tháng trước, vẫn còn hạn) -> Tính vào Tổng số cũ
+INSERT INTO residents (household_id, first_name, last_name, dob, gender, relationship_to_head, status, temp_start_date, temp_end_date)
+VALUES (1, 'Khách', 'Văn A', '1990-01-01', 'Male', 'Khách', 'Temporary', CURRENT_DATE - INTERVAL '2 months', CURRENT_DATE + INTERVAL '1 month');
+
+-- Case 2: Tạm trú MỚI (Bắt đầu hôm nay) -> Test Tăng trưởng Tạm trú
+INSERT INTO residents (household_id, first_name, last_name, dob, gender, relationship_to_head, status, temp_start_date, temp_end_date)
+VALUES (2, 'Khách', 'Thị B', '1995-01-01', 'Female', 'Khách', 'Temporary', CURRENT_DATE, CURRENT_DATE + INTERVAL '5 days');
+
+-- Case 3: Tạm trú ĐÃ HẾT HẠN (Không được đếm)
+INSERT INTO residents (household_id, first_name, last_name, dob, gender, relationship_to_head, status, temp_start_date, temp_end_date)
+VALUES (2, 'Khách', 'Văn Cũ', '1990-01-01', 'Male', 'Khách', 'Temporary', '2023-01-01', '2023-02-01');
+
+
+-- 7. TẠO TẠM VẮNG (TEMPORARY ABSENCES)
+-- Case 1: Tạm vắng cũ (Đi từ tháng trước, vẫn chưa về)
+INSERT INTO temporary_absences (resident_id, destination_address, reason, start_date, end_date)
+VALUES (2, 'Hồ Chí Minh', 'Công tác', CURRENT_DATE - INTERVAL '20 days', CURRENT_DATE + INTERVAL '10 days');
+
+-- Case 2: Tạm vắng MỚI (Mới đi hôm nay) -> Test biến động Tạm vắng
+INSERT INTO temporary_absences (resident_id, destination_address, reason, start_date, end_date)
+VALUES (3, 'Đà Nẵng', 'Du lịch', CURRENT_DATE, CURRENT_DATE + INTERVAL '5 days');

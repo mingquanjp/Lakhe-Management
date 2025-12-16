@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "../../../components/commons";
 import {
   calendarIcon,
@@ -7,6 +8,19 @@ import {
   upArrowIcon,
 } from "../../../assets/icons";
 import "./PopulationDashboard.css";
+import { getDashboardStats } from "../../../utils/api";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 
 // Inline SVG Icons for the dashboard
 const TrendUpIcon = () => (
@@ -34,11 +48,87 @@ const TrendUpIcon = () => (
   </svg>
 );
 
+// CountUp Component for animated numbers
+const CountUp = ({ end, duration = 1000 }) => {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(0);
+
+  useEffect(() => {
+    let startTimestamp = null;
+    const startValue = countRef.current;
+    const finalValue = end;
+
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+      // Ease out quart
+      const easeProgress = 1 - Math.pow(1 - progress, 4);
+
+      const currentCount =
+        startValue + (finalValue - startValue) * easeProgress;
+      setCount(currentCount);
+
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      } else {
+        countRef.current = finalValue;
+        setCount(finalValue);
+      }
+    };
+
+    window.requestAnimationFrame(step);
+  }, [end, duration]);
+
+  return <>{Math.floor(count).toLocaleString()}</>;
+};
+
 const PopulationDashboard = () => {
   const [startDate, setStartDate] = useState("2005-08-15");
   const [endDate, setEndDate] = useState("2025-08-15");
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
+
+  const handleStartDateChange = (e) => {
+    const newDate = e.target.value;
+    if (newDate && endDate && newDate > endDate) {
+      alert("Ngày bắt đầu không được lớn hơn ngày kết thúc!");
+      return;
+    }
+    setStartDate(newDate);
+  };
+
+  const handleEndDateChange = (e) => {
+    const newDate = e.target.value;
+    if (newDate && startDate && newDate < startDate) {
+      alert("Ngày kết thúc không được nhỏ hơn ngày bắt đầu!");
+      return;
+    }
+    setEndDate(newDate);
+  };
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const response = await getDashboardStats(startDate, endDate);
+      if (response.success) {
+        setStats(response.data);
+      }
+    } catch (err) {
+      console.error("Error fetching stats:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, [startDate, endDate]);
 
   const handleDateClick = (ref) => {
     if (ref.current) {
@@ -56,8 +146,37 @@ const PopulationDashboard = () => {
     });
   };
 
+  // Prepare data for charts
+  const genderData =
+    stats?.charts?.gender.map((item) => ({
+      name: item.gender === "Male" ? "Nam" : "Nữ",
+      value: parseInt(item.count),
+    })) || [];
+
+  const COLORS = ["#F2C94C", "#56CCF2"]; // Yellow for Male, Blue for Female (matching screenshot)
+
+  const ageData =
+    stats?.charts?.age.map((item) => ({
+      name: item.age_group + " tuổi",
+      value: parseInt(item.count),
+    })) || [];
+
+  // Sort age data to match the order in screenshot
+  const ageOrder = ["0-5", "6-10", "11-14", "15-17", "18-60", "60+"];
+  ageData.sort((a, b) => {
+    const aKey = a.name.replace(" tuổi", "");
+    const bKey = b.name.replace(" tuổi", "");
+    return ageOrder.indexOf(aKey) - ageOrder.indexOf(bKey);
+  });
+
+  if (loading && !stats)
+    return <div className="content">Đang tải dữ liệu...</div>;
+  if (error) return <div className="content">Lỗi: {error}</div>;
+
   return (
     <div className="content">
+      <h2 className="population-dashboard-title">Thống kê nhân khẩu</h2>
+
       {/* Date Filter Section */}
       <div className="date-filter-section">
         <div
@@ -70,7 +189,7 @@ const PopulationDashboard = () => {
             type="date"
             ref={startDateRef}
             value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            onChange={handleStartDateChange}
             style={{
               position: "absolute",
               opacity: 0,
@@ -92,7 +211,7 @@ const PopulationDashboard = () => {
             type="date"
             ref={endDateRef}
             value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            onChange={handleEndDateChange}
             style={{
               position: "absolute",
               opacity: 0,
@@ -105,56 +224,93 @@ const PopulationDashboard = () => {
           />
         </div>
       </div>
+
       {/* Summary Cards */}
       <div className="summary-cards-grid">
         <Card className="summary-card blue-light">
           <div className="card-title">Tổng số nhân khẩu</div>
           <div className="card-value-row">
-            <span className="card-value">7,265</span>
-            <span className="card-trend positive">
-              +11.01% <TrendUpIcon />
+            <span className="card-value">
+              <CountUp end={stats?.summary?.totalPopulation || 0} />
             </span>
           </div>
         </Card>
         <Card className="summary-card blue-light">
           <div className="card-title">Tổng số hộ khẩu</div>
           <div className="card-value-row">
-            <span className="card-value">200</span>
+            <span className="card-value">
+              <CountUp end={stats?.summary?.totalHouseholds || 0} />
+            </span>
           </div>
         </Card>
         <Card className="summary-card blue-light">
           <div className="card-title">Tổng số tạm trú</div>
           <div className="card-value-row">
-            <span className="card-value">30</span>
+            <span className="card-value">
+              <CountUp end={stats?.summary?.totalTempResidents || 0} />
+            </span>
           </div>
         </Card>
         <Card className="summary-card blue-light">
           <div className="card-title">Tổng số tạm vắng</div>
           <div className="card-value-row">
-            <span className="card-value">20</span>
+            <span className="card-value">
+              <CountUp end={stats?.summary?.totalTempAbsences || 0} />
+            </span>
           </div>
         </Card>
       </div>
+
       {/* Charts Section */}
       <div className="charts-grid">
         {/* Gender Chart */}
         <Card className="chart-card">
           <h3 className="chart-title">Thống kê giới tính</h3>
-          <div className="gender-chart-container">
-            <div className="donut-chart">
-              <div className="donut-hole"></div>
+          <div className="chart-content-wrapper">
+            <div style={{ width: "50%", height: 200 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={genderData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={0}
+                    dataKey="value"
+                    startAngle={90}
+                    endAngle={-270}
+                  >
+                    {genderData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
-            <div className="chart-legend">
-              <div className="legend-item">
-                <span className="dot male"></span>
-                <span className="label">Nam</span>
-                <span className="value">60.5%</span>
-              </div>
-              <div className="legend-item">
-                <span className="dot female"></span>
-                <span className="label">Nữ</span>
-                <span className="value">39.5%</span>
-              </div>
+            <div className="chart-legend-custom">
+              {genderData.map((entry, index) => (
+                <div key={index} className="legend-item-row">
+                  <span
+                    className="dot"
+                    style={{ backgroundColor: COLORS[index] }}
+                  ></span>
+                  <span className="label">{entry.name}</span>
+                  <span className="value">
+                    {stats?.summary?.totalPopulation > 0
+                      ? (
+                          (entry.value / stats.summary.totalPopulation) *
+                          100
+                        ).toFixed(1)
+                      : 0}
+                    %
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </Card>
@@ -162,76 +318,91 @@ const PopulationDashboard = () => {
         {/* Age Chart */}
         <Card className="chart-card">
           <h3 className="chart-title">Thống kê nhân khẩu</h3>
-          <div className="age-chart-container">
-            <div className="bar-chart">
-              {[
-                { label: "0-5 tuổi", value: 70 },
-                { label: "6-10 tuổi", value: 35 },
-                { label: "11-14 tuổi", value: 95 },
-                { label: "15-17 tuổi", value: 70 },
-                { label: "18-60 tuổi", value: 70 },
-                { label: "60+ tuổi", value: 70 },
-              ].map((item, index) => (
-                <div key={index} className="bar-column">
-                  <div className="bar-track">
-                    <div
-                      className="bar-fill"
-                      style={{ height: `${item.value}%` }}
-                    ></div>
-                  </div>
-                  <span className="bar-label">{item.label}</span>
-                </div>
-              ))}
-            </div>
-            <div className="y-axis">
-              <span>100</span>
-              <span>75</span>
-              <span>50</span>
-              <span>25</span>
-              <span>0</span>
-            </div>
+          <div style={{ width: "100%", height: 250 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={ageData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                barSize={30}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#E0E0E0"
+                />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#828282", fontSize: 12 }}
+                  dy={10}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#828282", fontSize: 12 }}
+                />
+                <Tooltip cursor={{ fill: "transparent" }} />
+                <Bar dataKey="value" fill="#E0E0E0" radius={[4, 4, 0, 0]}>
+                  {ageData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        entry.name.includes("18-60") ? "#E0E0E0" : "#E0E0E0"
+                      }
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </Card>
-      </div>{" "}
-      {/* Fluctuation Section */}
-      <div className="fluctuation-section">
-        <h3 className="section-title">Biến động</h3>
-        <div className="fluctuation-grid">
-          <Card className="fluctuation-card gray">
+      </div>
+
+      {/* Fluctuations Section */}
+      <div>
+        <h3 className="fluctuations-title">Biến động</h3>
+        <div className="fluctuations-grid">
+          <Card className="fluctuation-card">
             <div className="fluctuation-header">
-              <span>Nhân khẩu mới sinh</span>
+              <span className="fluctuation-label">Nhân khẩu mới sinh</span>
               <img src={userIcon} alt="user" className="dashboard-icon" />
             </div>
-            <div className="fluctuation-value">50</div>
-          </Card>
-          <Card className="fluctuation-card gray">
-            <div className="fluctuation-header">
-              <span>Chuyển tới</span>
-              <img
-                src={upArrowIcon}
-                alt="arrow down"
-                className="dashboard-icon rotate-180"
-              />
+            <div className="fluctuation-value">
+              <CountUp end={stats?.fluctuations?.newborns || 0} />
             </div>
-            <div className="fluctuation-value">100</div>
           </Card>
-          <Card className="fluctuation-card gray">
+          <Card className="fluctuation-card">
             <div className="fluctuation-header">
-              <span>Chuyển đi</span>
+              <span className="fluctuation-label">Chuyển tới</span>
               <img
                 src={upArrowIcon}
-                alt="arrow up"
+                alt="in"
                 className="dashboard-icon"
+                style={{ transform: "rotate(180deg)" }}
               />
             </div>
-            <div className="fluctuation-value">30</div>
-          </Card>
-          <Card className="fluctuation-card gray">
-            <div className="fluctuation-header">
-              <span>Qua đời</span>
-              <img src={tombIcon} alt="deceased" className="dashboard-icon" />
+            <div className="fluctuation-value">
+              <CountUp end={stats?.fluctuations?.movedIn || 0} />
             </div>
-            <div className="fluctuation-value">100</div>
+          </Card>
+          <Card className="fluctuation-card">
+            <div className="fluctuation-header">
+              <span className="fluctuation-label">Chuyển đi</span>
+              <img src={upArrowIcon} alt="out" className="dashboard-icon" />
+            </div>
+            <div className="fluctuation-value">
+              <CountUp end={stats?.fluctuations?.movedOut || 0} />
+            </div>
+          </Card>
+          <Card className="fluctuation-card">
+            <div className="fluctuation-header">
+              <span className="fluctuation-label">Qua đời</span>
+              <img src={tombIcon} alt="death" className="dashboard-icon" />
+            </div>
+            <div className="fluctuation-value">
+              <CountUp end={stats?.fluctuations?.deceased || 0} />
+            </div>
           </Card>
         </div>
       </div>

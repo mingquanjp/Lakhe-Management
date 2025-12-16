@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "./Sidebar.css";
@@ -42,7 +43,7 @@ const Sidebar = () => {
       label: "Quản lý dân cư",
       icon: People,
       subItems: [
-        // { id: "household", label: "Quản lý hộ khẩu thường trú", path: "/admin/household" },
+        { id: "household", label: "Quản lý hộ khẩu thường trú", path: "/admin/household" },
         { id: "temporary-household", label: "Quản lý hộ khẩu tạm trú", path: "/admin/temporary-household" },
         { id: "temporary-absence", label: "Quản lý tạm vắng", path: "/admin/temporary-absence" },
         { id: "form", label: "Form khai báo", path: "/admin/form" },

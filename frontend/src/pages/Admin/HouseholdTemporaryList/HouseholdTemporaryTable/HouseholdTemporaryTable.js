@@ -1,11 +1,9 @@
 import React from "react";
 import "./HouseholdTemporaryTable.css";
+import { useNavigate } from "react-router-dom";
 
-const HouseholdTemporaryTable = ({ data, onDetail }) => {
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleDateString('vi-VN');
-  };
+const HouseholdTemporaryTable = ({ data, onDelete }) => {
+  const navigate = useNavigate();
 
   return (
     <div className="table-container">
@@ -13,49 +11,56 @@ const HouseholdTemporaryTable = ({ data, onDetail }) => {
         <colgroup>
           <col style={{ width: "5%" }} />
           <col style={{ width: "15%" }} />
-          <col style={{ width: "10%" }} />
           <col style={{ width: "25%" }} />
-          <col style={{ width: "10%" }} />
+          <col style={{ width: "30%" }} />
           <col style={{ width: "10%" }} />
           <col style={{ width: "15%" }} />
-          <col style={{ width: "10%" }} />
         </colgroup>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Họ tên</th>
-            <th>Địa chỉ tạm trú</th>
+            <th>STT</th>
+            <th>Mã hộ</th>
             <th>Chủ hộ</th>
-            <th>Từ ngày</th>
-            <th>Đến ngày</th>
-            <th>Lý do</th>
+            <th>Địa chỉ</th>
+            <th className="text-center">Số nhân khẩu</th>
             <th className="text-center">Hành động</th>
           </tr>
         </thead>
         <tbody>
           {data.map((row, index) => (
             <tr key={index}>
-              <td>{row.id}</td>
-              <td className="owner-name">{row.last_name} {row.first_name}</td>
-              <td>{row.temporary_address}</td>
-              <td>{row.host_name}</td>
-              <td>{formatDate(row.start_date)}</td>
-              <td>{formatDate(row.end_date)}</td>
-              <td>{row.reason}</td>
+              <td>{row.stt || index + 1}</td>
+              <td>{row.code}</td>
+              <td className="owner-name">{row.owner}</td>
+              <td>{row.address}</td>
+              <td className="text-center">{row.members}</td>
               <td className="text-center action-cell">
-                <button 
+                <button
                   className="btn-action btn-detail"
-                  onClick={() => onDetail(row)}
+                  onClick={() => {
+                    navigate(`/admin/householdtemporary/${row.id}`);
+                  }}
                 >
                   Chi tiết
                 </button>
-                <button className="btn-action btn-delete">Xóa</button>
+                <button
+                  className="btn-action btn-delete"
+                  onClick={() => onDelete && onDelete(row.id)}
+                >
+                  Xóa
+                </button>
               </td>
             </tr>
           ))}
           {data.length === 0 && (
             <tr>
-              <td colSpan="8" className="text-center">Không có dữ liệu</td>
+              <td
+                colSpan="6"
+                className="text-center"
+                style={{ padding: "20px", color: "#666" }}
+              >
+                Không có dữ liệu hiển thị
+              </td>
             </tr>
           )}
         </tbody>

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import { Search, Download } from "lucide-react";
 import "./TemporaryAbsenceList.css";
 import TemporaryAbsenceTable from "./TemporaryAbsenceTable";

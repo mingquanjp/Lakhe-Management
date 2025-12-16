@@ -1,14 +1,14 @@
-﻿import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Download, Split } from "lucide-react";
 import "./HouseholdList.css";
-import HouseholdTable from "./HouseholdTable";
+import HouseholdTable from "./HouseholdTable/HouseholdTable";
 import Pagination from "../../../components/commons/Pagination";
-import HouseholdAddModal from "./HouseholdAddModal";
-import HouseholdSplitModal from "./HouseholdSplitModal";
+import HouseholdAddModal from "./HouseholdAddModal/HouseholdAddModal";
+import HouseholdSplitModal from "./HouseholdSplitModal/HouseholdSplitModal";
 import {
   fetchHouseholds,
-  createHousehold,
   deleteHousehold,
   splitHousehold,
 } from "../../../utils/api";
@@ -34,14 +34,7 @@ const HouseholdList = () => {
       const response = await fetchHouseholds();
 
       if (response.success && response.data) {
-        const formattedData = response.data.map((item) => ({
-          id: item.household_id,
-          code: item.household_code,
-          owner: item.owner_name || "Chưa có chủ hộ",
-          address: item.address,
-          members: parseInt(item.member_count) || 0,
-        }));
-        setHouseholds(formattedData);
+        setHouseholds(response.data);
       }
     } catch (error) {
       console.error("Failed to fetch households:", error);
@@ -57,48 +50,37 @@ const HouseholdList = () => {
   // Filter logic
   const filteredHouseholds = households.filter(item => {
     const matchesSearch = 
-      item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.owner.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.address.toLowerCase().includes(searchTerm.toLowerCase());
+      item.household_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.owner_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.address?.toLowerCase().includes(searchTerm.toLowerCase());
     
     return matchesSearch;
   });
 
   const handleExport = () => {
     const exportData = filteredHouseholds.map(item => ({
-      "Mã hộ khẩu": item.code,
-      "Chủ hộ": item.owner,
+      "Mã hộ khẩu": item.household_code,
+      "Chủ hộ": item.owner_name,
       "Địa chỉ": item.address,
-      "Số thành viên": item.members
+      "Số thành viên": item.member_count
     }));
     exportToCSV(exportData, "Danh_sach_ho_khau");
   };
 
   const handleSaveHousehold = async (formData) => {
-    try {
-      await createHousehold(formData);
-      alert("Thêm hộ khẩu thành công!");
-      setIsAddModalOpen(false);
-      loadData();
-    } catch (error) {
-      console.error("Lỗi:", error);
-      alert(error.message || "Có lỗi xảy ra khi tạo hộ khẩu");
-    }
+    // Implement save logic or refresh
+    loadData();
+    setIsAddModalOpen(false);
   };
 
   const handleDelete = async (id) => {
-    if (
-      window.confirm(
-        "Bạn có chắc chắn muốn xóa hộ khẩu này? Hành động này sẽ xóa cả các nhân khẩu bên trong!"
-      )
-    ) {
+    if (window.confirm("Bạn có chắc chắn muốn xóa hộ khẩu này?")) {
       try {
         await deleteHousehold(id);
-        alert("Xóa thành công!");
         loadData();
       } catch (error) {
-        console.error("Lỗi xóa:", error);
-        alert(error.message || "Không thể xóa hộ khẩu này");
+        console.error("Failed to delete household:", error);
+        alert("Xóa thất bại");
       }
     }
   };
@@ -106,12 +88,11 @@ const HouseholdList = () => {
   const handleSplitHousehold = async (splitData) => {
     try {
       await splitHousehold(splitData);
-      alert("Tách hộ thành công!");
-      setIsSplitModalOpen(false);
       loadData();
+      setIsSplitModalOpen(false);
     } catch (error) {
-      console.error("Lỗi tách hộ:", error);
-      alert(error.message);
+      console.error("Failed to split household:", error);
+      alert("Tách hộ thất bại: " + error.message);
     }
   };
 
@@ -122,7 +103,13 @@ const HouseholdList = () => {
     .map((item, index) => ({
       ...item,
       stt: indexOfFirstItem + index + 1,
+      // Map fields for Table
+      code: item.household_code,
+      owner: item.owner_name,
+      members: item.member_count,
+      id: item.household_id
     }));
+
   const totalPages = Math.ceil(filteredHouseholds.length / itemsPerPage);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -177,12 +164,18 @@ const HouseholdList = () => {
           onDetail={handleDetailClick}
         />
 
-        {!loading && (
+        {!loading && filteredHouseholds.length > 0 && (
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={paginate}
           />
+        )}
+
+        {!loading && filteredHouseholds.length === 0 && (
+          <div style={{ textAlign: "center", padding: "20px", color: "#666" }}>
+            Không tìm thấy kết quả nào phù hợp.
+          </div>
         )}
       </div>
 

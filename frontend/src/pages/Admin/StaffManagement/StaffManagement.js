@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useState } from "react";
 import "./StaffManagement.css";
 import Card from "../../../components/commons/Card/Card";
 import Button from "../../../components/commons/Button/Button";
