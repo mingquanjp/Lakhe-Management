@@ -76,13 +76,15 @@ const getOverviewData = async (req, res) => {
       SELECT 
         ch.change_type,
         ch.change_date,
-        u.full_name as performer_name,             -- Tên cán bộ thực hiện
+        u.full_name as performer_name,             -- Tên cán bộ
         h.household_code,                          -- Mã hộ khẩu
-        CONCAT(r.first_name, ' ', r.last_name) as resident_name -- Tên nhân khẩu (nếu có)
+        CONCAT(r.first_name, ' ', r.last_name) as resident_name, -- Tên nhân khẩu
+        f.fee_name                                
       FROM change_history ch
       LEFT JOIN users u ON ch.changed_by_user_id = u.user_id
       LEFT JOIN households h ON ch.household_id = h.household_id
       LEFT JOIN residents r ON ch.resident_id = r.resident_id
+      LEFT JOIN fees f ON ch.fee_id = f.fee_id     
       ORDER BY ch.change_date DESC
       LIMIT 10
     `;
