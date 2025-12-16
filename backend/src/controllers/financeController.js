@@ -44,9 +44,10 @@ const getFinanceStats = async (req, res) => {
     }
     const fee = feeQuery.rows[0];
 
-    // 2. Get Total Households (Active)
+    // 2. Get Total Households (Active + Temporary)
+    // Note: Temporary households also pay fees in this system
     const totalHouseholdsQuery = await pool.query(
-      "SELECT COUNT(*) FROM households WHERE status = 'Active'"
+      "SELECT COUNT(*) FROM households WHERE status IN ('Active', 'Temporary') AND deleted_at IS NULL"
     );
     const totalHouseholds = parseInt(totalHouseholdsQuery.rows[0].count);
 
@@ -73,16 +74,8 @@ const getFinanceStats = async (req, res) => {
     if (fee.fee_type === "Mandatory") {
       expectedRevenue = totalHouseholds * parseInt(fee.amount);
     } else {
-      // For voluntary, expected revenue is tricky.
-      // Let's assume expected is at least what has been collected,
-      // or maybe we don't show "expected" in the same way.
-      // For now, let's set expected = totalCollected for voluntary to avoid confusion,
-      // or maybe 0. Let's stick to logic: if voluntary, expected is undefined/dynamic.
-      // But to fit the UI chart, let's use totalCollected as the baseline or maybe a target if we had one.
-      // Let's just use totalCollected for now so the bar chart looks balanced, or 0.
-      // Actually, usually voluntary funds have a target, but we don't have a target column.
-      // Let's set it to totalCollected for now.
-      expectedRevenue = totalCollected;
+      // For voluntary fees, expected revenue is 0 as per requirement
+      expectedRevenue = 0;
     }
 
     // 4. Line Chart Data (Revenue by Month)

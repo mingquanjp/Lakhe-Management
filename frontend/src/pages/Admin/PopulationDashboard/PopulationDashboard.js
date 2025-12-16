@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card } from "../../../components/commons";
 import {
   calendarIcon,
@@ -20,32 +20,6 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-
-// Inline SVG Icons for the dashboard
-const TrendUpIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M23 6L13.5 15.5L8.5 10.5L1 18"
-      stroke="#27AE60"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M17 6H23V12"
-      stroke="#27AE60"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 // CountUp Component for animated numbers
 const CountUp = ({ end, duration = 1000 }) => {
@@ -83,8 +57,16 @@ const CountUp = ({ end, duration = 1000 }) => {
 };
 
 const PopulationDashboard = () => {
-  const [startDate, setStartDate] = useState("2005-08-15");
-  const [endDate, setEndDate] = useState("2025-08-15");
+  // Calculate default dates
+  const today = new Date();
+  const defaultEnd = today.toISOString().split('T')[0];
+  
+  const twentyYearsAgo = new Date();
+  twentyYearsAgo.setFullYear(twentyYearsAgo.getFullYear() - 20);
+  const defaultStart = twentyYearsAgo.toISOString().split('T')[0];
+
+  const [startDate, setStartDate] = useState(defaultStart);
+  const [endDate, setEndDate] = useState(defaultEnd);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -110,7 +92,7 @@ const PopulationDashboard = () => {
     setEndDate(newDate);
   };
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getDashboardStats(startDate, endDate);
@@ -123,11 +105,11 @@ const PopulationDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [startDate, endDate]);
 
   useEffect(() => {
     fetchStats();
-  }, [startDate, endDate]);
+  }, [fetchStats]);
 
   const handleDateClick = (ref) => {
     if (ref.current) {
