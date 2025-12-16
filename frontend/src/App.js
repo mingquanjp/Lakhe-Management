@@ -78,10 +78,11 @@ function AppRoutes() {
         <Route index element={<PopulationDashboard />} />
         <Route path="overview" element={<Overview />} />
         <Route path="household" element={<HouseholdList />} />
-        <Route path="householdtemporary" element={<HouseholdTemporaryList />} /> 
+        <Route path="household/:id" element={<HouseholdDetail />} />
+        <Route path="householdtemporary" element={<HouseholdTemporaryList />} />
+        <Route path="householdtemporary/:id" element={<HouseholdDetail />} />
         <Route path="stats/citizen" element={<PopulationDashboard />} />
         <Route path="stats/finance" element={<StatsFinanceDashboard />} />
-        <Route path="household" element={<HouseholdDetail />} />
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />
         <Route path="form/new-household-form" element={<NewHouseholdForm />} />
