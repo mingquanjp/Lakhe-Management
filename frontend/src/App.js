@@ -75,7 +75,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<PopulationDashboard />} />
+        <Route index element={<Overview />} />
         <Route path="overview" element={<Overview />} />
         <Route path="household" element={<HouseholdList />} />
         <Route path="household/:id" element={<HouseholdDetail />} />
