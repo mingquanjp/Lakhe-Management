@@ -10,7 +10,8 @@ import {
   getFeeSummary, 
   getAllHouseholdsForFee,
   createPayment,
-  updatePayment 
+  updatePayment,
+  deletePayment
 } from '../../../services/feeService';
 import { exportToExcelWithHeaders, formatDateForExcel, formatCurrencyForExcel } from '../../../utils/excelExport';
 import './TableFeeDetails.css';
@@ -165,7 +166,7 @@ const TableFeeDetail = () => {
         const response = await updatePayment(editingPayment.payment_id, {
           amount_paid: amountToPay,
           notes: paymentData.note,
-          payment_date: paymentData.paymentDate // ← THÊM
+          payment_date: paymentData.paymentDate
         });
 
         if (response.success) {
@@ -174,7 +175,6 @@ const TableFeeDetail = () => {
           setEditingPayment(null);
           setSelectedHousehold(null);
           
-          // Force refresh
           await fetchFeeData();
           
           alert('Cập nhật thanh toán thành công!');
@@ -186,7 +186,7 @@ const TableFeeDetail = () => {
           household_id: selectedHousehold.household_id,
           amount_paid: amountToPay,
           notes: paymentData.note,
-          payment_date: paymentData.paymentDate // ← THÊM
+          payment_date: paymentData.paymentDate
         });
 
         if (response.success) {
@@ -195,7 +195,6 @@ const TableFeeDetail = () => {
           setEditingPayment(null);
           setSelectedHousehold(null);
           
-          // Force refresh
           await fetchFeeData();
           
           alert('Ghi nhận thanh toán thành công!');
@@ -204,6 +203,38 @@ const TableFeeDetail = () => {
     } catch (err) {
       alert(`Lỗi: ${err.message}`);
       console.error('Error with payment:', err);
+    }
+  };
+
+  const handleDeletePayment = async () => {
+    if (!editingPayment || !editingPayment.payment_id) {
+      alert('Không tìm thấy thông tin thanh toán');
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      'Bạn có chắc chắn muốn xóa thanh toán này?\n' +
+      'Hộ sẽ được chuyển về trạng thái "Chưa nộp".'
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      const response = await deletePayment(editingPayment.payment_id);
+
+      if (response.success) {
+        setIsPaymentModalOpen(false);
+        setPaymentMode('create');
+        setEditingPayment(null);
+        setSelectedHousehold(null);
+        
+        await fetchFeeData();
+        
+        alert('Xóa thanh toán thành công! Hộ đã được chuyển về trạng thái chưa nộp.');
+      }
+    } catch (err) {
+      alert(`Lỗi khi xóa thanh toán: ${err.message}`);
+      console.error('Error deleting payment:', err);
     }
   };
 
@@ -268,7 +299,7 @@ const TableFeeDetail = () => {
             onClick={() => handleViewDetail(row)}
             className="action-btn"
           >
-            {row.payment_status === 'Đã nộp' ? 'Xem chi tiết' : 'Ghi nhận'}
+            {row.payment_status === 'Đã nộp' ? 'Chỉnh sửa' : 'Ghi nhận'}
           </Button>
         )
       };
@@ -475,8 +506,8 @@ const TableFeeDetail = () => {
       >
         {selectedHousehold && (
           <PaymentForm
-            mode={paymentMode} // ← THÊM prop mode
-            initialData={editingPayment} // ← THÊM dữ liệu ban đầu
+            mode={paymentMode}
+            initialData={editingPayment}
             householdData={{
               ownerName: selectedHousehold.head_name || 'Chưa có chủ hộ',
               amount: currentFee.amount ? formatCurrency(currentFee.amount) : 'Tự nguyện',
@@ -490,6 +521,7 @@ const TableFeeDetail = () => {
               setPaymentMode('create');
               setEditingPayment(null);
             }}
+            onDelete={paymentMode === 'edit' ? handleDeletePayment : null}
           />
         )}
       </Modal>

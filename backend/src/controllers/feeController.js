@@ -1013,6 +1013,48 @@ const updatePayment = async (req, res) => {
   }
 };
 
+/**
+ * Xóa thanh toán (chuyển về trạng thái chưa nộp)
+ * DELETE /api/fees/payments/:paymentId
+ */
+const deletePayment = async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+
+    // Kiểm tra payment có tồn tại không
+    const checkPayment = await pool.query(
+      'SELECT * FROM payment_history WHERE payment_id = $1',
+      [paymentId]
+    );
+
+    if (checkPayment.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy bản ghi thanh toán'
+      });
+    }
+
+    // Xóa payment
+    const result = await pool.query(
+      'DELETE FROM payment_history WHERE payment_id = $1 RETURNING *',
+      [paymentId]
+    );
+
+    res.json({
+      success: true,
+      message: 'Xóa thanh toán thành công. Hộ đã được chuyển về trạng thái chưa nộp.',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error deleting payment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi xóa thanh toán',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   // Fee management
   createFee,
@@ -1023,6 +1065,8 @@ module.exports = {
   
   // Payment management
   createPayment,
+  updatePayment,
+  deletePayment,
   getUnpaidHouseholds,
   getFeeSummary,
   getHouseholdPaymentHistory,
@@ -1033,6 +1077,5 @@ module.exports = {
   getHouseholdPaymentStatus,
   getHouseholdResidents,
   getOverallStatistics,
-  getAllHouseholdsWithPaymentSummary,
-  updatePayment
+  getAllHouseholdsWithPaymentSummary
 };

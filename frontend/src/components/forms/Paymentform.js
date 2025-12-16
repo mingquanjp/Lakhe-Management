@@ -8,7 +8,8 @@ const PaymentForm = ({
   mode = 'create',
   initialData = null, 
   onSubmit, 
-  onCancel 
+  onCancel,
+  onDelete
 }) => {
   const isVoluntary = feeType === 'Voluntary';
   const isEditMode = mode === 'edit';
@@ -169,6 +170,19 @@ const PaymentForm = ({
         >
           Hủy
         </Button>
+        
+        {/* Nút Xóa thanh toán - chỉ hiển thị ở chế độ edit */}
+        {isEditMode && onDelete && (
+          <Button
+            type="button"
+            variant="danger"
+            size="medium"
+            onClick={onDelete}
+          >
+            Xóa thanh toán
+          </Button>
+        )}
+        
         <Button
           type="submit"
           variant="primary"
