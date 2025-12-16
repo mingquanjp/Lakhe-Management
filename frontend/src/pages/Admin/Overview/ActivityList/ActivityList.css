@@ -36,13 +36,14 @@
   font-size: 14px;
   color: #333;
   font-weight: 500;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   line-height: 1.4;
 }
 
 .activity-bottom {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   font-size: 12px;
   color: #888;
   font-style: italic;
@@ -50,16 +51,17 @@
 
 .activity-performer {
   color: #666;
+  margin-bottom: 4px;
+  font-weight: 500;
 }
 
 .activity-dot {
-  margin: 0 6px;
-  font-size: 10px;
-  color: #ccc;
+  display: none;
 }
 
 .activity-time {
   color: #999;
+  font-size: 11px;
 }
 
 .no-activity {

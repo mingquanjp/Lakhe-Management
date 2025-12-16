@@ -74,12 +74,13 @@ function AppRoutes() {
             <Admin />
           </ProtectedRoute>
         }
-      >  
-        <Route index element={<PopulationDashboard />} />
+      >
+        <Route index element={<Overview />} />
         <Route path="overview" element={<Overview />} />
         <Route path="household" element={<HouseholdList />} />
         <Route path="household/:id" element={<HouseholdDetail />} />
         <Route path="householdtemporary" element={<HouseholdTemporaryList />} />
+        <Route path="householdtemporary/:id" element={<HouseholdDetail />} />
         <Route path="householdtemporary/:id" element={<HouseholdDetail />} />
         <Route path="stats/citizen" element={<PopulationDashboard />} />
         <Route path="stats/finance" element={<StatsFinanceDashboard />} />

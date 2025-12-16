@@ -208,11 +208,11 @@ const HouseholdList = () => {
                 : {}
             }
           >
-            <Filter size={16} /> Filters
+            <Filter size={16} /> Lọc
           </button>
 
           <button className="btn-tool" onClick={handleExport}>
-            <Download size={16} /> Export
+            <Download size={16} /> Xuất Excel
           </button>
           <button
             className="btn-tool btn-add"
