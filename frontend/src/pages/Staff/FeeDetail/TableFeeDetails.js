@@ -1,5 +1,3 @@
-// frontend/src/pages/Staff/FeeDetail/TableFeeDetails.js
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Table, Button, Modal, Pagination, Loading } from '../../../components/commons';
@@ -14,6 +12,7 @@ import {
   deletePayment
 } from '../../../services/feeService';
 import { exportToExcelWithHeaders, formatDateForExcel, formatCurrencyForExcel } from '../../../utils/excelExport';
+import { toast } from 'react-toastify';
 import './TableFeeDetails.css';
 
 const TableFeeDetail = () => {
@@ -43,10 +42,10 @@ const TableFeeDetail = () => {
           
           // Nếu không có feeId trong URL, redirect đến fee đầu tiên
           if (!feeId) {
-            navigate(`/staff/fee-detail/${feesResponse.data[0].fee_id}`, { replace: true });
+            navigate(`/staff/table-detail/${feesResponse.data[0].fee_id}`, { replace: true });
           }
         } else if (!feeId) {
-          // Không có fee nào trong database
+  
           setError('Chưa có khoản thu nào. Vui lòng tạo khoản thu mới.');
           setLoading(false);
         }
@@ -101,7 +100,7 @@ const TableFeeDetail = () => {
 
   const handleFeeChange = (event) => {
     const selectedFeeId = event.target.value;
-    navigate(`/staff/fee-detail/${selectedFeeId}`);
+    navigate(`/staff/table-detail/${selectedFeeId}`);
   };
 
   // Định nghĩa các cột mới theo thiết kế
@@ -177,7 +176,7 @@ const TableFeeDetail = () => {
           
           await fetchFeeData();
           
-          alert('Cập nhật thanh toán thành công!');
+          toast.success('Cập nhật thanh toán thành công!');
         }
       } else {
         // TẠO MỚI thanh toán
@@ -197,18 +196,18 @@ const TableFeeDetail = () => {
           
           await fetchFeeData();
           
-          alert('Ghi nhận thanh toán thành công!');
+          toast.success('Ghi nhận thanh toán thành công!');
         }
       }
     } catch (err) {
-      alert(`Lỗi: ${err.message}`);
+      toast.error(`Lỗi: ${err.message}`);
       console.error('Error with payment:', err);
     }
   };
 
   const handleDeletePayment = async () => {
     if (!editingPayment || !editingPayment.payment_id) {
-      alert('Không tìm thấy thông tin thanh toán');
+      toast.error('Không tìm thấy thông tin thanh toán');
       return;
     }
 
@@ -230,10 +229,10 @@ const TableFeeDetail = () => {
         
         await fetchFeeData();
         
-        alert('Xóa thanh toán thành công! Hộ đã được chuyển về trạng thái chưa nộp.');
+        toast.success('Xóa thanh toán thành công! Hộ đã được chuyển về trạng thái chưa nộp.');
       }
     } catch (err) {
-      alert(`Lỗi khi xóa thanh toán: ${err.message}`);
+      toast.error(`Lỗi khi xóa thanh toán: ${err.message}`);
       console.error('Error deleting payment:', err);
     }
   };
@@ -358,13 +357,13 @@ const TableFeeDetail = () => {
       );
 
       if (success) {
-        alert('Xuất Excel thành công!');
+        toast.success('Xuất Excel thành công!');
       } else {
-        alert('Có lỗi khi xuất Excel. Vui lòng thử lại.');
+        toast.error('Có lỗi khi xuất Excel. Vui lòng thử lại.');
       }
     } catch (error) {
       console.error('Export error:', error);
-      alert('Có lỗi khi xuất Excel: ' + error.message);
+      toast.error('Có lỗi khi xuất Excel: ' + error.message);
     }
   };
 
@@ -467,7 +466,7 @@ const TableFeeDetail = () => {
               <Button 
                 variant="primary" 
                 size="small"
-                onClick={handleExportExcel} // ← Thay đổi dòng này
+                onClick={handleExportExcel}
               >
                 Xuất Excel
               </Button>
@@ -479,13 +478,54 @@ const TableFeeDetail = () => {
           <>
             <Table columns={enhancedColumns} data={enhancedData} />
 
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            )}
+             {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="pagination">
+                      <button 
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        ← Trước
+                      </button>
+                      <div className="pagination-info">
+                        <span>Trang </span>
+                        <input
+                          type="number"
+                          className="pagination-input"
+                          min="1"
+                          max={totalPages}
+                          value={currentPage}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (value >= 1 && value <= totalPages) {
+                              setCurrentPage(value);
+                            }
+                          }}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              const value = parseInt(e.target.value);
+                              if (value >= 1 && value <= totalPages) {
+                                setCurrentPage(value);
+                              } else if (value < 1) {
+                                setCurrentPage(1);
+                              } else if (value > totalPages) {
+                                setCurrentPage(totalPages);
+                              }
+                            }
+                          }}
+                        />
+                        <span> / {totalPages}</span>
+                      </div>
+                      <button 
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        Sau →
+                      </button>
+                    </div>
+                  )}
           </>
         ) : (
           <div className="no-data">

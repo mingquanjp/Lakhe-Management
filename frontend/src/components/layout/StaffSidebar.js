@@ -48,13 +48,13 @@ const StaffSidebar = () => {
       label: "Thống kê",
       icon: Statistic,
       path: "/staff/fee-detail",
-    },
-    {
-      id: "detail",
-      label: "Chi tiết các đợt thu",
-      icon: detailIcon,
-      path: "/staff/table-detail",
     }
+    // {
+    //   id: "detail",
+    //   label: "Chi tiết các đợt thu",
+    //   icon: detailIcon,
+    //   path: "/staff/table-detail",
+    // }
   ];
 
   const toggleExpand = (itemId) => {

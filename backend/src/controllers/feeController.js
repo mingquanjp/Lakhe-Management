@@ -5,8 +5,10 @@ Tạo khoản thu mới
 POST /api/fees
  */
 const createFee = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { fee_name, fee_type, amount, start_date, end_date } = req.body;
+    const user_id = req.user?.user_id || req.user?.userId || 1;
 
     // Validation
     if (!fee_name || !fee_type || !start_date) {
@@ -32,12 +34,23 @@ const createFee = async (req, res) => {
       });
     }
 
-    const result = await pool.query(
+    await client.query('BEGIN');
+
+    const result = await client.query(
       `INSERT INTO fees (fee_name, fee_type, amount, start_date, end_date)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
       [fee_name, fee_type, amount, start_date, end_date]
     );
+
+    // GHI LOG VÀO change_history
+    await client.query(
+      `INSERT INTO change_history (change_date, change_type, changed_by_user_id, fee_id)
+       VALUES (NOW(), 'CreateFee', $1, $2)`,
+       [user_id,result.rows[0].fee_id]
+    );
+
+    await client.query('COMMIT');
 
     res.status(201).json({
       success: true,
@@ -45,12 +58,15 @@ const createFee = async (req, res) => {
       data: result.rows[0]
     });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Error creating fee:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tạo khoản thu',
       error: error.message
     });
+  } finally {
+    client.release();
   }
 };
 
@@ -72,6 +88,7 @@ const getAllFees = async (req, res) => {
         (SELECT COALESCE(SUM(amount_paid), 0) FROM payment_history WHERE fee_id = fees.fee_id) as total_collected,
         (SELECT COUNT(*) FROM households WHERE status = 'Active') as total_households
        FROM fees
+       WHERE deleted_at IS NULL
        ORDER BY start_date DESC`
     );
 
@@ -106,7 +123,7 @@ const getFeeById = async (req, res) => {
         start_date,
         end_date
        FROM fees
-       WHERE fee_id = $1`,
+       WHERE fee_id = $1 AND deleted_at IS NULL`,
       [feeId]
     );
 
@@ -136,12 +153,14 @@ const getFeeById = async (req, res) => {
  * PUT /api/fees/:feeId
  */
 const updateFee = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { feeId } = req.params;
     const { fee_name, fee_type, amount, start_date, end_date } = req.body;
+    const user_id = req.user?.user_id || req.user?.userId || 1;
 
     // Kiểm tra khoản thu có tồn tại không
-    const checkFee = await pool.query('SELECT * FROM fees WHERE fee_id = $1', [feeId]);
+    const checkFee = await client.query('SELECT * FROM fees WHERE fee_id = $1 AND deleted_at IS NULL', [feeId]);
     
     if (checkFee.rows.length === 0) {
       return res.status(404).json({
@@ -158,7 +177,9 @@ const updateFee = async (req, res) => {
       });
     }
 
-    const result = await pool.query(
+    await client.query('BEGIN');
+
+    const result = await client.query(
       `UPDATE fees
        SET fee_name = COALESCE($1, fee_name),
            fee_type = COALESCE($2, fee_type),
@@ -170,18 +191,30 @@ const updateFee = async (req, res) => {
       [fee_name, fee_type, amount, start_date, end_date, feeId]
     );
 
+    // GHI LOG VÀO change_history
+    await client.query(
+      `INSERT INTO change_history (change_date, change_type, changed_by_user_id, fee_id)
+       VALUES (NOW(), 'UpdateFee', $1, $2)`,
+      [user_id,feeId]
+    );
+
+    await client.query('COMMIT');
+
     res.json({
       success: true,
       message: 'Cập nhật khoản thu thành công',
       data: result.rows[0]
     });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Error updating fee:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi cập nhật khoản thu',
       error: error.message
     });
+  } finally {
+    client.release();
   }
 };
 
@@ -193,7 +226,8 @@ const deleteFee = async (req, res) => {
   const client = await pool.connect();
   try {
     const { feeId, id } = req.params;
-    const feeIdToDelete = feeId || id; // Support both parameter names
+    const feeIdToDelete = feeId || id;
+    const user_id = req.user?.user_id || req.user?.userId || 1;
 
     await client.query("BEGIN");
 
@@ -213,6 +247,13 @@ const deleteFee = async (req, res) => {
         message: 'Không tìm thấy khoản thu'
       });
     }
+
+    // GHI LOG VÀO change_history
+    await client.query(
+      `INSERT INTO change_history (change_date, change_type, changed_by_user_id,fee_id)
+       VALUES (NOW(), 'DeleteFee', $1, $2)`,
+      [user_id,feeIdToDelete],
+    );
 
     await client.query("COMMIT");
 
@@ -239,8 +280,9 @@ const deleteFee = async (req, res) => {
  * POST /api/fees/payments
  */
 const createPayment = async (req, res) => {
+  const client = await pool.connect();
   try {
-    const { fee_id, household_id, amount_paid, notes, payment_date } = req.body; // ← THÊM payment_date
+    const { fee_id, household_id, amount_paid, notes, payment_date } = req.body;
     const collected_by_user_id = req.user?.user_id || req.user?.userId || 1;
     
     // Validation
@@ -257,8 +299,10 @@ const createPayment = async (req, res) => {
     // Xử lý payment_date: nếu không có thì dùng ngày hiện tại
     const paymentDateValue = payment_date || new Date().toISOString().split('T')[0];
 
+    await client.query('BEGIN');
+
     // Kiểm tra khoản thu có tồn tại không
-    const feeCheck = await pool.query('SELECT * FROM fees WHERE fee_id = $1', [fee_id]);
+    const feeCheck = await client.query('SELECT * FROM fees WHERE fee_id = $1', [fee_id]);
     if (feeCheck.rows.length === 0) {
       return res.status(404).json({
         success: false,
@@ -267,7 +311,7 @@ const createPayment = async (req, res) => {
     }
 
     // Kiểm tra hộ khẩu có tồn tại không
-    const householdCheck = await pool.query('SELECT * FROM households WHERE household_id = $1', [household_id]);
+    const householdCheck = await client.query('SELECT * FROM households WHERE household_id = $1', [household_id]);
     if (householdCheck.rows.length === 0) {
       return res.status(404).json({
         success: false,
@@ -276,7 +320,7 @@ const createPayment = async (req, res) => {
     }
 
     // Kiểm tra xem đã có record thanh toán chưa
-    const existingPayment = await pool.query(
+    const existingPayment = await client.query(
       `SELECT payment_id FROM payment_history 
        WHERE fee_id = $1 AND household_id = $2`,
       [fee_id, household_id]
@@ -293,9 +337,12 @@ const createPayment = async (req, res) => {
         WHERE fee_id = $5 AND household_id = $6
         RETURNING *
       `;
-      const result = await pool.query(updateQuery, [
+      const result = await client.query(updateQuery, [
         amountInteger, paymentDateValue, notes, collected_by_user_id, fee_id, household_id
       ]);
+
+
+      await client.query('COMMIT');
 
       return res.status(200).json({
         success: true,
@@ -304,13 +351,16 @@ const createPayment = async (req, res) => {
       });
     }
 
-    // INSERT với payment_date từ frontend
-    const result = await pool.query(
+    // INSERT thanh toán mới
+    const result = await client.query(
       `INSERT INTO payment_history (fee_id, household_id, amount_paid, collected_by_user_id, notes, payment_date)
        VALUES ($1, $2, $3, $4, $5, $6::date)
        RETURNING *`,
       [fee_id, household_id, amountInteger, collected_by_user_id, notes, paymentDateValue]
     );
+
+
+    await client.query('COMMIT');
 
     res.status(201).json({
       success: true,
@@ -318,12 +368,140 @@ const createPayment = async (req, res) => {
       data: result.rows[0]
     });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Error creating payment:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi ghi nhận thanh toán',
       error: error.message
     });
+  } finally {
+    client.release();
+  }
+};
+
+/**
+ * Cập nhật thông tin thanh toán
+ * PUT /api/fees/payments/:paymentId
+ */
+const updatePayment = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { paymentId } = req.params;
+    const { amount_paid, notes, payment_date } = req.body;
+    const updated_by_user_id = req.user?.user_id || req.user?.userId || 1;
+
+    // Validation
+    if (!amount_paid || amount_paid <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Số tiền phải lớn hơn 0'
+      });
+    }
+
+    // Kiểm tra payment có tồn tại không
+    const checkPayment = await client.query(
+      'SELECT * FROM payment_history WHERE payment_id = $1',
+      [paymentId]
+    );
+
+    if (checkPayment.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy bản ghi thanh toán'
+      });
+    }
+
+    const household_id = checkPayment.rows[0].household_id;
+    const amountInteger = Math.round(parseFloat(amount_paid));
+    const paymentDateValue = payment_date || new Date().toISOString().split('T')[0];
+
+    await client.query('BEGIN');
+
+    // Update payment
+    const result = await client.query(
+      `UPDATE payment_history 
+       SET amount_paid = $1,
+           notes = $2,
+           payment_date = $3::date,
+           collected_by_user_id = $4
+       WHERE payment_id = $5
+       RETURNING *`,
+      [amountInteger, notes, paymentDateValue, updated_by_user_id, paymentId]
+    );
+
+
+
+    await client.query('COMMIT');
+
+    res.json({
+      success: true,
+      message: 'Cập nhật thanh toán thành công',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error updating payment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi cập nhật thanh toán',
+      error: error.message
+    });
+  } finally {
+    client.release();
+  }
+};
+
+/**
+ * Xóa thanh toán (chuyển về trạng thái chưa nộp)
+ * DELETE /api/fees/payments/:paymentId
+ */
+const deletePayment = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { paymentId } = req.params;
+    const user_id = req.user?.user_id || req.user?.userId || 1;
+
+    // Kiểm tra payment có tồn tại không
+    const checkPayment = await client.query(
+      'SELECT * FROM payment_history WHERE payment_id = $1',
+      [paymentId]
+    );
+
+    if (checkPayment.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy bản ghi thanh toán'
+      });
+    }
+
+    const household_id = checkPayment.rows[0].household_id;
+
+    await client.query('BEGIN');
+
+    // Xóa payment
+    const result = await client.query(
+      'DELETE FROM payment_history WHERE payment_id = $1 RETURNING *',
+      [paymentId]
+    );
+
+    await client.query('COMMIT');
+
+    res.json({
+      success: true,
+      message: 'Xóa thanh toán thành công. Hộ đã được chuyển về trạng thái chưa nộp.',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error deleting payment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi xóa thanh toán',
+      error: error.message
+    });
+  } finally {
+    client.release();
   }
 };
 
@@ -946,112 +1124,6 @@ const getAllHouseholdsWithPaymentSummary = async (req, res) => {
   } catch (error) {
     console.error("Lỗi lấy danh sách hộ khẩu:", error);
     res.status(500).json({ success: false, message: "Lỗi server" });
-  }
-};
-
-/**
- * Cập nhật thông tin thanh toán
- * PUT /api/fees/payments/:paymentId
- */
-const updatePayment = async (req, res) => {
-  try {
-    const { paymentId } = req.params;
-    const { amount_paid, notes, payment_date } = req.body; // ← THÊM payment_date
-    const updated_by_user_id = req.user?.user_id || req.user?.userId;
-
-    // Validation
-    if (!amount_paid || amount_paid <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Số tiền phải lớn hơn 0'
-      });
-    }
-
-    // Kiểm tra payment có tồn tại không
-    const checkPayment = await pool.query(
-      'SELECT * FROM payment_history WHERE payment_id = $1',
-      [paymentId]
-    );
-
-    if (checkPayment.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Không tìm thấy bản ghi thanh toán'
-      });
-    }
-
-    // Convert amount_paid thành integer
-    const amountInteger = Math.round(parseFloat(amount_paid));
-    
-    // Xử lý payment_date
-    const paymentDateValue = payment_date || new Date().toISOString().split('T')[0];
-
-    // Update payment với payment_date
-    const result = await pool.query(
-      `UPDATE payment_history 
-       SET amount_paid = $1,
-           notes = $2,
-           payment_date = $3::date,
-           collected_by_user_id = $4
-       WHERE payment_id = $5
-       RETURNING *`,
-      [amountInteger, notes, paymentDateValue, updated_by_user_id, paymentId]
-    );
-
-    res.json({
-      success: true,
-      message: 'Cập nhật thanh toán thành công',
-      data: result.rows[0]
-    });
-  } catch (error) {
-    console.error('Error updating payment:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Lỗi khi cập nhật thanh toán',
-      error: error.message
-    });
-  }
-};
-
-/**
- * Xóa thanh toán (chuyển về trạng thái chưa nộp)
- * DELETE /api/fees/payments/:paymentId
- */
-const deletePayment = async (req, res) => {
-  try {
-    const { paymentId } = req.params;
-
-    // Kiểm tra payment có tồn tại không
-    const checkPayment = await pool.query(
-      'SELECT * FROM payment_history WHERE payment_id = $1',
-      [paymentId]
-    );
-
-    if (checkPayment.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Không tìm thấy bản ghi thanh toán'
-      });
-    }
-
-    // Xóa payment
-    const result = await pool.query(
-      'DELETE FROM payment_history WHERE payment_id = $1 RETURNING *',
-      [paymentId]
-    );
-
-    res.json({
-      success: true,
-      message: 'Xóa thanh toán thành công. Hộ đã được chuyển về trạng thái chưa nộp.',
-      data: result.rows[0]
-    });
-  } catch (error) {
-    console.error('Error deleting payment:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Lỗi khi xóa thanh toán',
-      error: error.message
-    });
   }
 };
 

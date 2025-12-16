@@ -22,6 +22,10 @@ const FeeDashboard = () => {
   const [households, setHouseholds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Fetch all fees on mount
   useEffect(() => {
@@ -114,6 +118,19 @@ const FeeDashboard = () => {
 
     return filtered;
   }, [households, searchTerm, sortConfig]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredAndSortedData.slice(startIndex, endIndex);
+  }, [filteredAndSortedData, currentPage, itemsPerPage]);
+
+  // Reset to page 1 when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   // Stats cards data
   const stats = useMemo(() => {
@@ -265,28 +282,6 @@ const FeeDashboard = () => {
   return (
     <div className="content">
       {/* Banner chọn đợt thu/đóng góp */}
-      <div className="period-selector-banner">
-        <div className="period-selector-left">
-          <span className="period-selector-label">
-            Chọn đợt thu/đóng góp
-          </span>
-        </div>
-        <div className="period-selector-right">
-          <select
-            className="period-select"
-            value={selectedFeeId || ''}
-            onChange={handlePeriodChange}
-          >
-            <option value="">-- Chọn đợt thu --</option>
-            {allFees.map(fee => (
-              <option key={fee.fee_id} value={fee.fee_id}>
-                {fee.fee_name} ({formatDate(fee.start_date)})
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
       {/* Stat Cards */}
       {stats.length > 0 && (
         <div className="stats-grid">
@@ -302,7 +297,7 @@ const FeeDashboard = () => {
       {/* Detailed Statistical Table */}
       <Card
         title="Bảng thống kê chi tiết"
-        subtitle={`Tổng quan tất cả hộ khẩu`}
+        subtitle={`Hiển thị ${paginatedData.length} / ${filteredAndSortedData.length} hộ khẩu`}
         actions={
           <div className="table-actions">
             <div className="table-search">
@@ -315,6 +310,19 @@ const FeeDashboard = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
+            <select 
+              className="items-per-page-select"
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={5}>5 / trang</option>
+              <option value={10}>10 / trang</option>
+              <option value={20}>20 / trang</option>
+              <option value={50}>50 / trang</option>
+            </select>
             <Button variant="outline" size="small">
               Filters
             </Button>
@@ -327,10 +335,59 @@ const FeeDashboard = () => {
         <div className="table-wrapper">
           <EnhancedTable 
             columns={tableColumns} 
-            data={filteredAndSortedData} 
+            data={paginatedData} 
             className="staff-table" 
           />
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button 
+              className="pagination-btn"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              ← Trước
+            </button>
+            <div className="pagination-info">
+              <span>Trang </span>
+              <input
+                type="number"
+                className="pagination-input"
+                min="1"
+                max={totalPages}
+                value={currentPage}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  if (value >= 1 && value <= totalPages) {
+                    setCurrentPage(value);
+                  }
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    const value = parseInt(e.target.value);
+                    if (value >= 1 && value <= totalPages) {
+                      setCurrentPage(value);
+                    } else if (value < 1) {
+                      setCurrentPage(1);
+                    } else if (value > totalPages) {
+                      setCurrentPage(totalPages);
+                    }
+                  }
+                }}
+              />
+              <span> / {totalPages}</span>
+            </div>
+            <button 
+              className="pagination-btn"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Sau →
+            </button>
+          </div>
+        )}
       </Card>
     </div>
   );

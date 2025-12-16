@@ -9,7 +9,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import AccountManagement from './pages/Admin/AccountManagement';
 // Pages
 import Login from "./pages/Login/Login";
 import Admin from "./pages/Admin";
@@ -30,11 +30,11 @@ import Overview from "./pages/Admin/Overview/Overview";
 import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
 import HouseholdTemporaryList from "./pages/Admin/HouseholdTemporaryList/HouseholdTemporaryList";
 
-
 // Import Staff Pages
 import FeeDashboard from "./pages/Staff/FeeDashboard/FeeDashboard";
+import AccountantDashboard from "./pages/Staff/FeeDashboard/AccountantDashboard";  // ← THÊM DÒNG NÀY
 import FeeDetail from "./pages/Staff/FeeDetail/FeeDetail";
-
+import TableFeeDetail from "./pages/Staff/FeeDetail/TableFeeDetails"; 
 // Root redirect component
 const RootRedirect = () => {
   const { isAuthenticated, user, loading } = useAuth();
@@ -74,7 +74,7 @@ function AppRoutes() {
             <Admin />
           </ProtectedRoute>
         }
-      >
+      >  
         <Route index element={<PopulationDashboard />} />
         <Route path="overview" element={<Overview />} />
         <Route path="household" element={<HouseholdList />} />
@@ -96,6 +96,7 @@ function AppRoutes() {
           element={<TemporaryResidenceForm />}
         />
         <Route path="form/change-owner-form" element={<ChangeOwnerForm />} />
+        <Route path="accounts" element={<AccountManagement />} />
       </Route>
 
       {/* Staff Routes - Protected */}
@@ -108,7 +109,10 @@ function AppRoutes() {
         }
       >
         <Route index element={<FeeDashboard />} />
+        <Route path="fee-management" element={<AccountantDashboard />} />  {/* ← THÊM DÒNG NÀY */}
         <Route path="fee-detail" element={<FeeDetail />} />
+        <Route path="fee-detail/:feeId" element={<FeeDetail />} />
+        <Route path="table-detail/:feeId" element={<TableFeeDetail />} />
       </Route>
 
       {/* Fallback - redirect to root which will handle auth */}

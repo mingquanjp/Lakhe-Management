@@ -7,7 +7,6 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const financeRoutes = require("./routes/financeRoutes");
 const householdRoutes = require('./routes/householdRoutes');
 const residentRoutes = require("./routes/residentRoutes");
-const feeRoutes = require('./routes/feeRoutes');
 const overviewRoutes = require("./routes/overviewRoutes");
 
 const app = express();
@@ -52,22 +51,6 @@ app.get("/api/test-fees", async (req, res) => {
       stack: error.stack
     });
   }
-});
-// Example protected route - requires valid JWT token
-app.get("/api/test-protected", verifyToken, (req, res) => {
-  res.json({
-    success: true,
-    message: "Bạn đã truy cập route được bảo vệ thành công!",
-    user: req.user,
-  });
-});
-// Example admin-only route
-app.get("/api/test-admin", verifyToken, requireAdmin, (req, res) => {
-  res.json({
-    success: true,
-    message: "Chào mừng Admin!",
-    user: req.user,
-  });
 });
 // API Routes
 app.use("/api/auth", authRoutes);

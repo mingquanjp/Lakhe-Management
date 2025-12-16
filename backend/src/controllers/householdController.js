@@ -479,7 +479,7 @@ const createTemporaryHousehold = async (req, res) => {
 };
 
 module.exports = {
-  getAllHouseholds,
+  getHouseholds,
   getHouseholdById,
   createHousehold,
   deleteHousehold,
