@@ -9,17 +9,17 @@ const HouseholdTemporaryTable = ({ data, onDelete }) => {
     <div className="table-container">
       <table className="household-table">
         <colgroup>
-          <col style={{ width: "8%" }} />
+          <col style={{ width: "5%" }} />
           <col style={{ width: "15%" }} />
-          <col style={{ width: "22%" }} />
+          <col style={{ width: "25%" }} />
           <col style={{ width: "30%" }} />
           <col style={{ width: "10%" }} />
           <col style={{ width: "15%" }} />
         </colgroup>
         <thead>
           <tr>
-            <th>Số thứ tự</th>
-            <th>Mã hộ tạm trú</th>
+            <th>STT</th>
+            <th>Mã hộ</th>
             <th>Chủ hộ</th>
             <th>Địa chỉ</th>
             <th className="text-center">Số nhân khẩu</th>
