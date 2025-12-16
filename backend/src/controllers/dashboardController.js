@@ -5,23 +5,28 @@ const getPopulationStats = async (req, res) => {
     const { startDate, endDate } = req.query;
 
     // Default date range if not provided (e.g., last 20 years)
-    const start = startDate || "2005-08-15";
-    const end = endDate || "2025-08-15";
+    const today = new Date();
+    const defaultEnd = today.toISOString().split("T")[0];
+    const defaultStart = new Date(today.setFullYear(today.getFullYear() - 20))
+      .toISOString()
+      .split("T")[0];
+
+    const start = startDate || defaultStart;
+    const end = endDate || defaultEnd;
 
     // 1. Summary Cards (Snapshot at End Date or Activity within Range)
 
-    // Total Population (Permanent Residents registered before End Date)
+    // Total Population (Permanent + Temporary Residents registered before End Date)
     // Note: This is an approximation of "Population at that time" based on registration date.
-    // It excludes people who registered after the End Date.
     const totalPopulationQuery = await pool.query(
-      "SELECT COUNT(*) FROM residents WHERE status = 'Permanent' AND registration_date <= $1",
+      "SELECT COUNT(*) FROM residents WHERE status IN ('Permanent', 'Temporary') AND registration_date <= $1 AND deleted_at IS NULL",
       [end]
     );
     const totalPopulation = parseInt(totalPopulationQuery.rows[0].count);
 
-    // Total Households (Active households created before End Date)
+    // Total Households (Active + Temporary households created before End Date)
     const totalHouseholdsQuery = await pool.query(
-      "SELECT COUNT(*) FROM households WHERE status = 'Active' AND date_created <= $1",
+      "SELECT COUNT(*) FROM households WHERE status IN ('Active', 'Temporary') AND date_created <= $1 AND deleted_at IS NULL",
       [end]
     );
     const totalHouseholds = parseInt(totalHouseholdsQuery.rows[0].count);
@@ -30,7 +35,7 @@ const getPopulationStats = async (req, res) => {
     // Logic: Overlap between [temp_start, temp_end] and [start, end]
     // temp_start <= end AND temp_end >= start
     const totalTempResidentsQuery = await pool.query(
-      "SELECT COUNT(*) FROM residents WHERE status = 'Temporary' AND temp_start_date <= $2 AND temp_end_date >= $1",
+      "SELECT COUNT(*) FROM residents WHERE status = 'Temporary' AND temp_start_date <= $2 AND temp_end_date >= $1 AND deleted_at IS NULL",
       [start, end]
     );
     const totalTempResidents = parseInt(totalTempResidentsQuery.rows[0].count);
@@ -46,7 +51,7 @@ const getPopulationStats = async (req, res) => {
     // 2. Charts
     // Gender Statistics (Based on population at End Date)
     const genderStatsQuery = await pool.query(
-      "SELECT gender, COUNT(*) FROM residents WHERE status = 'Permanent' AND registration_date <= $1 GROUP BY gender",
+      "SELECT gender, COUNT(*) FROM residents WHERE status IN ('Permanent', 'Temporary') AND registration_date <= $1 AND deleted_at IS NULL GROUP BY gender",
       [end]
     );
     const genderStats = genderStatsQuery.rows;
@@ -65,7 +70,7 @@ const getPopulationStats = async (req, res) => {
         END as age_group,
         COUNT(*) as count
       FROM residents
-      WHERE status = 'Permanent' AND registration_date <= $1
+      WHERE status IN ('Permanent', 'Temporary') AND registration_date <= $1 AND deleted_at IS NULL
       GROUP BY age_group
     `,
       [end]
