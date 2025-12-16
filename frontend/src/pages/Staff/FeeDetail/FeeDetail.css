@@ -273,8 +273,41 @@
     border-bottom-color: #e9ecef;
   }
 }
+.fee-selector-section {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 
-/* Filter Dropdown */
+.fee-selector-section label {
+  font-weight: 500;
+  color: #374151;
+}
+
+.fee-select-dropdown {
+  padding: 8px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 300px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.fee-select-dropdown:hover {
+  border-color: #3b82f6;
+}
+
+.fee-select-dropdown:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}/* Filter Dropdown */
 .filter-dropdown-container {
   position: relative;
 }

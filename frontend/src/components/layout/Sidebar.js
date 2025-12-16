@@ -9,6 +9,7 @@ import {
   Staff,
   Statistic,
   logoutIcon,
+  accountIcon
 } from "../../assets/icons";
 import { Button } from "../commons";
 
@@ -50,7 +51,6 @@ const Sidebar = () => {
         { id: "form", label: "Form khai báo", path: "/admin/form" },
       ],
     },
-
     {
       id: "stats",
       label: "Thống kê",
@@ -69,10 +69,10 @@ const Sidebar = () => {
       ],
     },
     {
-      id: "staff",
+      id: "accounts",
       label: "Quản lý cán bộ",
-      icon: Staff,
-      path: "/admin/staff-management",
+      icon: Staff, // Hoặc dùng icon khác
+      path: "/admin/accounts",
     },
   ];
 

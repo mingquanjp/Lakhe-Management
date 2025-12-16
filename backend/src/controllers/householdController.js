@@ -11,8 +11,46 @@ const logChange = async (client, householdId, residentId, changeType, userId) =>
 
 const getHouseholds = async (req, res) => {
   try {
-    const query = `
-      SELECT 
+    const result = await pool.query(
+      `SELECT 
+        h.household_id,
+        h.household_code,
+        h.address,
+        h.date_created,
+        h.status,
+        CONCAT(r.first_name, ' ', r.last_name) as head_name,
+        (SELECT COUNT(*) FROM residents WHERE household_id = h.household_id AND status = 'Permanent') as member_count
+       FROM households h
+       LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
+       WHERE h.status = 'Active'
+       ORDER BY h.household_code`
+    );
+
+    res.json({
+      success: true,
+      total: result.rows.length,
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Error getting households:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách hộ khẩu',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Lấy chi tiết một hộ khẩu
+ * GET /api/households/:householdId
+ */
+const getHouseholdById = async (req, res) => {
+  try {
+    const { householdId } = req.params;
+
+    const result = await pool.query(
+      `SELECT 
         h.household_id,
         h.household_code,
         h.address,
@@ -31,37 +69,47 @@ const getHouseholds = async (req, res) => {
       WHERE h.status = 'Active' 
         AND h.deleted_at IS NULL
       ORDER BY h.household_id ASC
-    `;
+    `)
 
-    const result = await pool.query(query);
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy hộ khẩu'
+      });
+    }
 
-    res.status(200).json({
+    res.json({
       success: true,
-      count: result.rows.length,
-      data: result.rows,
+      data: result.rows[0]
     });
   } catch (error) {
-    console.error("Lỗi lấy danh sách:", error);
-    res.status(500).json({ success: false, message: "Lỗi server" });
+    console.error('Error getting household:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy thông tin hộ khẩu',
+      error: error.message
+    });
   }
 };
 
+/**
+ * Tạo hộ khẩu mới
+ * POST /api/households
+ */
 const createHousehold = async (req, res) => {
-  const client = await pool.connect();
-
   try {
     console.log("---- BẮT ĐẦU TẠO HỘ KHẨU ----");
     const { household_code, address, members } = req.body;
     const currentUserId = req.user ? req.user.user_id : null; 
 
+    // Validation
     if (!household_code || !address) {
       return res.status(400).json({ success: false, message: "Thiếu Mã hộ hoặc Địa chỉ" });
     }
 
-    await client.query("BEGIN");
-
-    const checkDup = await client.query(
-      "SELECT household_code FROM households WHERE household_code = $1",
+    // Kiểm tra trùng household_code
+    const existingHousehold = await pool.query(
+      'SELECT household_id FROM households WHERE household_code = $1',
       [household_code]
     );
     if (checkDup.rows.length > 0) {
@@ -135,8 +183,8 @@ const createHousehold = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Thêm hộ khẩu thành công!",
-      data: { household_id: newHouseholdId },
+      message: 'Tạo hộ khẩu thành công',
+      data: result.rows[0]
     });
   } catch (error) {
     await client.query("ROLLBACK");
@@ -448,39 +496,6 @@ const createTemporaryHousehold = async (req, res) => {
   }
 };
 
-const getHouseholdById = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const householdQuery = `
-            SELECT 
-                h.*,
-                (r.first_name || ' ' || r.last_name) as owner_name
-            FROM households h
-            LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
-            WHERE h.household_id = $1
-        `;
-        const householdResult = await pool.query(householdQuery, [id]);
-
-        if (householdResult.rows.length === 0) {
-            return res.status(404).json({ message: 'Household not found' });
-        }
-
-        const residentsQuery = `
-            SELECT * FROM residents 
-            WHERE household_id = $1
-            ORDER BY resident_id ASC
-        `;
-        const residentsResult = await pool.query(residentsQuery, [id]);
-
-        res.json({
-            household: householdResult.rows[0],
-            residents: residentsResult.rows
-        });
-    } catch (error) {
-        console.error('Error getting household details:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-};
 
 const changeHeadOfHousehold = async (req, res) => {
   const client = await pool.connect();
