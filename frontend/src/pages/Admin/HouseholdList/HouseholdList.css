@@ -45,6 +45,47 @@
 }
 .btn-tool:hover { transform: translateY(-1px); }
 
+.btn-tool.active {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+.filter-panel {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filter-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #525f7f;
+}
+
+.filter-input {
+  padding: 8px 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  font-size: 14px;
+  min-width: 200px;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #5e72e4;
+}
+
 .table-card {
   background: white;
   border-radius: 8px;

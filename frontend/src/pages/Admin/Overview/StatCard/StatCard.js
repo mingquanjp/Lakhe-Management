@@ -1,7 +1,7 @@
 import React from 'react';
 import './StatCard.css';
 
-const StatCard = ({ title, value, change, isPositive }) => {
+const StatCard = ({ title, value}) => {
   return (
     <div className="stat-card">
       <div className="stat-header">

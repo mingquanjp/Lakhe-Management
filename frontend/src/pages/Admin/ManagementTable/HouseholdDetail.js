@@ -1,16 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import Card from '../components/commons/Card/Card';
-import Table from '../components/commons/Table/Table';
-import Button from '../components/commons/Button/Button';
-import Modal from '../components/commons/Modal/Modal';
-import Input from '../components/commons/Input/Input';
-import Loading from '../components/commons/Loading/Loading';
-import { 
-  getAllHouseholds, 
-  createHousehold, 
-  updateHousehold, 
-  deleteHousehold 
-} from '../services/householdService';
+import React from "react";
+import { useState } from "react";
+import Card from '../../../components/commons/Card/Card';
+import Table from '../../../components/commons/Table/Table';
+import Button from '../../../components/commons/Button/Button';
+import Modal from '../../../components/commons/Modal/Modal';
+import Input from '../../../components/commons/Input/Input';
+
+// Mock Data
+const initialHouseholds = [
+    { 
+        id: 1, 
+        householdId: 'HK001',
+        ownerName: 'Nguyễn Minh Quân', 
+        address: 'Số 1, Đại Cồ Việt, Hai Bà Trưng, Hà Nội',
+        memberCount: 4,
+        regDate: '01/01/2020',
+        status: 'Thường trú' 
+    },
+    { 
+        id: 2, 
+        householdId: 'HK002',
+        ownerName: 'Đặng Hoàng Quân', 
+        address: 'Số 10, Tạ Quang Bửu, Hai Bà Trưng, Hà Nội',
+        memberCount: 3,
+        regDate: '15/03/2021',
+        status: 'Thường trú' 
+    },
+    { 
+        id: 3, 
+        householdId: 'HK003',
+        ownerName: 'Đinh Văn Phạm Việt', 
+        address: 'Số 5, Trần Đại Nghĩa, Hai Bà Trưng, Hà Nội',
+        memberCount: 2,
+        regDate: '20/11/2022',
+        status: 'Tạm trú' 
+    },
+];
 
 const StatusBadge = ({ status }) => {
     let colorClass = '';

@@ -6,8 +6,10 @@ const jwt = require('jsonwebtoken');
 const login = async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log('Login attempt for:', username);
 
     if (!username || !password) {
+      console.log('Missing username or password');
       return res.status(400).json({
         success: false,
         message: 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu'
@@ -20,6 +22,7 @@ const login = async (req, res) => {
     );
 
     if (result.rows.length === 0) {
+      console.log('User not found:', username);
       return res.status(401).json({
         success: false,
         message: 'Tên đăng nhập hoặc mật khẩu không đúng'
@@ -27,7 +30,11 @@ const login = async (req, res) => {
     }
 
     const user = result.rows[0];
+    console.log('User found:', user.username);
+
+    // Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log('Password valid:', isPasswordValid);
 
     if (!isPasswordValid) {
       return res.status(401).json({

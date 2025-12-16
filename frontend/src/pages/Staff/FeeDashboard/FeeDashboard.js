@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { useState, useEffect, useMemo } from "react";
 import "./FeeDashboard.css";
 import { Card, Button, Loading } from "../../../components/commons";
 import EnhancedTable from "../../../components/commons/Table/EnhancedTable";

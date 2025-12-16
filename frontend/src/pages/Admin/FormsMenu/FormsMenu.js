@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from "react";
+import { useState } from "react";
 import Modal from '../../../components/commons/Modal/Modal';
 import MemberStatusChangeForm from '../HouseholdForms/MemberStatusChangeForm/MemberStatusChangeForm';
 import ChangeOwnerForm from '../HouseholdForms/ChangeOwnerForm/ChangeOwnerForm';
@@ -25,7 +26,7 @@ const FormsMenu = () => {
         },
         {
             id: 'temporary-residence',
-            title: 'Đăng ký Tạm trú / Tạm vắng',
+            title: 'Tạm trú / Tạm vắng',
             description: 'Khai báo thông tin tạm trú cho người mới đến hoặc tạm vắng.',
             icon: '📝',
             themeClass: 'card-yellow'
