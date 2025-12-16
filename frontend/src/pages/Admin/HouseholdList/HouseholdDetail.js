@@ -6,6 +6,7 @@ import Table from '../../../components/commons/Table/Table';
 import Button from '../../../components/commons/Button/Button';
 import Modal from '../../../components/commons/Modal/Modal';
 import AddMemberModal from './AddMemberModal';
+import { getHouseholdById, fetchHistory, getAuthToken } from '../../../utils/api';
 import './HouseholdDetail.css';
 
 const StatusBadge = ({ status }) => {
@@ -41,11 +42,11 @@ const HouseholdDetail = () => {
     const [residents, setResidents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
-    const [isTypeSelectionOpen, setIsTypeSelectionOpen] = useState(false);
     const [addMemberType, setAddMemberType] = useState('NewBirth'); // 'NewBirth' or 'MoveIn'
     const [editingMember, setEditingMember] = useState(null);
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
     const [historyData, setHistoryData] = useState([]);
+    const [selectedResidentDetail, setSelectedResidentDetail] = useState(null); // For MovedOut/Deceased details
 
     useEffect(() => {
         fetchHouseholdDetails();
@@ -53,14 +54,9 @@ const HouseholdDetail = () => {
 
     const fetchHouseholdDetails = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/households/${id}`);
-            if (response.ok) {
-                const data = await response.json();
-                setHousehold(data.household);
-                setResidents(data.residents);
-            } else {
-                console.error('Failed to fetch household details');
-            }
+            const data = await getHouseholdById(id);
+            setHousehold(data.household);
+            setResidents(data.residents);
         } catch (error) {
             console.error('Error fetching household details:', error);
         } finally {
@@ -68,45 +64,44 @@ const HouseholdDetail = () => {
         }
     };
 
-    const fetchHistory = async () => {
+    const handleFetchHistory = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/history/household/${id}`);
-            if (response.ok) {
-                const data = await response.json();
-                setHistoryData(data.data);
-                setIsHistoryModalOpen(true);
-            } else {
-                console.error('Failed to fetch history');
-                alert('Không thể tải lịch sử biến động. Vui lòng thử lại sau.');
-            }
+            const data = await fetchHistory(id);
+            setHistoryData(data.data);
+            setIsHistoryModalOpen(true);
         } catch (error) {
             console.error('Error fetching history:', error);
-            alert('Lỗi kết nối server. Vui lòng kiểm tra lại.');
+            alert('Không thể tải lịch sử biến động. Vui lòng thử lại sau.');
         }
     };
 
-    const handleOpenTypeSelection = () => {
-        setEditingMember(null);
-        setIsTypeSelectionOpen(true);
-    };
-
     const handleSelectType = (type) => {
+        setEditingMember(null);
         setAddMemberType(type);
-        setIsTypeSelectionOpen(false);
         setIsAddMemberModalOpen(true);
     };
 
     const handleEditClick = (member) => {
         setEditingMember(member);
-        setAddMemberType(member.status === 'Permanent' ? 'MoveIn' : 'NewBirth'); // Just a default, or infer from data
+        // Nếu là tạm trú thì set type là MoveIn để hiện các trường tạm trú
+        if (member.status === 'Temporary' || member.status === 'Tạm trú') {
+            setAddMemberType('MoveIn');
+        } else {
+            // Nếu là thường trú thì set type khác NewBirth để hiện đầy đủ các trường (nghề nghiệp, CCCD...)
+            setAddMemberType('Permanent');
+        }
         setIsAddMemberModalOpen(true);
     };
 
     const handleDeleteClick = async (residentId) => {
         if (window.confirm('Bạn có chắc chắn muốn xóa nhân khẩu này?')) {
             try {
+                const token = getAuthToken();
                 const response = await fetch(`http://localhost:5000/api/residents/${residentId}`, {
                     method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
 
                 if (response.ok) {
@@ -125,6 +120,7 @@ const HouseholdDetail = () => {
 
     const handleSaveMember = async (memberData) => {
         try {
+            const token = getAuthToken();
             const url = editingMember 
                 ? `http://localhost:5000/api/residents/${editingMember.resident_id}`
                 : 'http://localhost:5000/api/residents';
@@ -135,6 +131,7 @@ const HouseholdDetail = () => {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(memberData),
             });
@@ -155,7 +152,7 @@ const HouseholdDetail = () => {
     };
 
     const columns = [
-        { key: 'resident_id', title: 'ID' },
+        { key: 'identity_card_number', title: 'CCCD' },
         { key: 'full_name', title: 'Họ và tên' },
         { key: 'relationship_to_head', title: 'Quan hệ với chủ hộ' },
         { key: 'dob', title: 'Ngày sinh' },
@@ -164,7 +161,7 @@ const HouseholdDetail = () => {
         { key: 'actions', title: 'Hành động' },
     ];
 
-    const tableData = residents.map(member => ({
+    const createTableData = (data) => data.map(member => ({
         ...member,
         full_name: `${member.first_name} ${member.last_name}`,
         dob: new Date(member.dob).toLocaleDateString('vi-VN'),
@@ -187,6 +184,30 @@ const HouseholdDetail = () => {
         )
     }));
 
+    const permanentResidents = residents.filter(r => r.status === 'Permanent' || r.status === 'Thường trú');
+    const temporaryResidents = residents.filter(r => r.status === 'Temporary' || r.status === 'Tạm trú');
+    const historyResidents = residents.filter(r => ['MovedOut', 'Deceased', 'Đã chuyển đi', 'Đã qua đời'].includes(r.status));
+
+    const permanentTableData = createTableData(permanentResidents);
+    const temporaryTableData = createTableData(temporaryResidents);
+    
+    const historyTableData = historyResidents.map(member => ({
+        ...member,
+        full_name: `${member.first_name} ${member.last_name}`,
+        dob: new Date(member.dob).toLocaleDateString('vi-VN'),
+        statusDisplay: <StatusBadge status={member.status} />,
+        actions: (
+            <div className="table-actions">
+                <button 
+                    className="btn-action btn-detail"
+                    onClick={() => setSelectedResidentDetail(member)}
+                >
+                    Xem chi tiết
+                </button>
+            </div>
+        )
+    }));
+
     if (loading) return <div>Loading...</div>;
     if (!household) return <div>Household not found</div>;
 
@@ -194,20 +215,6 @@ const HouseholdDetail = () => {
         <div className="p-6">
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold text-gray-800">Chi tiết hộ khẩu: {household.household_code}</h1>
-                <div className="header-actions">
-                    <Button 
-                        variant="secondary" 
-                        onClick={fetchHistory}
-                    >
-                        Lịch sử thay đổi nhân khẩu
-                    </Button>
-                    <Button 
-                        variant="secondary" 
-                        onClick={() => navigate('/admin/household')}
-                    >
-                        Quay lại
-                    </Button>
-                </div>
             </div>
 
             <div className="detail-card">
@@ -232,58 +239,64 @@ const HouseholdDetail = () => {
                 </div>
             </div>
 
-            <div className="detail-card">
+            {household.status !== 'Temporary' && (
+                <div className="detail-card">
+                    <div className="detail-card-header flex-between">
+                        <h2 className="detail-card-title">Danh sách thường trú</h2>
+                        <Button 
+                            variant="primary" 
+                            className="btn-add-member"
+                            onClick={() => handleSelectType('NewBirth')}
+                        >
+                            + Thêm mới sinh
+                        </Button>
+                    </div>
+                    
+                    <div className="detail-card-body p-0">
+                        <Table 
+                            columns={columns} 
+                            data={permanentTableData} 
+                            className="w-full"
+                        />
+                    </div>
+                </div>
+            )}
+
+            <div className="detail-card mt-6">
                 <div className="detail-card-header flex-between">
-                    <h2 className="detail-card-title">Danh sách nhân khẩu</h2>
+                    <h2 className="detail-card-title">Danh sách tạm trú (Chuyển đến)</h2>
                     <Button 
                         variant="primary" 
                         className="btn-add-member"
-                        onClick={handleOpenTypeSelection}
+                        onClick={() => handleSelectType('MoveIn')}
                     >
-                        + Thêm nhân khẩu mới
+                        + Thêm chuyển đến
                     </Button>
                 </div>
                 
                 <div className="detail-card-body p-0">
                     <Table 
                         columns={columns} 
-                        data={tableData} 
+                        data={temporaryTableData} 
                         className="w-full"
                     />
                 </div>
             </div>
 
-            {/* Modal chọn loại thêm mới */}
-            <Modal 
-                isOpen={isTypeSelectionOpen} 
-                onClose={() => setIsTypeSelectionOpen(false)}
-                title="Chọn loại thêm mới"
-                size="medium"
-            >
-                <div className="type-selection-container">
-                    <div 
-                        className="type-option-card new-birth"
-                        onClick={() => handleSelectType('NewBirth')}
-                    >
-                        <div className="type-option-icon">
-                            👶
-                        </div>
-                        <div className="type-option-title">Mới sinh</div>
-                        <div className="type-option-desc">Thêm trẻ em mới sinh vào hộ khẩu</div>
+            {historyResidents.length > 0 && (
+                <div className="detail-card mt-6">
+                    <div className="detail-card-header">
+                        <h2 className="detail-card-title">Nhân khẩu đã chuyển đi / Qua đời</h2>
                     </div>
-
-                    <div 
-                        className="type-option-card move-in"
-                        onClick={() => handleSelectType('MoveIn')}
-                    >
-                        <div className="type-option-icon">
-                            🚚
-                        </div>
-                        <div className="type-option-title">Chuyển đến</div>
-                        <div className="type-option-desc">Thêm người từ nơi khác chuyển đến</div>
+                    <div className="detail-card-body p-0">
+                        <Table 
+                            columns={columns} 
+                            data={historyTableData} 
+                            className="w-full"
+                        />
                     </div>
                 </div>
-            </Modal>
+            )}
 
             <AddMemberModal
                 isOpen={isAddMemberModalOpen}
@@ -293,6 +306,62 @@ const HouseholdDetail = () => {
                 householdId={household.household_id}
                 initialData={editingMember}
             />
+
+            <Modal
+                isOpen={!!selectedResidentDetail}
+                onClose={() => setSelectedResidentDetail(null)}
+                title="Chi tiết biến động nhân khẩu"
+                size="medium"
+            >
+                {selectedResidentDetail && (
+                    <div className="p-0">
+                        <table className="w-full text-sm text-left text-gray-500">
+                            <tbody>
+                                <tr className="border-b border-gray-100">
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 w-1/3">
+                                        Họ và tên
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-900 font-semibold text-lg">
+                                        {selectedResidentDetail.first_name} {selectedResidentDetail.last_name}
+                                    </td>
+                                </tr>
+                                <tr className="border-b border-gray-100">
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">
+                                        Ngày sinh
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-900">
+                                        {new Date(selectedResidentDetail.dob).toLocaleDateString('vi-VN')}
+                                    </td>
+                                </tr>
+                                <tr className="border-b border-gray-100">
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">
+                                        CCCD
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-900">
+                                        {selectedResidentDetail.identity_card_number || 'Chưa có'}
+                                    </td>
+                                </tr>
+                                <tr className="border-b border-gray-100">
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">
+                                        Trạng thái
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <StatusBadge status={selectedResidentDetail.status} />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 align-top">
+                                        Chi tiết biến động
+                                    </td>
+                                    <td className="px-6 py-4 text-gray-800 whitespace-pre-wrap bg-yellow-50">
+                                        {selectedResidentDetail.notes || 'Không có ghi chú'}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </Modal>
 
             <Modal
                 isOpen={isHistoryModalOpen}

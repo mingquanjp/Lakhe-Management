@@ -11,8 +11,10 @@ import {
   fetchHouseholds,
   deleteHousehold,
   splitHousehold,
+  createHousehold,
 } from "../../../utils/api";
 import { exportToCSV } from "../../../utils/exportUtils";
+import { toast } from "react-toastify";
 
 const HouseholdList = () => {
   const navigate = useNavigate();
@@ -49,10 +51,12 @@ const HouseholdList = () => {
 
   // Filter logic
   const filteredHouseholds = households.filter(item => {
+    const searchLower = searchTerm.toLowerCase();
     const matchesSearch = 
-      item.household_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.owner_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.address?.toLowerCase().includes(searchTerm.toLowerCase());
+      (item.household_code && item.household_code.toLowerCase().includes(searchLower)) ||
+      (item.owner_name && item.owner_name.toLowerCase().includes(searchLower)) ||
+      (item.address && item.address.toLowerCase().includes(searchLower)) ||
+      (item.member_count !== undefined && item.member_count.toString().includes(searchLower));
     
     return matchesSearch;
   });
@@ -66,11 +70,16 @@ const HouseholdList = () => {
     }));
     exportToCSV(exportData, "Danh_sach_ho_khau");
   };
-
   const handleSaveHousehold = async (formData) => {
-    // Implement save logic or refresh
-    loadData();
-    setIsAddModalOpen(false);
+    try {
+      await createHousehold(formData);
+      toast.success("Thêm hộ khẩu thành công!");
+      loadData();
+      setIsAddModalOpen(false);
+    } catch (error) {
+      console.error("Failed to create household:", error);
+      toast.error(error.message || "Thêm hộ khẩu thất bại");
+    }
   };
 
   const handleDelete = async (id) => {

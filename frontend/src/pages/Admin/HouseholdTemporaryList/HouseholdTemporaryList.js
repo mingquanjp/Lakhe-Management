@@ -61,10 +61,16 @@ const HouseholdTemporaryList = () => {
 
   const filteredHouseholds = households.filter((item) => {
     const searchLower = searchTerm.toLowerCase();
+    const createdDate = item.date_created ? new Date(item.date_created).toLocaleDateString("vi-VN") : "";
+    const expiredDate = item.expiration_date ? new Date(item.expiration_date).toLocaleDateString("vi-VN") : "";
+
     const matchesSearch =
       (item.code && item.code.toLowerCase().includes(searchLower)) ||
       (item.owner && item.owner.toLowerCase().includes(searchLower)) ||
-      (item.address && item.address.toLowerCase().includes(searchLower));
+      (item.address && item.address.toLowerCase().includes(searchLower)) ||
+      (item.members !== undefined && item.members.toString().includes(searchLower)) ||
+      (createdDate && createdDate.includes(searchLower)) ||
+      (expiredDate && expiredDate.includes(searchLower));
 
     return matchesSearch;
   });

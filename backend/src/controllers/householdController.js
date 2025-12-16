@@ -107,6 +107,11 @@ const createHousehold = async (req, res) => {
         const memberRes = await client.query(insertMemberQuery, memberValues);
         const newMemberId = memberRes.rows[0].resident_id;
 
+        // Log history for each new member
+        if (currentUserId) {
+           await logChange(client, newHouseholdId, newMemberId, 'Added', currentUserId);
+        }
+
         if (member.relation === "Chủ hộ") {
           headId = newMemberId;
         }
@@ -120,9 +125,10 @@ const createHousehold = async (req, res) => {
       );
     }
 
-    if (currentUserId) {
-      await logChange(client, newHouseholdId, null, 'Added', currentUserId);
-    }
+    // Removed generic household log to avoid duplication
+    // if (currentUserId) {
+    //   await logChange(client, newHouseholdId, null, 'Added', currentUserId);
+    // }
 
     await client.query("COMMIT");
     console.log("-> Tạo thành công!");
@@ -396,6 +402,11 @@ const createTemporaryHousehold = async (req, res) => {
 
     await client.query("UPDATE households SET head_of_household_id = $1 WHERE household_id = $2", [newOwnerId, newHouseholdId]);
 
+    // Log history for owner
+    if (currentUserId) {
+      await logChange(client, newHouseholdId, newOwnerId, 'Added', currentUserId);
+    }
+
     if (members && members.length > 0) {
       for (const mem of members) {
         if (!mem.name) continue;
@@ -410,13 +421,20 @@ const createTemporaryHousehold = async (req, res) => {
           address, start_date, end_date, reason
         ];
 
-        await client.query(insertResidentQuery, memValues);
+        const memRes = await client.query(insertResidentQuery, memValues);
+        const newMemId = memRes.rows[0].resident_id;
+
+        // Log history for member
+        if (currentUserId) {
+          await logChange(client, newHouseholdId, newMemId, 'Added', currentUserId);
+        }
       }
     }
 
-    if (currentUserId) {
-      await logChange(client, newHouseholdId, null, 'Added', currentUserId);
-    }
+    // Removed generic household log
+    // if (currentUserId) {
+    //   await logChange(client, newHouseholdId, null, 'Added', currentUserId);
+    // }
 
     await client.query("COMMIT");
     res.status(201).json({ success: true, message: "Đăng ký tạm trú thành công" });
@@ -506,6 +524,19 @@ const changeHeadOfHousehold = async (req, res) => {
         "UPDATE residents SET relationship_to_head = 'Thành viên' WHERE resident_id = $1",
         [oldHeadId]
       );
+    }
+
+    // Log history
+    try {
+        // Log for new head
+        const userId = req.user ? req.user.user_id : 1;
+        await client.query(
+            `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
+             VALUES ($1, $2, 'ChangeHeadOfHousehold', $3)`,
+            [household_id, new_head_id, userId]
+        );
+    } catch (histError) {
+        console.error('Error logging history:', histError);
     }
     
     await client.query("COMMIT");

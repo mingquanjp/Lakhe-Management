@@ -1,7 +1,7 @@
 import React from "react";
 import "./TemporaryAbsenceList.css";
 
-const TemporaryAbsenceTable = ({ data, onDetail }) => {
+const TemporaryAbsenceTable = ({ data, onDetail, onDelete }) => {
   const formatDate = (dateString) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString('vi-VN');
@@ -22,7 +22,7 @@ const TemporaryAbsenceTable = ({ data, onDetail }) => {
         </colgroup>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>Mã hộ khẩu</th>
             <th>Họ tên</th>
             <th>CMND/CCCD</th>
             <th>Nơi tạm vắng</th>
@@ -35,7 +35,7 @@ const TemporaryAbsenceTable = ({ data, onDetail }) => {
         <tbody>
           {data.map((row, index) => (
             <tr key={index}>
-              <td>{row.id}</td>
+              <td>{row.household_code}</td>
               <td className="owner-name">{row.last_name} {row.first_name}</td>
               <td>{row.identity_card_number}</td>
               <td>{row.temporary_address}</td>
@@ -48,6 +48,12 @@ const TemporaryAbsenceTable = ({ data, onDetail }) => {
                   onClick={() => onDetail(row)}
                 >
                   Chi tiết
+                </button>
+                <button 
+                  className="btn-action btn-delete"
+                  onClick={() => onDelete && onDelete(row.id)}
+                >
+                  Xóa
                 </button>
               </td>
             </tr>
