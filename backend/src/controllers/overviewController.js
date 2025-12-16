@@ -1,10 +1,8 @@
-// backend/src/controllers/overviewController.js
-
 const pool = require("../config/database");
 
 const getOverviewData = async (req, res) => {
   try {
-    // 1. Thống kê số liệu (Cards) - Giữ nguyên logic bạn đã duyệt
+    // 1. Thống kê số liệu (Cards) 
     const statsQuery = `
       SELECT
         (SELECT COUNT(*) FROM households WHERE deleted_at IS NULL AND status IN ('Active', 'Temporary')) AS total_households,
@@ -72,7 +70,7 @@ const getOverviewData = async (req, res) => {
       value: parseInt(item.value)
     }));
 
-    // --- 5. HOẠT ĐỘNG GẦN ĐÂY (PHẦN QUAN TRỌNG) ---
+    // --- 5. HOẠT ĐỘNG GẦN ĐÂY ---
     // Lấy 10 hoạt động mới nhất từ change_history
     const activityQuery = `
       SELECT 
