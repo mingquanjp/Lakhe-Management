@@ -244,13 +244,6 @@ const FeeDashboard = () => {
           {row.status === "paid" ? "• Đã nộp" : "• Chưa nộp"}
         </span>
       )
-    },
-    {
-      title: "",
-      headerRender: () => null,
-      render: () => (
-        <button className="table-menu-btn">⋮</button>
-      )
     }
   ];
 
