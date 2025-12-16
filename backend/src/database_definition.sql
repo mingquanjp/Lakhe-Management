@@ -89,13 +89,13 @@ CREATE TABLE temporary_absences (
 );
 
 -- 6. Bảng Change_History (Lịch sử biến động)
--- Bảng Log ghi lại ai làm gì, thay đổi hộ nào
+-- Bảng Log ghi lại ai làm gì, thay đổi hộ nào, thay đổi ai, thay đổi gì (có cả thay đổi phí)
 CREATE TABLE change_history (
     history_id SERIAL PRIMARY KEY, 
-    household_id INT NOT NULL, -- Hộ khẩu
-    resident_id INT, -- Nhân khẩu
+    household_id INT, -- Hộ khẩu (Nếu là NULL thì là thay đổi phí)
+    resident_id INT, -- Nhân khẩu (Nếu là NULL thì là thay đổi hộ khẩu hoặc phí)
     change_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Ngày thay đổi
-    change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('Split', 'MoveOut', 'Death', 'NewBirth', 'Added', 'Removed')), -- 'Split', 'MoveOut', 'Death', 'NewBirth'
+    change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('Split', 'MoveOut', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold', 'CreateFee', 'UpdateFee', 'DeleteFee')), -- 'Split', 'MoveOut', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold', 'CreateFee', 'UpdateFee', 'DeleteFee'
     changed_by_user_id INT NOT NULL, -- Người thực hiện thay đổi
     
     CONSTRAINT fk_history_household FOREIGN KEY (household_id) REFERENCES households(household_id),
@@ -110,7 +110,8 @@ CREATE TABLE fees (
     fee_type VARCHAR(20) NOT NULL CHECK (fee_type IN ('Mandatory', 'Voluntary')), -- 'Mandatory', 'Voluntary'
     amount BIGINT CHECK (amount >= 0), -- Số tiền (NULL nếu là tự nguyện đóng góp tùy tâm)
     start_date DATE NOT NULL, -- Ngày bắt đầu
-    end_date DATE -- Ngày kết thúc
+    end_date DATE, -- Ngày kết thúc
+    deleted_at TIMESTAMP DEFAULT NULL -- Soft delete
 );
 
 -- 8. Bảng Payment_History (Lịch sử nộp tiền - Bảng trung gian N-N)

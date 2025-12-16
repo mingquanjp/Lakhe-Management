@@ -7,7 +7,9 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const financeRoutes = require("./routes/financeRoutes");
 const householdRoutes = require('./routes/householdRoutes');
 const residentRoutes = require("./routes/residentRoutes");
-const { verifyToken, requireAdmin } = require("./middleware/authMiddleware");
+const feeRoutes = require('./routes/feeRoutes');
+const overviewRoutes = require("./routes/overviewRoutes");
+
 const app = express();
 // Middleware
 app.use(cors());
@@ -69,13 +71,15 @@ app.get("/api/test-admin", verifyToken, requireAdmin, (req, res) => {
 });
 // API Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/fees", feeRoutes);              // ← THÊM
-app.use("/api/dashboard", dashboardRoutes);   // ← THÊM
-app.use("/api/finance", financeRoutes);       // ← THÊM
+app.use("/api/fees", feeRoutes);              
+app.use("/api/dashboard", dashboardRoutes);   
+app.use("/api/finance", financeRoutes);       
 app.use('/api/households', householdRoutes); 
 app.use("/api/residents", residentRoutes);
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.use('/api/fees', feeRoutes);
+app.use("/api/overview", overviewRoutes);
+
+
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
 });

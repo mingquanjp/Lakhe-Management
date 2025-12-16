@@ -7,6 +7,8 @@ import {
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Pages
 import Login from "./pages/Login/Login";
@@ -28,11 +30,10 @@ import Overview from "./pages/Admin/Overview/Overview";
 import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
 import HouseholdTemporaryList from "./pages/Admin/HouseholdTemporaryList/HouseholdTemporaryList";
 
-// Import Staff Pages - SỬA ĐỔI TẠI ĐÂY
-import AccountantDashboard from "./pages/Staff/FeeDashboard/AccountantDashboard";
-import TableFeeDetails from "./pages/Staff/FeeDetail/TableFeeDetails";
-import FeeDashboard from "./pages/Staff/FeeDashboard/FeeDashboard"; // Giữ lại nếu cần
-import FeeDetail from "./pages/Staff/FeeDetail/FeeDetail"; // Giữ lại nếu cần
+
+// Import Staff Pages
+import FeeDashboard from "./pages/Staff/FeeDashboard/FeeDashboard";
+import FeeDetail from "./pages/Staff/FeeDetail/FeeDetail";
 
 // Root redirect component
 const RootRedirect = () => {
@@ -77,10 +78,11 @@ function AppRoutes() {
         <Route index element={<PopulationDashboard />} />
         <Route path="overview" element={<Overview />} />
         <Route path="household" element={<HouseholdList />} />
-        <Route path="householdtemporary" element={<HouseholdTemporaryList />} /> 
+        <Route path="household/:id" element={<HouseholdDetail />} />
+        <Route path="householdtemporary" element={<HouseholdTemporaryList />} />
+        <Route path="householdtemporary/:id" element={<HouseholdDetail />} />
         <Route path="stats/citizen" element={<PopulationDashboard />} />
         <Route path="stats/finance" element={<StatsFinanceDashboard />} />
-        <Route path="household" element={<HouseholdDetail />} />
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />
         <Route path="form/new-household-form" element={<NewHouseholdForm />} />
@@ -96,7 +98,7 @@ function AppRoutes() {
         <Route path="form/change-owner-form" element={<ChangeOwnerForm />} />
       </Route>
 
-      {/* Staff Routes - Protected - SỬA ĐỔI TẠI ĐÂY */}
+      {/* Staff Routes - Protected */}
       <Route
         path="/staff"
         element={
@@ -105,19 +107,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        {/* Trang mặc định khi vào /staff */}
         <Route index element={<FeeDashboard />} />
-        
-        {/* Route cho "Quản lý đợt thu" - AccountantDashboard */}
-        <Route path="fee-management" element={<AccountantDashboard />} />
-        
-        {/* Route cho "Chi tiết các đợt thu" - TableFeeDetails */}
-        <Route path="table-detail" element={<TableFeeDetails />} />
-        
-        {/* Route cho chi tiết một khoản thu cụ thể (với :feeId) */}
-        <Route path="fee-detail/:feeId" element={<TableFeeDetails />} />
-        
-        {/* Route cũ - giữ lại để tương thích */}
         <Route path="fee-detail" element={<FeeDetail />} />
       </Route>
 
@@ -131,6 +121,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <ToastContainer position="bottom-right" autoClose={3000} />
         <AppRoutes />
       </Router>
     </AuthProvider>

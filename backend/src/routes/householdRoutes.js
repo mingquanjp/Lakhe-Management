@@ -1,18 +1,19 @@
 // backend/src/routes/householdRoutes.js
 const express = require('express');
 const router = express.Router();
+const householdController = require('../controllers/householdController');
 const { verifyToken, requireAdmin } = require('../middleware/authMiddleware');
-const {
-  getAllHouseholds,
-  getHouseholdById,
-  createHousehold,
-  updateHousehold,
-  deleteHousehold
-} = require('../controllers/householdController');
-// Tất cả routes đều yêu cầu authentication
-router.get('/households', verifyToken, getAllHouseholds);
-router.get('/households/:householdId', verifyToken, getHouseholdById);
-router.post('/households', verifyToken, requireAdmin, createHousehold);
-router.put('/households/:householdId', verifyToken, requireAdmin, updateHousehold);
-router.delete('/households/:householdId', verifyToken, requireAdmin, deleteHousehold);
+
+router.use(verifyToken);
+
+router.get('/', householdController.getHouseholds);
+router.post('/', householdController.createHousehold);
+router.delete('/:id', householdController.deleteHousehold);
+router.post('/split', householdController.splitHousehold);
+
+router.get('/temporary', householdController.getTemporaryHouseholds);
+router.post('/temporary', householdController.createTemporaryHousehold);
+router.get('/temporary/:id', householdController.getTemporaryHouseholdById);
+router.delete('/:id', householdController.deleteHousehold);
+
 module.exports = router;
