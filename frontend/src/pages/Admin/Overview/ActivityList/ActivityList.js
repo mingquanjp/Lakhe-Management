@@ -19,8 +19,9 @@ const ActivityList = ({ activities }) => {
             });
 
             let content = "";
-            const hCode = act.household_code || "Unknown";
+            const hCode = act.household_code || "Không xác định";
             const rName = act.resident_name; 
+            const feeName = act.fee_name || "khoản thu";
 
             const performer = act.performer_name
               ? `Thực hiện bởi: ${act.performer_name}`
@@ -45,16 +46,40 @@ const ActivityList = ({ activities }) => {
                   : `Hộ khẩu "${hCode}" đã chuyển đi.`;
                 break;
 
+              case "Temporary":
+                content = rName
+                  ? `Hộ ${hCode}: Thành viên "${rName}" đăng kí tạm trú.`
+                  : `Hộ khẩu "${hCode}" đăng kí tạm trú.`;
+                break;
+
               case "NewBirth":
-                content = `Hộ ${hCode}: Đăng ký khai sinh cho "${rName}".`;
+                content = `Hộ ${hCode} đăng ký khai sinh cho "${rName}".`;
                 break;
 
               case "Death":
-                content = `Hộ ${hCode}: Khai tử cho "${rName}".`;
+                content = `Hộ ${hCode} khai tử cho "${rName}".`;
+                break;
+              
+              case "ChangeHeadOfHousehold":
+                content = `Hộ ${hCode} thay đổi chủ hộ mới là "${rName}".`;
+                break;
+
+              case "CreateFee":
+                content = `Tạo đợt thu mới "${feeName}".`;
+                break;
+
+              case "UpdateFee":
+                content = `Cập nhật thông tin đợt thu "${feeName}".`;
+                break;
+
+              case "DeleteFee":
+                content = `Xóa đợt thu "${feeName}".`;
                 break;
 
               default:
-                content = `Hộ ${hCode}: Có thay đổi (${act.change_type}).`;
+                content = hCode 
+                  ? `Hộ ${hCode}: Có thay đổi (${act.change_type}).`
+                  : `Hệ thống có thay đổi (${act.change_type}).`;
             }
 
             return (
