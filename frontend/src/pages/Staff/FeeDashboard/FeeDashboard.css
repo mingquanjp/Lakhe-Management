@@ -73,7 +73,7 @@
   margin-bottom: 24px;
 }
 
-.stat-card {
+.fee-stat-card {
   background: white;
   padding: 28px;
   border-radius: 12px;
@@ -86,7 +86,7 @@
   text-align: center;
 }
 
-.stat-card::before {
+.fee-stat-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -99,33 +99,33 @@
   transition: transform 0.3s ease;
 }
 
-.stat-card:hover {
+.fee-stat-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   border-color: #1976d2;
 }
 
-.stat-card:hover::before {
+.fee-stat-card:hover::before {
   transform: scaleX(1);
 }
 
-.stat-card:nth-child(1)::before {
+.fee-stat-card:nth-child(1)::before {
   background: linear-gradient(90deg, #28a745, #5cb85c);
 }
 
-.stat-card:nth-child(2)::before {
+.fee-stat-card:nth-child(2)::before {
   background: linear-gradient(90deg, #ff9800, #ffb74d);
 }
 
-.stat-card:nth-child(3)::before {
+.fee-stat-card:nth-child(3)::before {
   background: linear-gradient(90deg, #1976d2, #42a5f5);
 }
 
-.stat-card:nth-child(4)::before {
+.fee-stat-card:nth-child(4)::before {
   background: linear-gradient(90deg, #dc3545, #e57373);
 }
 
-.stat-value {
+.fee-stat-value {
   font-size: 32px;
   font-weight: 700;
   color: #333;
@@ -137,18 +137,18 @@
   background-clip: text;
 }
 
-.stat-card:hover .stat-value {
+.fee-stat-card:hover .fee-stat-value {
   transform: scale(1.05);
 }
 
-.stat-label {
+.fee-stat-label {
   font-size: 15px;
   color: #6c757d;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
-.stat-card:hover .stat-label {
+.fee-stat-card:hover .fee-stat-label {
   color: #1976d2;
 }
 
