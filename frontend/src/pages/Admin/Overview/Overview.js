@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Overview.css";
 import StatCard from "./StatCard";
 import PopulationChart from "./PopulationChart";

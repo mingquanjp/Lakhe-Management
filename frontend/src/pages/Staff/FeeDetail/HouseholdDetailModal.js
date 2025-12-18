@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./HouseholdDetailModal.css";
 import { Modal } from "../../../components/commons";
 import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
