@@ -4,7 +4,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import AccountManagement from './pages/Admin/AccountManagement';
 // Pages
 import Login from "./pages/Login/Login";
 import Admin from "./pages/Admin";
@@ -28,11 +28,15 @@ import NewMemberForm from "./pages/Admin/HouseholdForms/NewMemberForm";
 import MemberStatusChangeForm from "./pages/Admin/HouseholdForms/MemberStatusChangeForm";
 import TemporaryResidenceForm from "./pages/Admin/HouseholdForms/TemporaryResidenceForm";
 import ChangeOwnerForm from "./pages/Admin/HouseholdForms/ChangeOwnerForm/ChangeOwnerForm";
+import Overview from "./pages/Admin/Overview/Overview";
+import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
+import HouseholdTemporaryList from "./pages/Admin/HouseholdTemporaryList/HouseholdTemporaryList";
 
 // Import Staff Pages
 import FeeDashboard from "./pages/Staff/FeeDashboard/FeeDashboard";
+import AccountantDashboard from "./pages/Staff/FeeDashboard/AccountantDashboard";  // ← THÊM DÒNG NÀY
 import FeeDetail from "./pages/Staff/FeeDetail/FeeDetail";
-
+import TableFeeDetail from "./pages/Staff/FeeDetail/TableFeeDetails"; 
 // Root redirect component
 const RootRedirect = () => {
   const { isAuthenticated, user, loading } = useAuth();
@@ -80,16 +84,9 @@ function AppRoutes() {
         
         <Route path="household" element={<HouseholdList />} />
         <Route path="household/:id" element={<HouseholdDetail />} />
-
-        <Route path="temporary-absence" element={<TemporaryAbsenceList />} />
-
-        <Route path="history" element={<HistoryList />} />
-        <Route path="history/:id" element={<HistoryDetail />} />
         
-        <Route path="temporary-household" element={<HouseholdTemporaryList />} />
-
-        <Route path="temporary-household/:id" element={<HouseholdDetail />} />
-
+        <Route path="householdtemporary" element={<HouseholdTemporaryList />} />
+        <Route path="householdtemporary/:id" element={<HouseholdDetail />} />
         <Route path="stats/citizen" element={<PopulationDashboard />} />
         <Route path="stats/finance" element={<StatsFinanceDashboard />} />
         <Route path="citizen" element={<Declaration />} />
@@ -99,6 +96,7 @@ function AppRoutes() {
         <Route path="form/member-status-change-form" element={<MemberStatusChangeForm />} />
         <Route path="form/temporary-residence-form" element={<TemporaryResidenceForm />} />
         <Route path="form/change-owner-form" element={<ChangeOwnerForm />} />
+        <Route path="accounts" element={<AccountManagement />} />
       </Route>
 
       {/* Staff Routes - Protected */}
@@ -111,7 +109,10 @@ function AppRoutes() {
         }
       >
         <Route index element={<FeeDashboard />} />
+        <Route path="fee-management" element={<AccountantDashboard />} />  {/* ← THÊM DÒNG NÀY */}
         <Route path="fee-detail" element={<FeeDetail />} />
+        <Route path="fee-detail/:feeId" element={<FeeDetail />} />
+        <Route path="table-detail/:feeId" element={<TableFeeDetail />} />
       </Route>
 
       {/* Fallback - redirect to root which will handle auth */}

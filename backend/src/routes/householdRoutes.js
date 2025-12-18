@@ -1,4 +1,5 @@
-﻿const express = require('express');
+// backend/src/routes/householdRoutes.js
+const express = require('express');
 const router = express.Router();
 const householdController = require('../controllers/householdController');
 const { verifyToken, requireAdmin } = require('../middleware/authMiddleware');
