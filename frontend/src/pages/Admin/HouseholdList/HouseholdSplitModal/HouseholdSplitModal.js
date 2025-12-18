@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "../../../../components/commons/Modal/Modal";
 import "./HouseholdSplitModal.css";
 import { fetchResidents } from "../../../../utils/api";
