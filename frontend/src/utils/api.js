@@ -50,19 +50,7 @@ export const getUserInfo = () => {
   return user ? JSON.parse(user) : null;
 };
 
-// Remove user info from localStorage
-export const removeUserInfo = () => {
-  localStorage.removeItem("user");
-};
-
-// Clear all auth data
-export const clearAuthData = () => {
-  removeAuthToken();
-  removeUserInfo();
-};
-
-// ========== DASHBOARD APIs ==========
-
+// Dashboard API calls
 export const getDashboardStats = async (startDate, endDate) => {
   try {
     const token = getAuthToken();
@@ -95,6 +83,16 @@ export const getDashboardStats = async (startDate, endDate) => {
 };
 
 // Remove user info from localStorage
+export const removeUserInfo = () => {
+  localStorage.removeItem("user");
+};
+
+// Clear all auth data
+export const clearAuthData = () => {
+  removeAuthToken();
+  removeUserInfo();
+};
+
 export const fetchHouseholds = async () => {
   const token = getAuthToken();
 
@@ -111,29 +109,6 @@ export const fetchHouseholds = async () => {
 
     if (!response.ok) {
       throw new Error(data.message || "Lỗi khi lấy danh sách hộ khẩu");
-    }
-
-    return data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getHouseholdById = async (id) => {
-  const token = getAuthToken();
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/households/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Lỗi khi lấy thông tin hộ khẩu");
     }
 
     return data;
@@ -185,27 +160,6 @@ export const deleteHousehold = async (id) => {
   }
 };
 
-export const splitHousehold = async (data) => {
-  const token = getAuthToken();
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/households/split`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(data),
-    });
-    const resData = await response.json();
-    if (!response.ok) throw new Error(resData.message);
-    return resData;
-  } catch (error) {
-    throw error;
-  }
-};
-
-// ========== RESIDENT APIs ==========
-
 export const fetchResidents = async (householdId) => {
   const token = getAuthToken();
   // Nếu có householdId thì thêm vào đường dẫn query
@@ -225,6 +179,25 @@ export const fetchResidents = async (householdId) => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message);
     return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const splitHousehold = async (data) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/households/split`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    const resData = await response.json();
+    if (!response.ok) throw new Error(resData.message);
+    return resData;
   } catch (error) {
     throw error;
   }
@@ -284,7 +257,7 @@ export const fetchFees = async () => {
   const token = getAuthToken();
   try {
     const response = await fetch(`${API_BASE_URL}/api/fees`, {
-      method: 'GET',
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -543,25 +516,6 @@ export const fetchOverview = async () => {
   const token = getAuthToken();
   try {
     const response = await fetch(`${API_BASE_URL}/api/overview`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-    });
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message);
-    return data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const fetchHistory = async (householdId) => {
-  const token = getAuthToken();
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/history/household/${householdId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

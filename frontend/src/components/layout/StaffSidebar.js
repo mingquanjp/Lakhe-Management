@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "./StaffSidebar.css";
@@ -7,7 +6,6 @@ import {
   overView,
   Statistic,
   logoutIcon,
-  detailIcon,
 } from "../../assets/icons";
 import { Button } from "../commons";
 
@@ -16,6 +14,7 @@ const StaffSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth();
+
   const menuItems = [
     {
       id: "dashboards",
@@ -28,7 +27,6 @@ const StaffSidebar = () => {
       icon: overView,
       path: "/staff",
     },
-
     {
       id: "divider1",
       type: "divider",
@@ -40,22 +38,16 @@ const StaffSidebar = () => {
     },
     {
       id: "fee-management",
-      label: "Quản lý đợt thu",
+      label: "Quản lý thu phí",
       icon: overView,
-      path: "/staff/fee-management", 
+      // path: "/staff/fee-management", 
     },
     {
       id: "statistics",
       label: "Thống kê",
       icon: Statistic,
       path: "/staff/fee-detail",
-    }
-    // {
-    //   id: "detail",
-    //   label: "Chi tiết các đợt thu",
-    //   icon: detailIcon,
-    //   path: "/staff/table-detail",
-    // }
+    },
   ];
 
   const toggleExpand = (itemId) => {

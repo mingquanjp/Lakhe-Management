@@ -1,48 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken, requireAdmin } = require('../middleware/authMiddleware');
-const {
-  createFee,
-  getAllFees,
-  getFeeById,
-  updateFee,
-  deleteFee,
-  createPayment,
-  updatePayment,
-  deletePayment,
-  getUnpaidHouseholds,
-  getFeeSummary,
-  getHouseholdPaymentHistory,
-  getAllHouseholdsForFee,
-  getFeeStatistics,
-  getHouseholdPaymentStatus,
-  getHouseholdResidents,
-  getOverallStatistics,
-  getAllHouseholdsWithPaymentSummary
-} = require('../controllers/feeController');
+const feeController = require('../controllers/feeController');
 
-// Overall statistics (phải đặt trước các routes có params)
-router.get('/overall-statistics', verifyToken, getOverallStatistics);
-router.get('/all-households', verifyToken, getAllHouseholdsWithPaymentSummary);
-// Fee CRUD routes
-router.post('/', verifyToken, createFee);
-router.get('/', verifyToken, getAllFees);
-router.get('/:feeId', verifyToken, getFeeById);
-router.put('/:feeId', verifyToken, updateFee);
-router.delete('/:feeId', verifyToken, deleteFee);
-// Fee statistics & household routes
-router.get('/:feeId/statistics', verifyToken, getFeeStatistics);
-router.get('/:feeId/summary', verifyToken, getFeeSummary);
-router.get('/:feeId/households', verifyToken, getHouseholdPaymentStatus);
-router.get('/:feeId/unpaid-households', verifyToken, getUnpaidHouseholds);
-router.get('/:feeId/all-households', verifyToken, getAllHouseholdsForFee);
-// Household payment & resident routes
-router.get('/households/:id/payments', verifyToken, getHouseholdPaymentHistory);
-router.get('/households/:id/residents', verifyToken, getHouseholdResidents);
+// Fee routes
+router.get('/', feeController.getAllFees);
+router.post('/', feeController.createFee);
+router.get('/overall-statistics', feeController.getOverallStatistics);
+router.get('/all-households', feeController.getAllHouseholdsWithPaymentSummary);
+router.delete('/:id', feeController.deleteFee);
+router.get('/:id/statistics', feeController.getFeeStatistics);
+router.get('/:id/households', feeController.getHouseholdPaymentStatus);
+
+// Household payment routes
+router.get('/households/:id/payments', feeController.getHouseholdPaymentHistory);
+router.get('/households/:id/residents', feeController.getHouseholdResidents);
+
 // Payment routes
-router.post('/payments', verifyToken, createPayment);
-router.get('/payments/household/:householdId', verifyToken, getHouseholdPaymentHistory);
-router.put('/payments/:paymentId', verifyToken, updatePayment);
-router.delete('/payments/:paymentId', verifyToken, deletePayment);
+router.post('/payments', feeController.createPayment);
 
 module.exports = router;
