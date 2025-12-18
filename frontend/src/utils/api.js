@@ -117,6 +117,29 @@ export const fetchHouseholds = async () => {
   }
 };
 
+export const getHouseholdById = async (id) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/households/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Lỗi khi lấy thông tin hộ khẩu");
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const createHousehold = async (householdData) => {
   const token = getAuthToken();
   try {
@@ -516,6 +539,25 @@ export const fetchOverview = async () => {
   const token = getAuthToken();
   try {
     const response = await fetch(`${API_BASE_URL}/api/overview`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchHistory = async (householdId) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/history/household/${householdId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

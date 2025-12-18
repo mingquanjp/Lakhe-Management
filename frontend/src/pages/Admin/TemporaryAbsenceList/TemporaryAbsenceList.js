@@ -6,6 +6,8 @@ import TemporaryAbsenceTable from "./TemporaryAbsenceTable";
 import Pagination from "../../../components/commons/Pagination";
 import Modal from "../../../components/commons/Modal";
 import { exportToCSV } from "../../../utils/exportUtils";
+import { toast } from "react-toastify";
+import { getAuthToken } from "../../../utils/api";
 
 const TemporaryAbsenceList = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,7 +26,12 @@ const TemporaryAbsenceList = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/residents/list/temporary-absence');
+      const token = getAuthToken();
+      const response = await fetch('http://localhost:5000/api/residents/list/temporary-absence', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (response.ok) {
         const result = await response.json();
         setData(result.data);
@@ -34,23 +41,57 @@ const TemporaryAbsenceList = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa bản ghi tạm vắng này?")) {
+      try {
+        const token = getAuthToken();
+        const response = await fetch(`http://localhost:5000/api/residents/temporary-absence/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success) {
+          toast.success("Xóa thành công!");
+          fetchData();
+        } else {
+          toast.error(result.message || "Lỗi khi xóa");
+        }
+      } catch (error) {
+        console.error("Error deleting:", error);
+        toast.error("Lỗi kết nối server");
+      }
+    }
+  };
+
+
   // Filter logic
   const filteredData = data.filter(item => {
     const fullName = `${item.last_name} ${item.first_name}`.toLowerCase();
     const searchLower = searchTerm.toLowerCase();
+    const birthDate = item.dob ? new Date(item.dob).toLocaleDateString('vi-VN') : "";
+    const startDate = item.start_date ? new Date(item.start_date).toLocaleDateString('vi-VN') : "";
+    const endDate = item.end_date ? new Date(item.end_date).toLocaleDateString('vi-VN') : "";
     
     const matchesSearch = 
       fullName.includes(searchLower) ||
       (item.temporary_address && item.temporary_address.toLowerCase().includes(searchLower)) ||
-      (item.identity_card_number && item.identity_card_number.includes(searchLower));
+      (item.identity_card_number && item.identity_card_number.includes(searchLower)) ||
+      (birthDate && birthDate.includes(searchLower)) ||
+      (startDate && startDate.includes(searchLower)) ||
+      (endDate && endDate.includes(searchLower)) ||
+      (item.reason && item.reason.toLowerCase().includes(searchLower));
     
     return matchesSearch;
   });
 
   const handleExport = () => {
     const exportData = filteredData.map(item => ({
+      "Mã hộ khẩu": item.household_code,
       "Họ tên": `${item.last_name} ${item.first_name}`,
-      "Ngày sinh": new Date(item.birth_date).toLocaleDateString('vi-VN'),
+      "Ngày sinh": new Date(item.dob).toLocaleDateString('vi-VN'),
       "CMND/CCCD": item.identity_card_number,
       "Nơi tạm vắng": item.temporary_address,
       "Từ ngày": new Date(item.start_date).toLocaleDateString('vi-VN'),
@@ -105,6 +146,7 @@ const TemporaryAbsenceList = () => {
         <TemporaryAbsenceTable 
           data={currentItems} 
           onDetail={handleDetailClick}
+          onDelete={handleDelete}
         />
 
         <Pagination
@@ -123,22 +165,19 @@ const TemporaryAbsenceList = () => {
         {selectedItem && (
           <div className="detail-modal-content">
             <div className="detail-row">
+              <strong>Mã hộ khẩu:</strong> {selectedItem.household_code}
+            </div>
+            <div className="detail-row">
               <strong>Họ và tên:</strong> {selectedItem.last_name} {selectedItem.first_name}
             </div>
             <div className="detail-row">
-              <strong>Ngày sinh:</strong> {new Date(selectedItem.birth_date).toLocaleDateString('vi-VN')}
+              <strong>Ngày sinh:</strong> {new Date(selectedItem.dob).toLocaleDateString('vi-VN')}
             </div>
             <div className="detail-row">
               <strong>Giới tính:</strong> {selectedItem.gender}
             </div>
             <div className="detail-row">
               <strong>CMND/CCCD:</strong> {selectedItem.identity_card_number}
-            </div>
-            <div className="detail-row">
-              <strong>Số điện thoại:</strong> {selectedItem.phone_number}
-            </div>
-            <div className="detail-row">
-              <strong>Email:</strong> {selectedItem.email}
             </div>
             <div className="detail-row">
               <strong>Nơi tạm vắng:</strong> {selectedItem.temporary_address}

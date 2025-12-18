@@ -22,6 +22,10 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
     previous_address: "",
     registration_date: new Date().toISOString().split('T')[0],
     notes: "",
+    temp_home_address: "",
+    temp_start_date: "",
+    temp_end_date: "",
+    temp_reason: "",
   });
 
   useEffect(() => {
@@ -37,6 +41,10 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
           dob: initialData.dob ? new Date(initialData.dob).toISOString().split('T')[0] : "",
           identity_card_date: initialData.identity_card_date ? new Date(initialData.identity_card_date).toISOString().split('T')[0] : "",
           registration_date: initialData.registration_date ? new Date(initialData.registration_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          temp_home_address: initialData.temp_home_address || "",
+          temp_start_date: initialData.temp_start_date ? new Date(initialData.temp_start_date).toISOString().split('T')[0] : "",
+          temp_end_date: initialData.temp_end_date ? new Date(initialData.temp_end_date).toISOString().split('T')[0] : "",
+          temp_reason: initialData.temp_reason || "",
         });
       } else {
         setFormData({
@@ -57,6 +65,10 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
           previous_address: "",
           registration_date: new Date().toISOString().split('T')[0],
           notes: "",
+          temp_home_address: "",
+          temp_start_date: "",
+          temp_end_date: "",
+          temp_reason: "",
         });
       }
     }
@@ -83,6 +95,15 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
       dataToSave.identity_card_number = null;
       dataToSave.identity_card_date = null;
       dataToSave.identity_card_place = null;
+    }
+
+    // Nếu là Chuyển đến (Tạm trú), set status và validate
+    if (type === 'MoveIn') {
+        dataToSave.status = 'Temporary';
+        if (!formData.temp_start_date || !formData.temp_end_date) {
+             alert("Vui lòng nhập ngày bắt đầu và kết thúc tạm trú");
+             return;
+        }
     }
     
     // Add type for history logging
@@ -286,18 +307,66 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
         )}
 
         {type === 'MoveIn' && (
-          <div className="form-row">
-            <div className="form-group full-width">
-              <label>Địa chỉ trước khi chuyển đến</label>
-              <input
-                type="text"
-                className="form-control"
-                name="previous_address"
-                value={formData.previous_address}
-                onChange={handleChange}
-              />
+          <>
+            <div className="form-row">
+              <div className="form-group full-width">
+                <label>Địa chỉ trước khi chuyển đến</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="previous_address"
+                  value={formData.previous_address}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
-          </div>
+            <div className="form-row">
+              <div className="form-group full-width">
+                <label>Địa chỉ tạm trú hiện tại</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="temp_home_address"
+                  value={formData.temp_home_address}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Ngày bắt đầu tạm trú <span className="text-red-500">*</span></label>
+                <input
+                  type="date"
+                  className="form-control"
+                  name="temp_start_date"
+                  value={formData.temp_start_date}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Ngày kết thúc tạm trú <span className="text-red-500">*</span></label>
+                <input
+                  type="date"
+                  className="form-control"
+                  name="temp_end_date"
+                  value={formData.temp_end_date}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group full-width">
+                <label>Lý do tạm trú</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="temp_reason"
+                  value={formData.temp_reason}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </>
         )}
 
         <div className="form-row">

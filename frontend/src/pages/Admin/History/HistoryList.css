@@ -1,0 +1,88 @@
+.history-list-container {
+    padding: 20px;
+}
+
+.page-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #32325d;
+    margin-bottom: 20px;
+}
+
+.history-toolbar {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #e9ecef;
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    width: 250px;
+    box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15), 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+.search-icon {
+    color: #adb5bd;
+    margin-right: 8px;
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    font-size: 14px;
+    width: 100%;
+    color: #525f7f;
+}
+
+/* Pagination Styles */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 8px;
+}
+
+.pagination-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background-color: #f8f9fa; /* Light gray background */
+    color: #5e6e82; /* Text color */
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background-color: #e9ecef;
+    color: #2d3748;
+}
+
+.pagination-btn.active {
+    background-color: #ffe4e6; /* Light pink/red background matching the image */
+    color: #e11d48; /* Red text color */
+    font-weight: 600;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-dots {
+    color: #5e6e82;
+    font-weight: bold;
+    padding: 0 4px;
+}

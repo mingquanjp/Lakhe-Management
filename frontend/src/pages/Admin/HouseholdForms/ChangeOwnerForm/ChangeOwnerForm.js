@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
+import { getAuthToken } from '../../../../utils/api';
 import './ChangeOwnerForm.css';
 
 const ChangeOwnerForm = () => {
@@ -21,7 +22,12 @@ const ChangeOwnerForm = () => {
 
     const fetchHouseholds = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/households');
+            const token = getAuthToken();
+            const response = await fetch('http://localhost:5000/api/households', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             if (response.ok) {
                 const data = await response.json();
                 setHouseholds(data.data);
@@ -37,7 +43,12 @@ const ChangeOwnerForm = () => {
         
         if (householdId) {
             try {
-                const response = await fetch(`http://localhost:5000/api/households/${householdId}`);
+                const token = getAuthToken();
+                const response = await fetch(`http://localhost:5000/api/households/${householdId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setMembers(data.residents);
@@ -73,10 +84,12 @@ const ChangeOwnerForm = () => {
         }
 
         try {
+            const token = getAuthToken();
             const response = await fetch('http://localhost:5000/api/households/change-head', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     household_id: selectedHouseholdId,
@@ -142,7 +155,7 @@ const ChangeOwnerForm = () => {
                     >
                         <option value="">-- Chọn chủ hộ mới --</option>
                         {members
-                            .filter(m => m.status === 'Permanent') // Only show permanent residents
+                            .filter(m => m.status === 'Permanent' || m.status === 'Thường trú') // Only show permanent residents
                             .map(member => (
                             <option key={member.resident_id} value={member.resident_id}>
                                 {member.last_name} {member.first_name} ({new Date(member.dob).getFullYear()})

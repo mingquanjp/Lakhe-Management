@@ -19,6 +19,8 @@ import TemporaryAbsenceList from "./pages/Admin/TemporaryAbsenceList/TemporaryAb
 import Declaration from "./pages/Admin/ManagementTable/Declaration";
 import FormsMenu from "./pages/Admin/FormsMenu/FormsMenu";
 import Overview from "./pages/Admin/Overview/Overview";
+import HistoryList from "./pages/Admin/History/HistoryList";
+import HistoryDetail from "./pages/Admin/History/HistoryDetail";
 
 // Import Forms
 import NewHouseholdForm from "./pages/Admin/HouseholdForms/NewHouseholdForm";
@@ -75,15 +77,17 @@ function AppRoutes() {
         <Route path="overview" element={<Overview />} />
         <Route path="stats/citizen" element={<PopulationDashboard />} />
         <Route path="stats/finance" element={<StatsFinanceDashboard />} />
-        
+
         <Route path="household" element={<HouseholdList />} />
         <Route path="household/:id" element={<HouseholdDetail />} />
-        
-        <Route path="householdtemporary" element={<HouseholdTemporaryList />} />
-        <Route path="householdtemporary/:id" element={<HouseholdDetail />} />     
+
         <Route path="temporary-household" element={<HouseholdTemporaryList />} />
-        <Route path="temporary-absence" element={<TemporaryAbsenceList />} />
+        <Route path="temporary-household/:id" element={<HouseholdDetail />} />     
         
+        <Route path="temporary-absence" element={<TemporaryAbsenceList />} />
+        <Route path="history" element={<HistoryList />} />
+        <Route path="history/:id" element={<HistoryDetail />} />
+
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />
         <Route path="form/new-household-form" element={<NewHouseholdForm />} />

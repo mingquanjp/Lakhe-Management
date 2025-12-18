@@ -46,6 +46,7 @@ const Sidebar = () => {
         { id: "household", label: "Quản lý hộ khẩu thường trú", path: "/admin/household" },
         { id: "temporary-household", label: "Quản lý hộ khẩu tạm trú", path: "/admin/temporary-household" },
         { id: "temporary-absence", label: "Quản lý tạm vắng", path: "/admin/temporary-absence" },
+        { id: "history", label: "Lịch sử biến động", path: "/admin/history" },
         { id: "form", label: "Form khai báo", path: "/admin/form" },
       ],
     },

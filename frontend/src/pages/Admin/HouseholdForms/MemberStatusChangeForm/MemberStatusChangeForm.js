@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect, useRef } from "react";
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
+import { getAuthToken } from '../../../../utils/api';
 import './MemberStatusChangeForm.css';
 
 const MemberStatusChangeForm = () => {
@@ -46,7 +47,12 @@ const MemberStatusChangeForm = () => {
         if (value.length > 1) {
             searchTimeoutRef.current = setTimeout(async () => {
                 try {
-                    const response = await fetch(`http://localhost:5000/api/residents?search=${encodeURIComponent(value)}`);
+                    const token = getAuthToken();
+                    const response = await fetch(`http://localhost:5000/api/residents?search=${encodeURIComponent(value)}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
                     if (response.ok) {
                         const result = await response.json();
                         setSearchResults(result.data);
@@ -88,11 +94,15 @@ const MemberStatusChangeForm = () => {
         }
 
         try {
+            const token = getAuthToken();
             let response;
             if (formData.changeType === 'deceased') {
                 response = await fetch(`http://localhost:5000/api/residents/${formData.residentId}/death`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify({
                         death_date: formData.changeDate,
                         notes: formData.deathReason
@@ -102,10 +112,13 @@ const MemberStatusChangeForm = () => {
                 // Move out
                 response = await fetch(`http://localhost:5000/api/residents/${formData.residentId}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify({
                         status: 'MovedOut',
-                        notes: `Chuyển đi ngày ${formData.changeDate}. Lý do: ${formData.reason}. Địa chỉ mới: ${formData.newAddress}`
+                        notes: `Chuyển đi ngày: ${new Date(formData.changeDate).toLocaleDateString('vi-VN')}\nLý do: ${formData.reason}\nĐịa chỉ mới: ${formData.newAddress}`
                     })
                 });
             }
@@ -143,7 +156,7 @@ const MemberStatusChangeForm = () => {
                         name="memberName"
                         value={formData.memberName}
                         onChange={handleSearchChange}
-                        placeholder="Tìm kiếm tên hoặc CMND/CCCD"
+                        placeholder="Tìm kiếm tên, CCCD hoặc Mã hộ khẩu"
                         required
                         autoComplete="off"
                     />
