@@ -1,33 +1,32 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Search, Download, Split } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, Filter, Download, Split, X } from "lucide-react";
 import "./HouseholdList.css";
-import HouseholdTable from "./HouseholdTable/HouseholdTable";
+import HouseholdTable from "./HouseholdTable";
 import Pagination from "../../../components/commons/Pagination";
-import HouseholdAddModal from "./HouseholdAddModal/HouseholdAddModal";
-import HouseholdSplitModal from "./HouseholdSplitModal/HouseholdSplitModal";
+import HouseholdAddModal from "./HouseholdAddModal";
+import HouseholdSplitModal from "./HouseholdSplitModal";
 import {
   fetchHouseholds,
+  createHousehold,
   deleteHousehold,
   splitHousehold,
-  createHousehold,
 } from "../../../utils/api";
-import { exportToCSV } from "../../../utils/exportUtils";
+import * as XLSX from "xlsx";
 import { toast } from "react-toastify";
 
 const HouseholdList = () => {
-  const navigate = useNavigate();
   const [households, setHouseholds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
-  
-  // Filter states
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [showFilter, setShowFilter] = useState(false);
+  const [filters, setFilters] = useState({
+    minMembers: "",
+    maxMembers: "",
+  });
   const itemsPerPage = 8;
 
   const loadData = async () => {
@@ -36,7 +35,15 @@ const HouseholdList = () => {
       const response = await fetchHouseholds();
 
       if (response.success && response.data) {
-        setHouseholds(response.data);
+        const formattedData = response.data.map((item) => ({
+          ...item,
+          id: item.household_id,
+          code: item.household_code,
+          owner: item.owner_name || "Chưa có chủ hộ",
+          address: item.address,
+          members: parseInt(item.member_count) || 0,
+        }));
+        setHouseholds(formattedData);
       }
     } catch (error) {
       console.error("Failed to fetch households:", error);
@@ -49,61 +56,111 @@ const HouseholdList = () => {
     loadData();
   }, []);
 
-  // Filter logic
-  const filteredHouseholds = households.filter(item => {
-    const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = 
-      (item.household_code && item.household_code.toLowerCase().includes(searchLower)) ||
-      (item.owner_name && item.owner_name.toLowerCase().includes(searchLower)) ||
-      (item.address && item.address.toLowerCase().includes(searchLower)) ||
-      (item.member_count !== undefined && item.member_count.toString().includes(searchLower));
-    
-    return matchesSearch;
-  });
-
-  const handleExport = () => {
-    const exportData = filteredHouseholds.map(item => ({
-      "Mã hộ khẩu": item.household_code,
-      "Chủ hộ": item.owner_name,
-      "Địa chỉ": item.address,
-      "Số thành viên": item.member_count
-    }));
-    exportToCSV(exportData, "Danh_sach_ho_khau");
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
   };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+
+    if (value !== "" && parseInt(value) < 1) {
+      return;
+    }
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setCurrentPage(1);
+  };
+
+  const clearFilters = () => {
+    setFilters({ minMembers: "", maxMembers: "" });
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
   const handleSaveHousehold = async (formData) => {
     try {
       await createHousehold(formData);
       toast.success("Thêm hộ khẩu thành công!");
-      loadData();
       setIsAddModalOpen(false);
+      loadData();
     } catch (error) {
-      console.error("Failed to create household:", error);
-      toast.error(error.message || "Thêm hộ khẩu thất bại");
+      console.error("Lỗi:", error);
+      alert(error.message || "Có lỗi xảy ra khi tạo hộ khẩu");
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa hộ khẩu này?")) {
-      try {
-        await deleteHousehold(id);
-        loadData();
-      } catch (error) {
-        console.error("Failed to delete household:", error);
-        alert("Xóa thất bại");
-      }
+    try {
+      await deleteHousehold(id);
+      toast.success("Xóa thành công!");
+      loadData();
+    } catch (error) {
+      console.error("Lỗi xóa:", error);
+      alert(error.message || "Không thể xóa hộ khẩu này");
     }
   };
 
   const handleSplitHousehold = async (splitData) => {
     try {
       await splitHousehold(splitData);
-      loadData();
+      toast.success("Tách hộ thành công!");
       setIsSplitModalOpen(false);
+      loadData();
     } catch (error) {
-      console.error("Failed to split household:", error);
-      alert("Tách hộ thất bại: " + error.message);
+      console.error("Lỗi tách hộ:", error);
+      alert(error.message);
     }
   };
+
+  const handleExport = () => {
+    const dataToExport = households.map((item, index) => ({
+      STT: index + 1,
+      "Mã Hộ": item.household_code,
+      "Chủ Hộ": item.owner_name || "Chưa có",
+      "CCCD Chủ Hộ": item.owner_cccd || "",
+      "Địa Chỉ": item.address,
+      "Số Thành Viên": item.member_count,
+      "Trạng Thái": "Thường trú",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const wscols = [
+      { wch: 5 },
+      { wch: 15 },
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 30 },
+      { wch: 10 },
+      { wch: 15 },
+    ];
+    worksheet["!cols"] = wscols;
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DanhSachHoKhau");
+    XLSX.writeFile(workbook, "Danh_Sach_Ho_Khau.xlsx");
+  };
+
+  const filteredHouseholds = households.filter((item) => {
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch =
+      item.code.toLowerCase().includes(searchLower) ||
+      item.owner.toLowerCase().includes(searchLower) ||
+      item.address.toLowerCase().includes(searchLower);
+
+    let matchesMembers = true;
+    if (filters.minMembers !== "") {
+      matchesMembers =
+        matchesMembers && item.members >= parseInt(filters.minMembers);
+    }
+    if (filters.maxMembers !== "") {
+      matchesMembers =
+        matchesMembers && item.members <= parseInt(filters.maxMembers);
+    }
+
+    return matchesSearch && matchesMembers;
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -112,11 +169,6 @@ const HouseholdList = () => {
     .map((item, index) => ({
       ...item,
       stt: indexOfFirstItem + index + 1,
-      // Map fields for Table
-      code: item.household_code,
-      owner: item.owner_name,
-      members: item.member_count,
-      id: item.household_id
     }));
 
   const totalPages = Math.ceil(filteredHouseholds.length / itemsPerPage);
@@ -126,10 +178,8 @@ const HouseholdList = () => {
     setSelectedHousehold(household);
     setIsSplitModalOpen(true);
   };
-
-  const handleDetailClick = (household) => {
-    navigate(`/admin/household/${household.id}`);
-  };
+  const isFiltering =
+    searchTerm !== "" || filters.minMembers !== "" || filters.maxMembers !== "";
 
   return (
     <div className="household-page">
@@ -138,11 +188,11 @@ const HouseholdList = () => {
         <div className="toolbar">
           <div className="search-box">
             <Search size={18} className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm..." 
+            <input
+              type="text"
+              placeholder="Tìm kiếm..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
           </div>
           <button
@@ -173,12 +223,58 @@ const HouseholdList = () => {
         </div>
       </div>
 
+      {showFilter && (
+        <div
+          className="filter-panel"
+          style={{
+            backgroundColor: "#f8f9fa",
+            padding: "15px",
+            borderRadius: "8px",
+            marginBottom: "20px",
+            border: "1px solid #eee",
+            display: "flex",
+            gap: "20px",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontWeight: 500, fontSize: "14px" }}>
+              Số nhân khẩu:
+            </span>
+            <input
+              type="number"
+              name="minMembers"
+              placeholder="Min"
+              min="1"
+              value={filters.minMembers}
+              onChange={handleFilterChange}
+              className="form-control"
+              style={{ width: "80px", height: "36px" }}
+            />
+            <span>-</span>
+            <input
+              type="number"
+              name="maxMembers"
+              placeholder="Max"
+              min="1"
+              value={filters.maxMembers}
+              onChange={handleFilterChange}
+              className="form-control"
+              style={{ width: "80px", height: "36px" }}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="table-card">
         <div className="card-top">
           <span className="card-title">
             {loading
               ? "Đang tải dữ liệu..."
-              : `Tổng số: ${filteredHouseholds.length} hộ khẩu`}
+              : isFiltering
+              ? `Hiển thị ${filteredHouseholds.length} kết quả (Tổng: ${households.length})`
+              : `Tổng số: ${households.length} hộ khẩu`}
           </span>
         </div>
 
@@ -186,7 +282,6 @@ const HouseholdList = () => {
           data={currentItems}
           onSplit={handleSplitClick}
           onDelete={handleDelete}
-          onDetail={handleDetailClick}
         />
 
         {!loading && filteredHouseholds.length > 0 && (
