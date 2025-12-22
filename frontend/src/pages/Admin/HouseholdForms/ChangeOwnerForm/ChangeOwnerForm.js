@@ -1,17 +1,18 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
 import { getAuthToken } from '../../../../utils/api';
 import './ChangeOwnerForm.css';
 
 const ChangeOwnerForm = () => {
+    // 1. Khai báo các state còn thiếu
     const [households, setHouseholds] = useState([]);
     const [selectedHouseholdId, setSelectedHouseholdId] = useState('');
     const [members, setMembers] = useState([]);
+    
     const [formData, setFormData] = useState({
-        currentOwner: '',
-        newOwnerId: '',
+        currentOwner: '', 
+        newOwnerId: '', // Đổi tên cho khớp với logic xử lý
         reason: '',
         date: new Date().toISOString().split('T')[0]
     });
@@ -51,7 +52,7 @@ const ChangeOwnerForm = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setMembers(data.residents);
+                    setMembers(data.residents || []); // Đảm bảo luôn là mảng
                     setFormData(prev => ({
                         ...prev,
                         currentOwner: data.household.owner_name || 'Chưa có chủ hộ',
@@ -118,13 +119,13 @@ const ChangeOwnerForm = () => {
     return (
         <div className="change-owner-form">
             <form className="space-y-6" onSubmit={handleSubmit}>
+                {/* Thêm dropdown chọn hộ khẩu */}
                 <div className="input-group">
                     <label className="input-label">Chọn hộ khẩu</label>
                     <select 
                         className="input-field"
-                        value={selectedHouseholdId}
                         onChange={handleHouseholdChange}
-                        required
+                        value={selectedHouseholdId}
                     >
                         <option value="">-- Chọn hộ khẩu --</option>
                         {households.map(h => (
@@ -140,22 +141,22 @@ const ChangeOwnerForm = () => {
                     name="currentOwner"
                     value={formData.currentOwner}
                     readOnly
-                    className="input-field bg-gray-100"
+                    className="bg-gray-100"
                 />
                 
                 <div className="input-group">
                     <label className="input-label">Chủ hộ mới</label>
                     <select 
-                        name="newOwnerId"
-                        value={formData.newOwnerId}
+                        name="newOwnerId" // Sửa name thành newOwnerId
+                        value={formData.newOwnerId} // Sửa value thành newOwnerId
                         onChange={handleChange}
                         className="input-field"
                         required
                         disabled={!selectedHouseholdId}
                     >
                         <option value="">-- Chọn chủ hộ mới --</option>
-                        {members
-                            .filter(m => m.status === 'Permanent' || m.status === 'Thường trú') // Only show permanent residents
+                        {members && members
+                            .filter(m => m.status === 'Permanent' || m.status === 'Thường trú') 
                             .map(member => (
                             <option key={member.resident_id} value={member.resident_id}>
                                 {member.last_name} {member.first_name} ({new Date(member.dob).getFullYear()})

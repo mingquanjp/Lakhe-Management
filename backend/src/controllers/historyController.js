@@ -52,6 +52,11 @@ const getHouseholdsWithHistory = async (req, res) => {
       GROUP BY h.household_id, h.household_code, h.address, h.owner_name
       ORDER BY last_change_date DESC
     `;
+
+    // Note: h.owner_name might not exist in households table if it's not denormalized.
+    // Based on previous files, owner_name is usually fetched via join.
+    // Let's check householdController.js getHouseholds query again.
+    // It uses: CONCAT(r.first_name, ' ', r.last_name) as owner_name
     
     const correctedQuery = `
       SELECT DISTINCT 
@@ -82,6 +87,7 @@ const getHouseholdsWithHistory = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   getHouseholdHistory,
   getHouseholdsWithHistory

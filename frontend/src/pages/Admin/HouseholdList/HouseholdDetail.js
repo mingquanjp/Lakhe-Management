@@ -105,11 +105,13 @@ const HouseholdDetail = () => {
         if (window.confirm('Bạn có chắc chắn muốn xóa nhân khẩu này?')) {
             try {
                 const token = getAuthToken();
+                
                 const response = await fetch(`http://localhost:5000/api/residents/${residentId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
+                    
                 });
 
                 if (response.ok) {
@@ -129,6 +131,7 @@ const HouseholdDetail = () => {
     const handleSaveMember = async (memberData) => {
         try {
             const token = getAuthToken();
+            
             const url = editingMember 
                 ? `http://localhost:5000/api/residents/${editingMember.resident_id}`
                 : 'http://localhost:5000/api/residents';
@@ -140,6 +143,7 @@ const HouseholdDetail = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
+            
                 },
                 body: JSON.stringify(memberData),
             });
@@ -170,6 +174,7 @@ const HouseholdDetail = () => {
     ];
 
     const createTableData = (data) => data.map(member => ({
+    
         ...member,
         full_name: `${member.first_name} ${member.last_name}`,
         dob: new Date(member.dob).toLocaleDateString('vi-VN'),
@@ -215,6 +220,7 @@ const HouseholdDetail = () => {
             </div>
         )
     }));
+
 
     if (loading) return <div>Loading...</div>;
     if (!household) return <div>Household not found</div>;

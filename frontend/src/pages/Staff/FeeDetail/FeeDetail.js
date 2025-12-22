@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "./FeeDetail.css";
 import { Card, Button } from "../../../components/commons";
 import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
@@ -282,9 +281,9 @@ const FeeDetail = () => {
           {/* Stat Cards */}
           <div className="stats-grid">
             {stats.map((stat, index) => (
-              <div key={index} className="stat-card">
-                <div className="stat-value">{stat.value}</div>
-                <div className="stat-label">{stat.label}</div>
+              <div key={index} className="fee-stat-card">
+                <div className="fee-stat-value">{stat.value}</div>
+                <div className="fee-stat-label">{stat.label}</div>
               </div>
             ))}
           </div>

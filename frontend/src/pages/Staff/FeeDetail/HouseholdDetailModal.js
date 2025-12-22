@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./HouseholdDetailModal.css";
 import { Modal } from "../../../components/commons";
 import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
@@ -32,7 +31,7 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
             paid: p.paid_amount || 0,
             paymentDate: p.payment_date 
               ? new Date(p.payment_date).toLocaleDateString('vi-VN') 
-              : 'NULL',
+              : 'Chưa nộp',
             status: p.status
           })));
         }

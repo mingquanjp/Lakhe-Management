@@ -1,10 +1,8 @@
-// backend/src/controllers/overviewController.js
-
 const pool = require("../config/database");
 
 const getOverviewData = async (req, res) => {
   try {
-    // 1. Thống kê số liệu (Cards) - Giữ nguyên logic bạn đã duyệt
+    // 1. Thống kê số liệu (Cards) 
     const statsQuery = `
       SELECT
         (SELECT COUNT(*) FROM households WHERE deleted_at IS NULL AND status IN ('Active', 'Temporary')) AS total_households,
@@ -72,19 +70,21 @@ const getOverviewData = async (req, res) => {
       value: parseInt(item.value)
     }));
 
-    // --- 5. HOẠT ĐỘNG GẦN ĐÂY (PHẦN QUAN TRỌNG) ---
+    // --- 5. HOẠT ĐỘNG GẦN ĐÂY ---
     // Lấy 10 hoạt động mới nhất từ change_history
     const activityQuery = `
       SELECT 
         ch.change_type,
         ch.change_date,
-        u.full_name as performer_name,             -- Tên cán bộ thực hiện
+        u.full_name as performer_name,             -- Tên cán bộ
         h.household_code,                          -- Mã hộ khẩu
-        CONCAT(r.first_name, ' ', r.last_name) as resident_name -- Tên nhân khẩu (nếu có)
+        CONCAT(r.first_name, ' ', r.last_name) as resident_name, -- Tên nhân khẩu
+        f.fee_name                                
       FROM change_history ch
       LEFT JOIN users u ON ch.changed_by_user_id = u.user_id
       LEFT JOIN households h ON ch.household_id = h.household_id
       LEFT JOIN residents r ON ch.resident_id = r.resident_id
+      LEFT JOIN fees f ON ch.fee_id = f.fee_id     
       ORDER BY ch.change_date DESC
       LIMIT 10
     `;
@@ -108,7 +108,12 @@ const getOverviewData = async (req, res) => {
 
   } catch (error) {
     console.error("Lỗi lấy dữ liệu Overview:", error);
-    res.status(500).json({ success: false, message: "Lỗi server" });
+    // Trả về chi tiết lỗi để dễ debug
+    res.status(500).json({ 
+        success: false, 
+        message: "Lỗi server: " + error.message,
+        error: error.toString() 
+    });
   }
 };
 

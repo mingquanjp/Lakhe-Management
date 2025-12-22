@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
 import { getAuthToken } from '../../../../utils/api';
@@ -7,7 +6,6 @@ import './MemberStatusChangeForm.css';
 
 const MemberStatusChangeForm = () => {
     const [formData, setFormData] = useState({
-        residentId: '',
         memberName: '',
         changeType: 'move_out',
         changeDate: '',

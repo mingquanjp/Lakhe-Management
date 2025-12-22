@@ -431,92 +431,39 @@ const createTemporaryHousehold = async (req, res) => {
 };
 
 const getHouseholdById = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const householdQuery = `
-            SELECT 
-                h.*,
-                (r.first_name || ' ' || r.last_name) as owner_name
-            FROM households h
-            LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
-            WHERE h.household_id = $1
-        `;
-        const householdResult = await pool.query(householdQuery, [id]);
-
-        if (householdResult.rows.length === 0) {
-            return res.status(404).json({ message: 'Household not found' });
-        }
-
-        const residentsQuery = `
-            SELECT * FROM residents 
-            WHERE household_id = $1
-            ORDER BY resident_id ASC
-        `;
-        const residentsResult = await pool.query(residentsQuery, [id]);
-
-        res.json({
-            household: householdResult.rows[0],
-            residents: residentsResult.rows
-        });
-    } catch (error) {
-        console.error('Error getting household details:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-};
-
-const changeHeadOfHousehold = async (req, res) => {
-  const client = await pool.connect();
   try {
-    const { household_id, new_head_id, reason, change_date } = req.body;
+    const { id } = req.params;
+    
+    // 1. Lấy thông tin hộ khẩu
+    const householdQuery = `
+      SELECT 
+        h.*,
+        CONCAT(r.first_name, ' ', r.last_name) as owner_name
+      FROM households h
+      LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
+      WHERE h.household_id = $1 AND h.deleted_at IS NULL
+    `;
+    const householdResult = await pool.query(householdQuery, [id]);
 
-    if (!household_id || !new_head_id) {
-      return res.status(400).json({ success: false, message: "Thiếu thông tin bắt buộc" });
+    if (householdResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy hộ khẩu" });
     }
 
-    await client.query("BEGIN");
+    // 2. Lấy danh sách thành viên
+    const residentsQuery = `
+      SELECT * FROM residents 
+      WHERE household_id = $1 AND deleted_at IS NULL
+    `;
+    const residentsResult = await pool.query(residentsQuery, [id]);
 
-    // 1. Get current head
-    const currentHeadRes = await client.query(
-      "SELECT head_of_household_id FROM households WHERE household_id = $1",
-      [household_id]
-    );
-    
-    if (currentHeadRes.rows.length === 0) {
-      throw new Error("Không tìm thấy hộ khẩu");
-    }
-    
-    const oldHeadId = currentHeadRes.rows[0].head_of_household_id;
-
-    // 2. Update household's head
-    await client.query(
-      "UPDATE households SET head_of_household_id = $1 WHERE household_id = $2",
-      [new_head_id, household_id]
-    );
-
-    // 3. Update relationships
-    // Set new head's relation to 'Chủ hộ'
-    await client.query(
-      "UPDATE residents SET relationship_to_head = 'Chủ hộ' WHERE resident_id = $1",
-      [new_head_id]
-    );
-
-    // Set old head's relation to 'Thành viên' (or ask user, but for now default to Member)
-    if (oldHeadId && oldHeadId !== new_head_id) {
-      await client.query(
-        "UPDATE residents SET relationship_to_head = 'Thành viên' WHERE resident_id = $1",
-        [oldHeadId]
-      );
-    }
-    
-    await client.query("COMMIT");
-    res.json({ success: true, message: "Thay đổi chủ hộ thành công" });
-
+    res.status(200).json({
+      success: true,
+      household: householdResult.rows[0],
+      residents: residentsResult.rows
+    });
   } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Error changing head:", error);
-    res.status(500).json({ success: false, message: error.message });
-  } finally {
-    client.release();
+    console.error("Lỗi lấy chi tiết hộ khẩu:", error);
+    res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
 
@@ -526,7 +473,6 @@ module.exports = {
   createHousehold,
   deleteHousehold,
   splitHousehold,
-  changeHeadOfHousehold,
   getTemporaryHouseholds,
   getTemporaryHouseholdById,
   createTemporaryHousehold,

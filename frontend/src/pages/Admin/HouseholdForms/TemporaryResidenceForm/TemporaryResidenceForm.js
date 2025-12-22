@@ -12,7 +12,6 @@ const TemporaryResidenceForm = () => {
         householdCode: '', // New field
         fullName: '',
         dob: '',
-        gender: 'Nam',
         identityCard: '',
         fromDate: '',
         toDate: '',
@@ -23,7 +22,6 @@ const TemporaryResidenceForm = () => {
         permanentAddress: '',
         job: '',
         workplace: '',
-        temporaryAddress: '', // Địa chỉ tạm trú
         hostName: '', // Chủ hộ
         relationshipWithHost: '',
         // Temp Absence specific
@@ -153,7 +151,7 @@ const TemporaryResidenceForm = () => {
                 // Use createTemporaryHousehold endpoint
                 const payload = {
                     household_code: formData.householdCode,
-                    address: formData.temporaryAddress,
+                    address: formData.tempAddress,
                     start_date: formData.fromDate,
                     end_date: formData.toDate,
                     reason: formData.reason,
@@ -178,7 +176,7 @@ const TemporaryResidenceForm = () => {
                 const result = await response.json();
                 if (result.success) {
                     alert('Đăng ký tạm trú thành công!');
-                    navigate('/admin/temporary-household');
+                    navigate('/admin/householdtemporary');
                 } else {
                     alert('Lỗi: ' + result.message + (result.error ? `\nChi tiết: ${result.error}` : ''));
                 }
@@ -307,18 +305,6 @@ const TemporaryResidenceForm = () => {
                             onChange={handleChange}
                             required
                         />
-                        <div className="form-group">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Giới tính</label>
-                            <select
-                                name="gender"
-                                value={formData.gender}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                            >
-                                <option value="Nam">Nam</option>
-                                <option value="Nữ">Nữ</option>
-                            </select>
-                        </div>
                         <Input
                             label="Số CMND/CCCD"
                             name="identityCard"
@@ -369,6 +355,13 @@ const TemporaryResidenceForm = () => {
                         {isTemporaryResidence ? (
                             <>
                                 <Input
+                                    label="Địa chỉ tạm trú"
+                                    name="tempAddress"
+                                    value={formData.tempAddress}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <Input
                                     label="Địa chỉ thường trú (Quê quán)"
                                     name="permanentAddress"
                                     value={formData.permanentAddress}
@@ -390,18 +383,10 @@ const TemporaryResidenceForm = () => {
                                     />
                                 </div>
                                 <div className="bg-yellow-50 p-3 rounded border border-yellow-100 mt-2">
-                                    <p className="text-sm font-medium text-yellow-800 mb-2">Thông tin nơi tạm trú</p>
+                                    <p className="text-sm font-medium text-yellow-800 mb-2">Thông tin chủ hộ (Nơi tạm trú)</p>
                                     <div className="grid grid-cols-2 gap-3">
                                         <Input
-                                            label="Địa chỉ tạm trú"
-                                            name="temporaryAddress"
-                                            value={formData.temporaryAddress}
-                                            onChange={handleChange}
-                                            required
-                                            placeholder="Nhập địa chỉ tạm trú"
-                                        />
-                                        <Input
-                                            label="Tên chủ hộ (nếu có)"
+                                            label="Tên chủ hộ"
                                             name="hostName"
                                             value={formData.hostName}
                                             onChange={handleChange}
@@ -416,24 +401,14 @@ const TemporaryResidenceForm = () => {
                                 </div>
                             </>
                         ) : (
-                            <>
-                                <Input
-                                    label="Địa chỉ thường trú (Hiện tại)"
-                                    name="permanentAddress"
-                                    value={formData.permanentAddress}
-                                    onChange={handleChange}
-                                    required
-                                    placeholder="Nhập địa chỉ thường trú hiện tại"
-                                />
-                                <Input
-                                    label="Nơi đến (Địa chỉ tạm trú)"
-                                    name="tempAddress"
-                                    value={formData.tempAddress}
-                                    onChange={handleChange}
-                                    required
-                                    placeholder="Nhập địa chỉ nơi sẽ đến tạm trú"
-                                />
-                            </>
+                            <Input
+                                label="Nơi đến (Địa chỉ tạm trú)"
+                                name="tempAddress"
+                                value={formData.tempAddress}
+                                onChange={handleChange}
+                                required
+                                placeholder="Nhập địa chỉ nơi sẽ đến tạm trú"
+                            />
                         )}
                     </div>
                 </div>

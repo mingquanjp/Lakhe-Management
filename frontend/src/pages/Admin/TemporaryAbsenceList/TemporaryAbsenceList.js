@@ -83,7 +83,6 @@ const TemporaryAbsenceList = () => {
       (startDate && startDate.includes(searchLower)) ||
       (endDate && endDate.includes(searchLower)) ||
       (item.reason && item.reason.toLowerCase().includes(searchLower));
-    
     return matchesSearch;
   });
 

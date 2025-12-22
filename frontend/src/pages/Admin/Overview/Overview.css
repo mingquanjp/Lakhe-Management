@@ -4,7 +4,6 @@
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -12,13 +11,20 @@
   margin-bottom: 20px;
 }
 
+.overview-container {
+  padding: 20px;
+  background-color: #f5f7fb;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+
 .charts-row-1 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   margin-bottom: 20px;
 }
-
 .charts-row-1 > .line-chart-container {
   grid-column: span 3;
 }
@@ -26,13 +32,11 @@
 .charts-row-1 > .activity-card {
   grid-column: span 1;
 }
-
 .charts-row-2 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
-
 .charts-row-2 > .bar-chart-container {
   grid-column: span 2;
 }
@@ -40,7 +44,6 @@
 .charts-row-2 > .pie-chart-container {
   grid-column: span 1;
 }
-
 @media (max-width: 1024px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
