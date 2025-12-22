@@ -38,7 +38,7 @@ const HouseholdTemporaryTable = ({ data, onDelete }) => {
                 <button
                   className="btn-action btn-detail"
                   onClick={() => {
-                    navigate(`/admin/householdtemporary/${row.id}`);
+                    navigate(`/admin/temporary-household/${row.id}`);
                   }}
                 >
                   Chi tiết
