@@ -279,13 +279,6 @@ const HouseholdDetail = () => {
             <div className="detail-card mt-6">
                 <div className="detail-card-header flex-between">
                     <h2 className="detail-card-title">Danh sách tạm trú (Chuyển đến)</h2>
-                    <Button 
-                        variant="primary" 
-                        className="btn-add-member"
-                        onClick={() => handleSelectType('MoveIn')}
-                    >
-                        + Thêm chuyển đến
-                    </Button>
                 </div>
                 
                 <div className="detail-card-body p-0">

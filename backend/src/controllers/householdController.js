@@ -315,7 +315,7 @@ const getTemporaryHouseholds = async (req, res) => {
     res.status(200).json({ success: true, data: result.rows });
   } catch (error) {
     console.error("Lỗi lấy danh sách hộ tạm trú:", error);
-    res.status(500).json({ success: false, message: "Lỗi server" });
+    res.status(500).json({ success: false, message: "Lỗi server: " + error.message });
   }
 };
 
@@ -328,7 +328,7 @@ const getTemporaryHouseholdById = async (req, res) => {
         h.household_id, h.household_code, h.address, h.date_created,
         r.first_name, r.last_name, r.dob, r.gender, 
         r.identity_card_number as cccd,
-        r.temp_start_date, r.temp_end_date, r.temp_reason, r.phone_number
+        r.temp_start_date, r.temp_end_date, r.temp_reason
       FROM households h
       LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
       WHERE h.household_id = $1 AND h.status = 'Temporary'

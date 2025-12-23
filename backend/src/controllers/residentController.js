@@ -1,5 +1,10 @@
 const pool = require('../config/database');
 
+const cleanValue = (val) => {
+  if (val === '' || val === undefined || val === 'null') return null;
+  return val;
+};
+
 // 1. Create new resident (Thêm mới nhân khẩu - Sinh con hoặc chuyển đến)
 const createResident = async (req, res) => {
   try {
@@ -223,7 +228,7 @@ const updateResident = async (req, res) => {
     }
 
     const setClause = keys.map((key, index) => `${key} = $${index + 2}`).join(', ');
-    const values = [id, ...keys.map(key => updates[key])];
+    const values = [id, ...keys.map(key => cleanValue(updates[key]))];
 
     const query = `
       UPDATE residents
@@ -347,10 +352,14 @@ const registerTemporaryResidence = async (req, res) => {
       identity_card_number,
       dob,
       gender,
-      home_address,
+      home_address, // This will be mapped to place_of_origin (Quê quán)
       reason,
       start_date,
-      end_date
+      end_date,
+      occupation,
+      workplace,
+      email, // Not stored in DB currently
+      phone  // Not stored in DB currently
     } = req.body;
 
     if (!host_household_id || !first_name || !last_name || !start_date || !end_date) {
@@ -360,21 +369,41 @@ const registerTemporaryResidence = async (req, res) => {
       });
     }
 
+    // Insert into residents table with status = 'Temporary'
+    // Mapping home_address (Quê quán) to place_of_origin
+    // Mapping occupation, workplace
     const query = `
-      INSERT INTO temporary_residents (
-        host_household_id, first_name, last_name, identity_card_number,
-        dob, gender, home_address, reason, start_date, end_date
+      INSERT INTO residents (
+        household_id, first_name, last_name, identity_card_number,
+        dob, gender, 
+        place_of_origin, occupation, workplace,
+        temp_reason, temp_start_date, temp_end_date,
+        status, relationship_to_head, registration_date
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Temporary', 'Tạm trú', CURRENT_DATE)
       RETURNING *
     `;
 
     const values = [
-      host_household_id, first_name, last_name, identity_card_number,
-      dob, gender, home_address, reason, start_date, end_date
+      host_household_id, first_name, last_name, cleanValue(identity_card_number),
+      dob, gender, 
+      cleanValue(home_address), cleanValue(occupation), cleanValue(workplace),
+      cleanValue(reason), cleanValue(start_date), cleanValue(end_date)
     ];
 
     const result = await pool.query(query, values);
+
+    // Log history
+    try {
+        const userId = req.user ? req.user.user_id : 1;
+        await pool.query(
+            `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
+             VALUES ($1, $2, 'Added', $3)`,
+            [host_household_id, result.rows[0].resident_id, userId]
+        );
+    } catch (histError) {
+        console.error('Error logging history:', histError);
+    }
 
     res.status(201).json({
       success: true,
@@ -385,7 +414,7 @@ const registerTemporaryResidence = async (req, res) => {
     console.error('Error registering temporary residence:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi server khi đăng ký tạm trú',
+      message: 'Lỗi server khi đăng ký tạm trú: ' + error.message,
       error: error.message
     });
   }
@@ -500,9 +529,7 @@ const registerTemporaryAbsence = async (req, res) => {
     const query = `
       INSERT INTO temporary_absences (
         resident_id, destination_address, reason, start_date, end_date
-        resident_id, destination_address, reason, start_date, end_date
       )
-      VALUES ($1, $2, $3, $4, $5)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *
     `;
@@ -597,11 +624,12 @@ const getExpiringTemporaryResidents = async (req, res) => {
     const daysLimit = parseInt(days) || 30; // Default 30 days
 
     const query = `
-      SELECT tr.*, h.household_code, h.address as host_address
-      FROM temporary_residents tr
-      JOIN households h ON tr.host_household_id = h.household_id
-      WHERE tr.end_date BETWEEN CURRENT_DATE AND CURRENT_DATE + interval '${daysLimit} days'
-      ORDER BY tr.end_date ASC
+      SELECT r.*, h.household_code, h.address as host_address
+      FROM residents r
+      JOIN households h ON r.household_id = h.household_id
+      WHERE r.status = 'Temporary' 
+      AND r.temp_end_date BETWEEN CURRENT_DATE AND CURRENT_DATE + interval '${daysLimit} days'
+      ORDER BY r.temp_end_date ASC
     `;
 
     const result = await pool.query(query);
@@ -626,7 +654,11 @@ const getExpiringTemporaryResidents = async (req, res) => {
 const getTemporaryResidents = async (req, res) => {
   try {
     const query = `
-      SELECT * FROM temporary_residents ORDER BY start_date DESC
+      SELECT r.*, h.household_code, h.address as host_address
+      FROM residents r
+      LEFT JOIN households h ON r.household_id = h.household_id
+      WHERE r.status = 'Temporary'
+      ORDER BY r.temp_start_date DESC
     `;
     const result = await pool.query(query);
     res.status(200).json({
