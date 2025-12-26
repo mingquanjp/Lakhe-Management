@@ -462,7 +462,7 @@ const TemporaryResidenceForm = () => {
                                     />
                                 </div>
                                 <div className="bg-yellow-50 p-3 rounded border border-yellow-100 mt-2">
-                                    <p className="text-sm font-medium text-yellow-800 mb-2">Thông tin chủ hộ (Nơi tạm trú)</p>
+                                    <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin chủ hộ (Nơi tạm trú)</h3>
                                     <div className="grid grid-cols-2 gap-3">
                                         <Input
                                             label="Tên chủ hộ"
