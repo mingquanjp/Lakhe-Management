@@ -346,19 +346,19 @@ const FeeDashboard = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="pagination">
+                <div className="staff-pagination">
                   <button
-                    className="pagination-btn"
+                    className="staff-pagination-btn"
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
                   >
                     ← Trước
                   </button>
-                  <div className="pagination-info">
+                  <div className="staff-pagination-info">
                     <span>Trang </span>
                     <input
                       type="number"
-                      className="pagination-input"
+                      className="staff-pagination-input"
                       min="1"
                       max={totalPages}
                       value={currentPage}
@@ -384,7 +384,7 @@ const FeeDashboard = () => {
                     <span> / {totalPages}</span>
                   </div>
                   <button
-                    className="pagination-btn"
+                    className="staff-pagination-btn"
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
                   >
