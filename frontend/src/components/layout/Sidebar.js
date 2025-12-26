@@ -44,7 +44,8 @@ const Sidebar = () => {
       subItems: [
         { id: "household", label: "Quản lý hộ khẩu thường trú", path: "/admin/household" },
         { id: "householdtemporary", label: "Quản lý hộ khẩu tạm trú", path: "/admin/householdtemporary" },
-        { id: "citizen", label: "Quản lý nhân khẩu", path: "/admin/citizen" },
+        { id: "temporary-absence", label: "Quản lý tạm vắng", path: "/admin/temporary-absence" },
+        { id: "history", label: "Lịch sử biến động", path: "/admin/history" },
         { id: "form", label: "Form khai báo", path: "/admin/form" },
       ],
     },

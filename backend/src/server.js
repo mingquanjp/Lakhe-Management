@@ -9,6 +9,7 @@ const householdRoutes = require('./routes/householdRoutes');
 const residentRoutes = require("./routes/residentRoutes");
 const feeRoutes = require('./routes/feeRoutes');
 const overviewRoutes = require("./routes/overviewRoutes");
+const historyRoutes = require("./routes/historyRoutes");
 
 const app = express();
 app.use(cors());
@@ -42,6 +43,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/finance", financeRoutes);
 
+
 // Example protected route - requires valid JWT token
 app.get("/api/test-protected", verifyToken, (req, res) => {
   res.json({
@@ -64,6 +66,7 @@ app.use('/api/households', householdRoutes);
 app.use("/api/residents", residentRoutes);
 app.use('/api/fees', feeRoutes);
 app.use("/api/overview", overviewRoutes);
+app.use("/api/history", historyRoutes);
 
 
 app.listen(5000, () => {
