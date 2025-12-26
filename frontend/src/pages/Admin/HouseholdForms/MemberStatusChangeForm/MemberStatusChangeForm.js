@@ -6,6 +6,7 @@ import './MemberStatusChangeForm.css';
 
 const MemberStatusChangeForm = () => {
     const [formData, setFormData] = useState({
+        residentId: '',
         memberName: '',
         changeType: 'move_out',
         changeDate: '',

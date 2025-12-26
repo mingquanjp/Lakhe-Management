@@ -12,7 +12,7 @@ const FeeDashboard = () => {
   const [households, setHouseholds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Search, Filter, Sort states
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -51,7 +51,7 @@ const FeeDashboard = () => {
           fetchFeeStatistics(selectedFeeId),
           fetchHouseholdPaymentStatus(selectedFeeId)
         ]);
-        
+
         if (statsRes.success) {
           setStatistics(statsRes.data.statistics);
         }
@@ -113,7 +113,7 @@ const FeeDashboard = () => {
     if (sortConfig.key) {
       data.sort((a, b) => {
         let aVal, bVal;
-        
+
         // Special handling for Vietnamese name sorting (by last_name first, then first_name)
         if (sortConfig.key === "owner_name") {
           aVal = (a.last_name || "") + " " + (a.first_name || "");
@@ -122,16 +122,16 @@ const FeeDashboard = () => {
           aVal = a[sortConfig.key];
           bVal = b[sortConfig.key];
         }
-        
+
         // Handle null/undefined
         aVal = aVal ?? "";
         bVal = bVal ?? "";
-        
+
         // Numeric comparison for numbers
         if (typeof aVal === 'number' && typeof bVal === 'number') {
           return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
         }
-        
+
         // String comparison using localeCompare for proper Vietnamese sorting
         const comparison = String(aVal).localeCompare(String(bVal), 'vi');
         return sortConfig.direction === "asc" ? comparison : -comparison;
@@ -196,8 +196,8 @@ const FeeDashboard = () => {
   };
 
   const tableColumns = [
-    { 
-      key: "household_code", 
+    {
+      key: "household_code",
       title: "Số hộ khẩu",
       headerRender: () => (
         <span onClick={() => handleSort("household_code")} style={{ cursor: "pointer" }}>
@@ -206,8 +206,8 @@ const FeeDashboard = () => {
         </span>
       )
     },
-    { 
-      key: "owner_name", 
+    {
+      key: "owner_name",
       title: "Họ và tên chủ hộ",
       headerRender: () => (
         <span onClick={() => handleSort("owner_name")} style={{ cursor: "pointer" }}>
@@ -216,8 +216,8 @@ const FeeDashboard = () => {
         </span>
       )
     },
-    { 
-      key: "address", 
+    {
+      key: "address",
       title: "Địa chỉ",
       headerRender: () => (
         <span onClick={() => handleSort("address")} style={{ cursor: "pointer" }}>
@@ -226,8 +226,8 @@ const FeeDashboard = () => {
         </span>
       )
     },
-    { 
-      key: "status", 
+    {
+      key: "status",
       title: "Trạng thái",
       headerRender: () => (
         <span onClick={() => handleSort("status")} style={{ cursor: "pointer" }}>
@@ -237,9 +237,8 @@ const FeeDashboard = () => {
       ),
       render: (value, row) => (
         <span
-          className={`status-badge ${
-            row.status === "paid" ? "status-paid" : "status-unpaid"
-          }`}
+          className={`status-badge ${row.status === "paid" ? "status-paid" : "status-unpaid"
+            }`}
         >
           {row.status === "paid" ? "• Đã nộp" : "• Chưa nộp"}
         </span>
@@ -253,150 +252,150 @@ const FeeDashboard = () => {
 
   return (
     <div className="content">
-          {/* Banner chọn đợt thu/đóng góp */}
-          <div className="period-selector-banner">
-            <div className="period-selector-left">
-              <span className="period-selector-label">
-                Chọn đợt thu/đóng góp
-              </span>
-            </div>
-            <div className="period-selector-right">
-              <select
-                className="period-select"
-                value={selectedFeeId || ""}
-                onChange={(e) => setSelectedFeeId(Number(e.target.value))}
-              >
-                {fees.map(fee => (
-                  <option key={fee.fee_id} value={fee.fee_id}>
-                    {fee.fee_name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Stat Cards */}
-          <div className="stats-grid">
-            {stats.map((stat, index) => (
-              <div key={index} className="fee-stat-card">
-                <div className="fee-stat-value">{stat.value}</div>
-                <div className="fee-stat-label">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Detailed Statistical Table */}
-          <Card
-            title="Bảng thống kê chi tiết"
-            subtitle={`Chi tiết thu phí: ${fees.find(f => f.fee_id === selectedFeeId)?.fee_name || ''} (${filteredAndSortedData.length} hộ)`}
-            actions={
-              <div className="table-actions">
-                <div className="table-search">
-                  <img src={searchIcon} alt="Search" className="search-icon" />
-                  <input
-                    type="text"
-                    placeholder="Tìm kiếm..."
-                    className="table-search-input"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <div className="filter-dropdown-container">
-                  <Button 
-                    variant="outline" 
-                    size="small"
-                    onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                  >
-                    Lọc {filterStatus !== "all" && `(${filterStatus === "paid" ? "Đã nộp" : "Chưa nộp"})`}
-                  </Button>
-                  {showFilterDropdown && (
-                    <div className="filter-dropdown">
-                      <div 
-                        className={`filter-option ${filterStatus === "all" ? "active" : ""}`}
-                        onClick={() => { setFilterStatus("all"); setShowFilterDropdown(false); }}
-                      >
-                        Tất cả
-                      </div>
-                      <div 
-                        className={`filter-option ${filterStatus === "paid" ? "active" : ""}`}
-                        onClick={() => { setFilterStatus("paid"); setShowFilterDropdown(false); }}
-                      >
-                        Đã nộp
-                      </div>
-                      <div 
-                        className={`filter-option ${filterStatus === "unpaid" ? "active" : ""}`}
-                        onClick={() => { setFilterStatus("unpaid"); setShowFilterDropdown(false); }}
-                      >
-                        Chưa nộp
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <Button variant="outline" size="small" onClick={handleExport}>
-                  Xuất CSV
-                </Button>
-              </div>
-            }
+      {/* Banner chọn đợt thu/đóng góp */}
+      <div className="period-selector-banner">
+        <div className="period-selector-left">
+          <span className="period-selector-label">
+            Chọn đợt thu/đóng góp
+          </span>
+        </div>
+        <div className="period-selector-right">
+          <select
+            className="period-select"
+            value={selectedFeeId || ""}
+            onChange={(e) => setSelectedFeeId(Number(e.target.value))}
           >
-            <div className="table-wrapper">
-              {loading ? (
-                <p>Đang tải dữ liệu...</p>
-              ) : (
-                <>
-                  <EnhancedTable columns={tableColumns} data={paginatedData} className="staff-table" />
-                  
-                  {/* Pagination */}
-                  {totalPages > 1 && (
-                    <div className="pagination">
-                      <button 
-                        className="pagination-btn"
-                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        disabled={currentPage === 1}
-                      >
-                        ← Trước
-                      </button>
-                      <div className="pagination-info">
-                        <span>Trang </span>
-                        <input
-                          type="number"
-                          className="pagination-input"
-                          min="1"
-                          max={totalPages}
-                          value={currentPage}
-                          onChange={(e) => {
-                            const value = parseInt(e.target.value);
-                            if (value >= 1 && value <= totalPages) {
-                              setCurrentPage(value);
-                            }
-                          }}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              const value = parseInt(e.target.value);
-                              if (value >= 1 && value <= totalPages) {
-                                setCurrentPage(value);
-                              } else if (value < 1) {
-                                setCurrentPage(1);
-                              } else if (value > totalPages) {
-                                setCurrentPage(totalPages);
-                              }
-                            }
-                          }}
-                        />
-                        <span> / {totalPages}</span>
-                      </div>
-                      <button 
-                        className="pagination-btn"
-                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                        disabled={currentPage === totalPages}
-                      >
-                        Sau →
-                      </button>
-                    </div>
-                  )}
-                </>
+            {fees.map(fee => (
+              <option key={fee.fee_id} value={fee.fee_id}>
+                {fee.fee_name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Stat Cards */}
+      <div className="stats-grid">
+        {stats.map((stat, index) => (
+          <div key={index} className="fee-stat-card">
+            <div className="fee-stat-value">{stat.value}</div>
+            <div className="fee-stat-label">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Detailed Statistical Table */}
+      <Card
+        title="Bảng thống kê chi tiết"
+        subtitle={`Chi tiết thu phí: ${fees.find(f => f.fee_id === selectedFeeId)?.fee_name || ''} (${filteredAndSortedData.length} hộ)`}
+        actions={
+          <div className="table-actions">
+            <div className="table-search">
+              <img src={searchIcon} alt="Search" className="search-icon" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm..."
+                className="table-search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="filter-dropdown-container">
+              <Button
+                variant="outline"
+                size="small"
+                onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+              >
+                Lọc {filterStatus !== "all" && `(${filterStatus === "paid" ? "Đã nộp" : "Chưa nộp"})`}
+              </Button>
+              {showFilterDropdown && (
+                <div className="filter-dropdown">
+                  <div
+                    className={`filter-option ${filterStatus === "all" ? "active" : ""}`}
+                    onClick={() => { setFilterStatus("all"); setShowFilterDropdown(false); }}
+                  >
+                    Tất cả
+                  </div>
+                  <div
+                    className={`filter-option ${filterStatus === "paid" ? "active" : ""}`}
+                    onClick={() => { setFilterStatus("paid"); setShowFilterDropdown(false); }}
+                  >
+                    Đã nộp
+                  </div>
+                  <div
+                    className={`filter-option ${filterStatus === "unpaid" ? "active" : ""}`}
+                    onClick={() => { setFilterStatus("unpaid"); setShowFilterDropdown(false); }}
+                  >
+                    Chưa nộp
+                  </div>
+                </div>
               )}
             </div>
-          </Card>
+            <Button variant="outline" size="small" onClick={handleExport}>
+              Xuất CSV
+            </Button>
+          </div>
+        }
+      >
+        <div className="table-wrapper">
+          {loading ? (
+            <p>Đang tải dữ liệu...</p>
+          ) : (
+            <>
+              <EnhancedTable columns={tableColumns} data={paginatedData} className="staff-table" />
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="pagination">
+                  <button
+                    className="pagination-btn"
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    ← Trước
+                  </button>
+                  <div className="pagination-info">
+                    <span>Trang </span>
+                    <input
+                      type="number"
+                      className="pagination-input"
+                      min="1"
+                      max={totalPages}
+                      value={currentPage}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (value >= 1 && value <= totalPages) {
+                          setCurrentPage(value);
+                        }
+                      }}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          const value = parseInt(e.target.value);
+                          if (value >= 1 && value <= totalPages) {
+                            setCurrentPage(value);
+                          } else if (value < 1) {
+                            setCurrentPage(1);
+                          } else if (value > totalPages) {
+                            setCurrentPage(totalPages);
+                          }
+                        }
+                      }}
+                    />
+                    <span> / {totalPages}</span>
+                  </div>
+                  <button
+                    className="pagination-btn"
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Sau →
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </Card>
     </div>
   );
 };
