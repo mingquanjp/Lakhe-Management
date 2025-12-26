@@ -44,7 +44,7 @@
   overflow: hidden;
 }
 
-.household-info-card {
+.staff-household-info-card {
   background: white;
   border-radius: 8px;
   padding: 16px 20px;
@@ -54,32 +54,32 @@
   flex-shrink: 0;
 }
 
-.household-info-row {
+.staff-household-info-row {
   display: flex;
   gap: 24px;
   align-items: center;
   margin-bottom: 12px;
 }
 
-.household-info-row:last-child {
+.staff-household-info-row:last-child {
   margin-bottom: 0;
 }
 
-.info-item {
+.staff-info-item {
   display: flex;
   align-items: center;
   gap: 8px;
   flex: 1;
 }
 
-.info-label {
+.staff-info-label {
   font-size: 14px;
   font-weight: 600;
   color: #6c757d;
   white-space: nowrap;
 }
 
-.info-value {
+.staff-info-value {
   font-size: 14px;
   color: #333;
   font-weight: 500;
@@ -117,7 +117,7 @@
 .tab-button.active {
   color: #1976d2;
   background: white;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.02);
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.02);
 }
 
 .tab-content-wrapper {
@@ -183,13 +183,40 @@
   line-height: 1.2;
 }
 
-.badge-mandatory { color: #c62828; background: #ffcdd2; }
-.badge-donation { color: #ef6c00; background: #ffe0b2; }
-.badge-paid { color: #2e7d32; background: #c8e6c9; }
-.badge-owing { color: #c62828; background: #ffcdd2; }
-.badge-permanent { color: #2e7d32; background: #c8e6c9; }
-.badge-temporary { color: #ef6c00; background: #ffe0b2; }
-.badge-absent { color: #c62828; background: #ffcdd2; }
+.badge-mandatory {
+  color: #c62828;
+  background: #ffcdd2;
+}
+
+.badge-donation {
+  color: #ef6c00;
+  background: #ffe0b2;
+}
+
+.badge-paid {
+  color: #2e7d32;
+  background: #c8e6c9;
+}
+
+.badge-owing {
+  color: #c62828;
+  background: #ffcdd2;
+}
+
+.badge-permanent {
+  color: #2e7d32;
+  background: #c8e6c9;
+}
+
+.badge-temporary {
+  color: #ef6c00;
+  background: #ffe0b2;
+}
+
+.badge-absent {
+  color: #c62828;
+  background: #ffcdd2;
+}
 
 @media (max-width: 768px) {
   .household-detail-modal-wrapper {
@@ -215,4 +242,3 @@
     border-bottom-color: #e9ecef;
   }
 }
-
