@@ -22,6 +22,7 @@ import FormsMenu from "./pages/Admin/FormsMenu/FormsMenu";
 import Overview from "./pages/Admin/Overview/Overview";
 import HistoryList from "./pages/Admin/History/HistoryList";
 import HistoryDetail from "./pages/Admin/History/HistoryDetail";
+import StaffManagement from "./pages/Admin/StaffManagement/StaffManagement";
 
 // Import Forms
 import NewHouseholdForm from "./pages/Admin/HouseholdForms/NewHouseholdForm";
@@ -89,6 +90,7 @@ function AppRoutes() {
         <Route path="history/:id" element={<HistoryDetail />} />
         <Route path="stats/citizen" element={<PopulationDashboard />} />
         <Route path="stats/finance" element={<StatsFinanceDashboard />} />
+        <Route path="staff-management" element={<StaffManagement />} />
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />
         <Route path="form/new-household-form" element={<NewHouseholdForm />} />

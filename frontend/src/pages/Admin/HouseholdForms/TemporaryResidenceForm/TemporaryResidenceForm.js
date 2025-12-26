@@ -294,7 +294,7 @@ const TemporaryResidenceForm = () => {
                                 checked={formData.type === 'temporary_residence_new'}
                                 onChange={handleChange}
                             />
-                            <span className="ml-2 font-medium">Đăng ký Tạm trú (Hộ mới)</span>
+                            <span className="ml-2 font-medium">Khai báo Tạm trú (Hộ mới)</span>
                         </label>
                         <label className="inline-flex items-center cursor-pointer">
                             <input 
@@ -305,7 +305,7 @@ const TemporaryResidenceForm = () => {
                                 checked={formData.type === 'temporary_residence_existing'}
                                 onChange={handleChange}
                             />
-                            <span className="ml-2 font-medium">Đăng ký Tạm trú (Vào hộ đã có)</span>
+                            <span className="ml-2 font-medium">Khai báo Tạm trú (Vào hộ đã có)</span>
                         </label>
                         <label className="inline-flex items-center cursor-pointer">
                             <input 
