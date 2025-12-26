@@ -12,16 +12,24 @@ import './HouseholdDetail.css';
 const StatusBadge = ({ status }) => {
     let colorClass = '';
     let dotColor = '';
+    let displayStatus = status;
     
     if (status === 'Permanent' || status === 'Thường trú') {
         colorClass = 'bg-green-100 text-green-700';
         dotColor = 'bg-green-500';
+        displayStatus = 'Thường trú';
     } else if (status === 'MovedOut' || status === 'Đã chuyển đi') {
         colorClass = 'bg-yellow-100 text-yellow-700';
         dotColor = 'bg-yellow-500';
+        displayStatus = 'Đã chuyển đi';
     } else if (status === 'Deceased' || status === 'Đã qua đời') {
         colorClass = 'bg-red-100 text-red-700';
         dotColor = 'bg-red-500';
+        displayStatus = 'Đã qua đời';
+    } else if (status === 'Temporary' || status === 'Tạm trú') {
+        colorClass = 'bg-blue-100 text-blue-700';
+        dotColor = 'bg-blue-500';
+        displayStatus = 'Tạm trú';
     } else {
         colorClass = 'bg-gray-100 text-gray-700';
         dotColor = 'bg-gray-500';
@@ -30,7 +38,7 @@ const StatusBadge = ({ status }) => {
     return (
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorClass}`}>
             <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${dotColor}`}></span>
-            {status}
+            {displayStatus}
         </span>
     );
 };
@@ -97,11 +105,13 @@ const HouseholdDetail = () => {
         if (window.confirm('Bạn có chắc chắn muốn xóa nhân khẩu này?')) {
             try {
                 const token = getAuthToken();
+                
                 const response = await fetch(`http://localhost:5000/api/residents/${residentId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
+                    
                 });
 
                 if (response.ok) {
@@ -121,6 +131,7 @@ const HouseholdDetail = () => {
     const handleSaveMember = async (memberData) => {
         try {
             const token = getAuthToken();
+            
             const url = editingMember 
                 ? `http://localhost:5000/api/residents/${editingMember.resident_id}`
                 : 'http://localhost:5000/api/residents';
@@ -132,6 +143,7 @@ const HouseholdDetail = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
+            
                 },
                 body: JSON.stringify(memberData),
             });
@@ -162,6 +174,7 @@ const HouseholdDetail = () => {
     ];
 
     const createTableData = (data) => data.map(member => ({
+    
         ...member,
         full_name: `${member.first_name} ${member.last_name}`,
         dob: new Date(member.dob).toLocaleDateString('vi-VN'),
@@ -208,13 +221,14 @@ const HouseholdDetail = () => {
         )
     }));
 
+
     if (loading) return <div>Loading...</div>;
     if (!household) return <div>Household not found</div>;
 
     return (
         <div className="p-6">
             <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold text-gray-800">Chi tiết hộ khẩu: {household.household_code}</h1>
+                <h2 className="page-title">Chi tiết hộ khẩu: {household.household_code}</h2>
             </div>
 
             <div className="detail-card">
@@ -265,13 +279,6 @@ const HouseholdDetail = () => {
             <div className="detail-card mt-6">
                 <div className="detail-card-header flex-between">
                     <h2 className="detail-card-title">Danh sách tạm trú (Chuyển đến)</h2>
-                    <Button 
-                        variant="primary" 
-                        className="btn-add-member"
-                        onClick={() => handleSelectType('MoveIn')}
-                    >
-                        + Thêm chuyển đến
-                    </Button>
                 </div>
                 
                 <div className="detail-card-body p-0">

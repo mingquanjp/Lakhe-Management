@@ -1,5 +1,10 @@
 const pool = require('../config/database');
 
+const cleanValue = (val) => {
+  if (val === '' || val === undefined || val === 'null') return null;
+  return val;
+};
+
 // 1. Create new resident (Thêm mới nhân khẩu - Sinh con hoặc chuyển đến)
 const createResident = async (req, res) => {
   try {
@@ -54,24 +59,24 @@ const createResident = async (req, res) => {
     `;
 
     const values = [
-      household_id, 
-      first_name, 
-      last_name, 
-      cleanValue(nickname), 
-      dob, 
+      household_id,
+      first_name,
+      last_name,
+      cleanValue(nickname),
+      dob,
       gender,
-      cleanValue(place_of_birth), 
-      cleanValue(place_of_origin), 
-      cleanValue(ethnicity), 
-      cleanValue(occupation), 
+      cleanValue(place_of_birth),
+      cleanValue(place_of_origin),
+      cleanValue(ethnicity),
+      cleanValue(occupation),
       cleanValue(workplace),
-      cleanValue(identity_card_number), 
-      cleanValue(identity_card_date), 
+      cleanValue(identity_card_number),
+      cleanValue(identity_card_date),
       cleanValue(identity_card_place),
-      registration_date || new Date(), 
-      cleanValue(previous_address), 
-      relationship_to_head, 
-      cleanValue(notes), 
+      registration_date || new Date(),
+      cleanValue(previous_address),
+      relationship_to_head,
+      cleanValue(notes),
       status || 'Permanent',
       cleanValue(temp_home_address),
       cleanValue(temp_start_date),
@@ -84,18 +89,18 @@ const createResident = async (req, res) => {
 
     // Log history
     try {
-        // Map 'MoveIn' to 'Added', or default to 'NewBirth' if specified, else 'Added'
-        const userId = req.user ? req.user.user_id : 1;
-        let historyType = 'Added';
-        if (change_type === 'NewBirth') historyType = 'NewBirth';
-        
-        await pool.query(
-            `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
+      // Map 'MoveIn' to 'Added', or default to 'NewBirth' if specified, else 'Added'
+      const userId = req.user ? req.user.user_id : 1;
+      let historyType = 'Added';
+      if (change_type === 'NewBirth') historyType = 'NewBirth';
+
+      await pool.query(
+        `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
              VALUES ($1, $2, $3, $4)`,
-            [household_id, newResident.resident_id, historyType, userId]
-        );
+        [household_id, newResident.resident_id, historyType, userId]
+      );
     } catch (histError) {
-        console.error('Error logging history:', histError);
+      console.error('Error logging history:', histError);
     }
 
     res.status(201).json({
@@ -117,7 +122,7 @@ const createResident = async (req, res) => {
 const getAllResidents = async (req, res) => {
   try {
     const { household_id, status, search } = req.query;
-    
+
     let query = `
       SELECT r.*, h.household_code 
       FROM residents r
@@ -168,14 +173,14 @@ const getAllResidents = async (req, res) => {
 const getResidentById = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const query = `
       SELECT r.*, h.household_code, h.address as household_address
       FROM residents r
       LEFT JOIN households h ON r.household_id = h.household_id
       WHERE r.resident_id = $1
     `;
-    
+
     const result = await pool.query(query, [id]);
 
     if (result.rows.length === 0) {
@@ -204,10 +209,10 @@ const updateResident = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
-    
+
     // Filter out fields that shouldn't be updated directly or handle them specifically if needed
     // For simplicity, we'll construct a dynamic update query
-    
+
     const allowedUpdates = [
       'first_name', 'last_name', 'nickname', 'dob', 'gender',
       'place_of_birth', 'place_of_origin', 'ethnicity', 'occupation', 'workplace',
@@ -217,7 +222,7 @@ const updateResident = async (req, res) => {
     ];
 
     const keys = Object.keys(updates).filter(key => allowedUpdates.includes(key));
-    
+
     if (keys.length === 0) {
       return res.status(400).json({
         success: false,
@@ -251,21 +256,21 @@ const updateResident = async (req, res) => {
 
     // Log history
     try {
-        let changeType = 'UpdateInfo';
-        const userId = req.user ? req.user.user_id : 1;
+      let changeType = 'UpdateInfo';
+      const userId = req.user ? req.user.user_id : 1;
 
-        if (updates.status) {
-            if (updates.status === 'Deceased') changeType = 'Death';
-            else if (updates.status === 'MovedOut') changeType = 'MoveOut';
-        }
+      if (updates.status) {
+        if (updates.status === 'Deceased') changeType = 'Death';
+        else if (updates.status === 'MovedOut') changeType = 'MoveOut';
+      }
 
-        await pool.query(
-            `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
+      await pool.query(
+        `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
              VALUES ($1, $2, $3, $4)`,
-            [updatedResident.household_id, id, changeType, userId]
-        );
+        [updatedResident.household_id, id, changeType, userId]
+      );
     } catch (histError) {
-        console.error('Error logging history:', histError);
+      console.error('Error logging history:', histError);
     }
 
     res.status(200).json({
@@ -318,14 +323,14 @@ const deleteResident = async (req, res) => {
 
     // Log history
     try {
-        const userId = req.user ? req.user.user_id : 1;
-        await pool.query(
-            `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
+      const userId = req.user ? req.user.user_id : 1;
+      await pool.query(
+        `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
              VALUES ($1, $2, 'MoveOut', $3)`,
-            [deletedResident.household_id, id, userId]
-        );
+        [deletedResident.household_id, id, userId]
+      );
     } catch (histError) {
-        console.error('Error logging history:', histError);
+      console.error('Error logging history:', histError);
     }
 
     res.status(200).json({
@@ -352,17 +357,14 @@ const registerTemporaryResidence = async (req, res) => {
       identity_card_number,
       dob,
       gender,
-      permanent_address,
-      temporary_address,
-      phone_number,
-      email,
-      job,
-      workplace,
-      host_name,
-      relationship_with_host,
+      home_address, // This will be mapped to place_of_origin (Quê quán)
       reason,
       start_date,
-      end_date
+      end_date,
+      occupation,
+      workplace,
+      email, // Not stored in DB currently
+      phone  // Not stored in DB currently
     } = req.body;
 
     if (!first_name || !last_name || !start_date || !end_date) {
@@ -372,25 +374,41 @@ const registerTemporaryResidence = async (req, res) => {
       });
     }
 
+    // Insert into residents table with status = 'Temporary'
+    // Mapping home_address (Quê quán) to place_of_origin
+    // Mapping occupation, workplace
     const query = `
-      INSERT INTO temporary_residents (
-        first_name, last_name, identity_card_number, dob, gender,
-        permanent_address, temporary_address, phone_number, email,
-        job, workplace, host_name, relationship_with_host,
-        reason, start_date, end_date
+      INSERT INTO residents (
+        household_id, first_name, last_name, identity_card_number,
+        dob, gender, 
+        place_of_origin, occupation, workplace,
+        temp_reason, temp_start_date, temp_end_date,
+        status, relationship_to_head, registration_date
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Temporary', 'Tạm trú', CURRENT_DATE)
       RETURNING *
     `;
 
     const values = [
-      first_name, last_name, identity_card_number, dob, gender,
-      permanent_address, temporary_address, phone_number, email,
-      job, workplace, host_name, relationship_with_host,
-      reason, start_date, end_date
+      host_household_id, first_name, last_name, cleanValue(identity_card_number),
+      dob, gender,
+      cleanValue(home_address), cleanValue(occupation), cleanValue(workplace),
+      cleanValue(reason), cleanValue(start_date), cleanValue(end_date)
     ];
 
     const result = await pool.query(query, values);
+
+    // Log history
+    try {
+      const userId = req.user ? req.user.user_id : 1;
+      await pool.query(
+        `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
+             VALUES ($1, $2, 'Added', $3)`,
+        [host_household_id, result.rows[0].resident_id, userId]
+      );
+    } catch (histError) {
+      console.error('Error logging history:', histError);
+    }
 
     res.status(201).json({
       success: true,
@@ -401,7 +419,7 @@ const registerTemporaryResidence = async (req, res) => {
     console.error('Error registering temporary residence:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi server khi đăng ký tạm trú',
+      message: 'Lỗi server khi đăng ký tạm trú: ' + error.message,
       error: error.message
     });
   }
@@ -428,7 +446,7 @@ const registerTemporaryAbsence = async (req, res) => {
     if (!first_name || !last_name || !start_date) {
       return res.status(400).json({
         success: false,
-        message: 'Vui lòng nhập tên và ngày bắt đầu'
+        message: 'Vui lòng nhập resident_id và ngày bắt đầu'
       });
     }
 
@@ -438,13 +456,13 @@ const registerTemporaryAbsence = async (req, res) => {
 
     // If resident_id is provided, verify it exists
     if (residentId) {
-        const checkQuery = `SELECT resident_id, household_id FROM residents WHERE resident_id = $1`;
-        const checkResult = await pool.query(checkQuery, [residentId]);
-        if (checkResult.rows.length > 0) {
-            householdId = checkResult.rows[0].household_id;
-        } else {
-            residentId = null; // Invalid ID, fall back to lookup
-        }
+      const checkQuery = `SELECT resident_id, household_id FROM residents WHERE resident_id = $1`;
+      const checkResult = await pool.query(checkQuery, [residentId]);
+      if (checkResult.rows.length > 0) {
+        householdId = checkResult.rows[0].household_id;
+      } else {
+        residentId = null; // Invalid ID, fall back to lookup
+      }
     }
 
     // Try to find resident by identity_card_number if not found by ID
@@ -459,26 +477,26 @@ const registerTemporaryAbsence = async (req, res) => {
 
     // If not found by ID card, try by name and dob
     if (!residentId) {
-       const fullName = `${last_name} ${first_name}`.trim();
-       console.log('Searching resident by Name/DOB:', { fullName, dob });
-       
-       // DEBUG: Check if we can find by name ONLY
-       const nameCheck = await pool.query(`
+      const fullName = `${last_name} ${first_name}`.trim();
+      console.log('Searching resident by Name/DOB:', { fullName, dob });
+
+      // DEBUG: Check if we can find by name ONLY
+      const nameCheck = await pool.query(`
           SELECT resident_id, first_name, last_name, dob 
           FROM residents 
           WHERE LOWER(TRIM(first_name || ' ' || last_name)) = LOWER(TRIM($1))
           OR LOWER(TRIM(last_name || ' ' || first_name)) = LOWER(TRIM($1))
        `, [fullName]);
-       console.log('Found by name only:', nameCheck.rows.length, 'records');
-       if (nameCheck.rows.length > 0) {
-           console.log('First match DOB:', nameCheck.rows[0].dob);
-       }
+      console.log('Found by name only:', nameCheck.rows.length, 'records');
+      if (nameCheck.rows.length > 0) {
+        console.log('First match DOB:', nameCheck.rows[0].dob);
+      }
 
-       // Check both combinations of first_name/last_name in DB against the full name provided
-       // AND handle date comparison carefully
-       // Note: We cast $2 to ::text explicitly in the second condition to avoid "operator does not exist: text = date"
-       // because usage of $2::date elsewhere might cause PG to infer $2 as date type for the whole query.
-       const residentQueryByName = `
+      // Check both combinations of first_name/last_name in DB against the full name provided
+      // AND handle date comparison carefully
+      // Note: We cast $2 to ::text explicitly in the second condition to avoid "operator does not exist: text = date"
+      // because usage of $2::date elsewhere might cause PG to infer $2 as date type for the whole query.
+      const residentQueryByName = `
           SELECT resident_id, household_id 
           FROM residents 
           WHERE (
@@ -492,23 +510,23 @@ const registerTemporaryAbsence = async (req, res) => {
             TO_CHAR(dob, 'YYYY-MM-DD') = $2::text
           )
        `;
-       
-       const residentResultByName = await pool.query(residentQueryByName, [fullName, dob]);
-       
-       if (residentResultByName.rows.length > 0) {
-          residentId = residentResultByName.rows[0].resident_id;
-          householdId = residentResultByName.rows[0].household_id;
-          console.log('Found resident by Name/DOB:', residentId);
-       } else {
-          console.log('Resident not found by Name/DOB');
-       }
+
+      const residentResultByName = await pool.query(residentQueryByName, [fullName, dob]);
+
+      if (residentResultByName.rows.length > 0) {
+        residentId = residentResultByName.rows[0].resident_id;
+        householdId = residentResultByName.rows[0].household_id;
+        console.log('Found resident by Name/DOB:', residentId);
+      } else {
+        console.log('Resident not found by Name/DOB');
+      }
     }
 
     if (!residentId) {
-        return res.status(404).json({
-            success: false,
-            message: `Không tìm thấy nhân khẩu trong hệ thống. Đã tìm kiếm: Tên="${last_name} ${first_name}", Ngày sinh="${dob}", CCCD="${identity_card_number || 'Không có'}". Vui lòng kiểm tra chính xác họ tên (có dấu) và ngày sinh.`
-        });
+      return res.status(404).json({
+        success: false,
+        message: `Không tìm thấy nhân khẩu trong hệ thống. Đã tìm kiếm: Tên="${last_name} ${first_name}", Ngày sinh="${dob}", CCCD="${identity_card_number || 'Không có'}". Vui lòng kiểm tra chính xác họ tên (có dấu) và ngày sinh.`
+      });
     }
 
     // 2. Insert into temporary_absences using resident_id
@@ -522,10 +540,10 @@ const registerTemporaryAbsence = async (req, res) => {
     `;
 
     const values = [
-      residentId, 
+      residentId,
       temporary_address, // Map temporary_address to destination_address
-      reason, 
-      start_date, 
+      reason,
+      start_date,
       end_date
     ];
 
@@ -534,12 +552,12 @@ const registerTemporaryAbsence = async (req, res) => {
 
     // Log history
     try {
-        const userId = req.user ? req.user.user_id : 1;
-        await pool.query(
-          `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
-           VALUES ($1, $2, 'TemporaryAbsence', $3)`,
-          [householdId, residentId, userId]
-        );
+      const userId = req.user ? req.user.user_id : 1;
+      await pool.query(
+        `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
+           VALUES ($1, $2, 'MoveOut', $3)`,
+        [householdId, residentId, userId]
+      );
     } catch (histError) {
       console.error('Error logging history for temporary absence:', histError);
     }
@@ -591,13 +609,13 @@ const declareDeath = async (req, res) => {
 
     // Log history
     try {
-        await pool.query(
-            `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
+      await pool.query(
+        `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
              VALUES ($1, $2, 'Death', $3)`,
-            [result.rows[0].household_id, id, 1]
-        );
+        [result.rows[0].household_id, id, 1]
+      );
     } catch (histError) {
-        console.error('Error logging history:', histError);
+      console.error('Error logging history:', histError);
     }
 
     res.status(200).json({
@@ -622,10 +640,12 @@ const getExpiringTemporaryResidents = async (req, res) => {
     const daysLimit = parseInt(days) || 30; // Default 30 days
 
     const query = `
-      SELECT *
-      FROM temporary_residents
-      WHERE end_date BETWEEN CURRENT_DATE AND CURRENT_DATE + interval '${daysLimit} days'
-      ORDER BY end_date ASC
+      SELECT r.*, h.household_code, h.address as host_address
+      FROM residents r
+      JOIN households h ON r.household_id = h.household_id
+      WHERE r.status = 'Temporary' 
+      AND r.temp_end_date BETWEEN CURRENT_DATE AND CURRENT_DATE + interval '${daysLimit} days'
+      ORDER BY r.temp_end_date ASC
     `;
 
     const result = await pool.query(query);
@@ -650,7 +670,11 @@ const getExpiringTemporaryResidents = async (req, res) => {
 const getTemporaryResidents = async (req, res) => {
   try {
     const query = `
-      SELECT * FROM temporary_residents ORDER BY start_date DESC
+      SELECT r.*, h.household_code, h.address as host_address
+      FROM residents r
+      LEFT JOIN households h ON r.household_id = h.household_id
+      WHERE r.status = 'Temporary'
+      ORDER BY r.temp_start_date DESC
     `;
     const result = await pool.query(query);
     res.status(200).json({
@@ -683,7 +707,7 @@ const getTemporaryAbsences = async (req, res) => {
       FROM temporary_absences ta
       LEFT JOIN residents r ON ta.resident_id = r.resident_id
       LEFT JOIN households h ON r.household_id = h.household_id
-      ORDER BY ta.start_date DESC
+      ORDER BY ta.absence_id DESC
     `;
     const result = await pool.query(query);
     res.status(200).json({
@@ -700,8 +724,10 @@ const getTemporaryAbsences = async (req, res) => {
 const deleteTemporaryAbsence = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user ? req.user.user_id : 1;
 
-    const query = 'DELETE FROM temporary_absences WHERE id = $1 RETURNING *';
+    // 1. Delete and get resident info
+    const query = 'DELETE FROM temporary_absences WHERE absence_id = $1 RETURNING *';
     const result = await pool.query(query, [id]);
 
     if (result.rows.length === 0) {
@@ -711,10 +737,30 @@ const deleteTemporaryAbsence = async (req, res) => {
       });
     }
 
+    const deletedRecord = result.rows[0];
+    const residentId = deletedRecord.resident_id;
+
+    // 2. Get household_id for history logging
+    try {
+      const residentRes = await pool.query('SELECT household_id FROM residents WHERE resident_id = $1', [residentId]);
+      if (residentRes.rows.length > 0) {
+        const householdId = residentRes.rows[0].household_id;
+
+        // 3. Log to history
+        await pool.query(
+          `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
+                 VALUES ($1, $2, 'UpdateInfo', $3)`,
+          [householdId, residentId, userId]
+        );
+      }
+    } catch (histError) {
+      console.error('Error logging history for delete temporary absence:', histError);
+    }
+
     res.status(200).json({
       success: true,
       message: 'Xóa bản ghi tạm vắng thành công',
-      data: result.rows[0]
+      data: deletedRecord
     });
   } catch (error) {
     console.error('Error deleting temporary absence:', error);

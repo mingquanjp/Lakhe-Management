@@ -1,4 +1,5 @@
 -- 1. Bảng Users (Cán bộ quản lý)
+-- Dùng full_name như đã thống nhất
 CREATE TABLE users
 (
     user_id SERIAL PRIMARY KEY,
@@ -12,14 +13,10 @@ CREATE TABLE users
 CREATE TABLE households
 (
     household_id SERIAL PRIMARY KEY,
-    household_code VARCHAR(20) UNIQUE NOT NULL,
-    -- Số sổ hộ khẩu
-    head_of_household_id INT,
-    -- Chủ hộ
-    address VARCHAR(100) NOT NULL,
-    -- Địa chỉ
-    date_created DATE DEFAULT CURRENT_DATE,
-    -- Ngày tạo
+    household_code VARCHAR(20) UNIQUE NOT NULL, -- Số sổ hộ khẩu
+    head_of_household_id INT, -- Chủ hộ
+    address VARCHAR(100) NOT NULL, -- Địa chỉ
+    date_created DATE DEFAULT CURRENT_DATE, -- Ngày tạo
     deleted_at TIMESTAMP DEFAULT NULL,
     status VARCHAR(20) DEFAULT 'Active' CHECK (status IN ('Active', 'MovedOut', 'Temporary'))
     -- 'Active', 'MovedOut', 'Temporary'
@@ -32,16 +29,11 @@ CREATE TABLE residents
     resident_id SERIAL PRIMARY KEY,
     household_id INT NOT NULL,
     -- 2. Thông tin cá nhân
-    first_name VARCHAR(50) NOT NULL,
-    -- Họ (Ví dụ: Nguyễn)
-    last_name VARCHAR(50) NOT NULL,
-    -- Tên (Ví dụ: An)
-    nickname VARCHAR(50),
-    -- Tên gọi
-    dob DATE NOT NULL,
-    -- Ngày sinh
-    gender VARCHAR(10) NOT NULL CHECK (gender IN ('Male', 'Female')),
-    -- 'Male', 'Female'
+    first_name VARCHAR(50) NOT NULL, -- Họ (Ví dụ: Nguyễn)
+    last_name VARCHAR(50) NOT NULL, -- Tên (Ví dụ: An)
+    nickname VARCHAR(50), -- Tên gọi
+    dob DATE NOT NULL, -- Ngày sinh
+    gender VARCHAR(10) NOT NULL CHECK (gender IN ('Male', 'Female')), -- 'Male', 'Female'
     -- 3. Quê quán
     place_of_birth VARCHAR(255),
     -- Nơi sinh
@@ -81,8 +73,7 @@ CREATE TABLE residents
     -- Lý do tạm trú
     -- 8. Trạng thái
     deleted_at TIMESTAMP DEFAULT NULL,
-    status VARCHAR(20) DEFAULT 'Permanent' CHECK (status IN ('Permanent', 'MovedOut', 'Deceased', 'Temporary')) ,
-    -- 'Permanent', 'MovedOut', 'Deceased', 'Temporary'
+    status VARCHAR(20) DEFAULT 'Permanent' CHECK (status IN ('Permanent', 'MovedOut', 'Deceased', 'Temporary')) , -- 'Permanent', 'MovedOut', 'Deceased', 'Temporary'
 
     -- Tạo khóa ngoại liên kết với bảng Households
     CONSTRAINT fk_household 
@@ -91,7 +82,8 @@ CREATE TABLE residents
 
     -- 9. Kiểm tra logic tạm trú
     CONSTRAINT check_temporary_logic CHECK (
-        (status = 'Temporary' AND temp_start_date IS NOT NULL AND temp_end_date IS NOT NULL) OR
+        (status = 'Temporary' AND temp_start_date IS NOT NULL AND temp_end_date IS NOT NULL)
+        OR
         (status <> 'Temporary') -- Nếu không phải tạm trú thì thoải mái
     )
 );
@@ -106,16 +98,11 @@ REFERENCES residents(resident_id);
 CREATE TABLE temporary_absences
 (
     absence_id SERIAL PRIMARY KEY,
-    resident_id INT NOT NULL,
-    -- Nhân khẩu
-    destination_address VARCHAR(255),
-    -- Nơi chuyển đến tạm thời
-    reason TEXT,
-    -- Lý do
-    start_date DATE NOT NULL,
-    -- Ngày bắt đầu
-    end_date DATE,
-    -- Ngày kết thúc
+    resident_id INT NOT NULL, -- Nhân khẩu
+    destination_address VARCHAR(255), -- Nơi chuyển đến tạm thời
+    reason TEXT, -- Lý do
+    start_date DATE NOT NULL, -- Ngày bắt đầu
+    end_date DATE, -- Ngày kết thúc
 
     CONSTRAINT fk_absent_resident
         FOREIGN KEY (resident_id)
@@ -147,14 +134,10 @@ CREATE TABLE payment_history
     payment_id SERIAL PRIMARY KEY,
     fee_id INT NOT NULL,
     household_id INT NOT NULL,
-    amount_paid BIGINT NOT NULL CHECK (amount_paid >= 0),
-    -- Số tiền nộp
-    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    -- Ngày nộp
-    collected_by_user_id INT NOT NULL,
-    -- Cán bộ thu tiền
-    notes TEXT,
-    -- Ghi chú
+    amount_paid BIGINT NOT NULL CHECK (amount_paid >= 0), -- Số tiền nộp
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Ngày nộp
+    collected_by_user_id INT NOT NULL, -- Cán bộ thu tiền
+    notes TEXT, -- Ghi chú
 
     CONSTRAINT fk_payment_fee FOREIGN KEY (fee_id) REFERENCES fees(fee_id),
     CONSTRAINT fk_payment_household FOREIGN KEY (household_id) REFERENCES households(household_id),
@@ -166,20 +149,13 @@ CREATE TABLE payment_history
 CREATE TABLE change_history
 (
     history_id SERIAL PRIMARY KEY,
-    household_id INT,
-    -- Hộ khẩu (Nếu là NULL thì là thay đổi phí)
-    resident_id INT,
-    -- Nhân khẩu (Nếu là NULL thì là thay đổi hộ khẩu hoặc phí)
-    fee_id INT,
-    -- Phí (Nếu là NULL thì là thay đổi hộ khẩu hoặc nhân khẩu)
-    change_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    -- Ngày thay đổi
-    change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('Split', 'MoveOut', 'Temporary', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold', 'CreateFee', 'UpdateFee', 'DeleteFee')),
-    -- 'Split', 'MoveOut', 'Temporary', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold', 'CreateFee', 'UpdateFee', 'DeleteFee'
-    changed_by_user_id INT NOT NULL,
-    -- Người thực hiện thay đổi
-    notes TEXT,
-    -- Ghi chú
+    household_id INT, -- Hộ khẩu (Nếu là NULL thì là thay đổi phí)
+    resident_id INT, -- Nhân khẩu (Nếu là NULL thì là thay đổi hộ khẩu hoặc phí)
+    fee_id INT, -- Phí (Nếu là NULL thì là thay đổi hộ khẩu hoặc nhân khẩu)
+    change_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Ngày thay đổi
+    change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('Split', 'MoveOut', 'Temporary', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold', 'CreateFee', 'UpdateFee', 'DeleteFee')), -- 'Split', 'MoveOut', 'Temporary', 'Death', 'NewBirth', 'Added', 'Removed', 'ChangeHeadOfHousehold', 'CreateFee', 'UpdateFee', 'DeleteFee'
+    changed_by_user_id INT NOT NULL, -- Người thực hiện thay đổi
+    notes TEXT, -- Ghi chú
 
     CONSTRAINT fk_history_household FOREIGN KEY (household_id) REFERENCES households(household_id),
     CONSTRAINT fk_history_resident FOREIGN KEY (resident_id) REFERENCES residents(resident_id),

@@ -41,12 +41,32 @@ app.use("/api/auth", authRoutes);
 app.use("/api/fees", feeRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/finance", financeRoutes);
-app.use('/api/households', householdRoutes);
+
+
+// Example protected route - requires valid JWT token
+app.get("/api/test-protected", verifyToken, (req, res) => {
+  res.json({
+    success: true,
+    message: "Bạn đã truy cập route được bảo vệ thành công!",
+    user: req.user,
+  });
+});
+
+// Example admin-only route
+app.get("/api/test-admin", verifyToken, requireAdmin, (req, res) => {
+  res.json({
+    success: true,
+    message: "Chào mừng Admin!",
+    user: req.user,
+  });
+});
+
+app.use('/api/households', householdRoutes); 
 app.use("/api/residents", residentRoutes);
 app.use("/api/overview", overviewRoutes);
 app.use("/api/history", historyRoutes);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log('Server running on port ' + PORT);
+
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
 });

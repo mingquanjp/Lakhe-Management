@@ -119,10 +119,14 @@ export const fetchHouseholds = async () => {
   }
 };
 
-export const getHouseholdById = async (id) => {
+export const getHouseholdById = async (id, includeDeleted = false) => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/households/${id}`, {
+    const url = includeDeleted
+      ? `${API_BASE_URL}/api/households/${id}?includeDeleted=true`
+      : `${API_BASE_URL}/api/households/${id}`;
+
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -447,14 +451,14 @@ export const fetchAllHouseholdsWithPaymentSummary = async () => {
   }
 };
 export const fetchOverviewStats = async () => {
-  const token = getAuthToken(); 
-  
+  const token = getAuthToken();
+
   try {
     const response = await fetch(`${API_BASE_URL}/api/overview`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` 
+        'Authorization': `Bearer ${token}`
       },
     });
 
@@ -464,7 +468,7 @@ export const fetchOverviewStats = async () => {
       throw new Error(data.message || 'Lỗi khi lấy dữ liệu thống kê');
     }
 
-    return data; 
+    return data;
   } catch (error) {
     throw error;
   }
@@ -473,7 +477,7 @@ export const fetchOverviewStats = async () => {
 
 export const fetchTemporaryHouseholds = async (searchTerm = '') => {
   const token = getAuthToken();
-  
+
   let url = `${API_BASE_URL}/api/households/temporary`;
   if (searchTerm) {
     url += `?search=${encodeURIComponent(searchTerm)}`;
@@ -484,7 +488,7 @@ export const fetchTemporaryHouseholds = async (searchTerm = '') => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` 
+        'Authorization': `Bearer ${token}`
       },
     });
 
@@ -494,7 +498,7 @@ export const fetchTemporaryHouseholds = async (searchTerm = '') => {
       throw new Error(data.message || 'Lỗi khi lấy danh sách tạm trú');
     }
 
-    return data; 
+    return data;
   } catch (error) {
     throw error;
   }

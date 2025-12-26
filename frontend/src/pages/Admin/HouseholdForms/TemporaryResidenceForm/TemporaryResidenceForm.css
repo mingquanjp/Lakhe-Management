@@ -48,6 +48,7 @@
 .temporary-residence-form.theme-yellow button {
     box-shadow: 0 4px 6px -1px rgba(234, 179, 8, 0.3);
 }
+
 .temporary-residence-form.theme-yellow button:hover {
     box-shadow: 0 6px 8px -1px rgba(234, 179, 8, 0.4);
 }
@@ -64,6 +65,7 @@
 .temporary-residence-form.theme-red button {
     box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);
 }
+
 .temporary-residence-form.theme-red button:hover {
     box-shadow: 0 6px 8px -1px rgba(220, 38, 38, 0.4);
 }
@@ -96,7 +98,8 @@
 }
 
 .suggestion-item:hover {
-    background-color: #fefce8; /* Light yellow hover to match theme */
+    background-color: #fefce8;
+    /* Light yellow hover to match theme */
 }
 
 .suggestion-name {
@@ -112,4 +115,47 @@
     display: flex;
     gap: 8px;
     margin-top: 2px;
+}
+
+/* Declaration Tabs Styles */
+.declaration-tabs-container {
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.declaration-tabs {
+    display: flex;
+    gap: 0;
+}
+
+.tab-button {
+    padding: 0.875rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1rem;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    position: relative;
+    bottom: -2px;
+}
+
+.tab-button:hover {
+    color: #374151;
+    background-color: #f9fafb;
+}
+
+.tab-button.active-yellow {
+    color: #ca8a04;
+    border-bottom-color: #eab308;
+    font-weight: 600;
+}
+
+.tab-button.active-red {
+    color: #dc2626;
+    border-bottom-color: #dc2626;
+    font-weight: 600;
 }
