@@ -123,21 +123,21 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
       className="household-detail-modal-wrapper"
     >
       <div className="household-detail-content">
-        <div className="household-info-card">
-          <div className="household-info-row">
-            <div className="info-item">
-              <span className="info-label">Số hộ khẩu:</span>
-              <span className="info-value">{household.household_code || household.householdId}</span>
+        <div className="staff-household-info-card">
+          <div className="staff-household-info-row">
+            <div className="staff-info-item">
+              <span className="staff-info-label">Số hộ khẩu:</span>
+              <span className="staff-info-value">{household.household_code || household.householdId}</span>
             </div>
-            <div className="info-item">
-              <span className="info-label">Họ và tên chủ hộ:</span>
-              <span className="info-value">{household.owner_name || household.ownerName}</span>
+            <div className="staff-info-item">
+              <span className="staff-info-label">Họ và tên chủ hộ:</span>
+              <span className="staff-info-value">{household.owner_name || household.ownerName}</span>
             </div>
           </div>
-          <div className="household-info-row">
-            <div className="info-item">
-              <span className="info-label">Địa chỉ:</span>
-              <span className="info-value">{household.address || household.houseNumber}</span>
+          <div className="staff-household-info-row">
+            <div className="staff-info-item">
+              <span className="staff-info-label">Địa chỉ:</span>
+              <span className="staff-info-value">{household.address || household.houseNumber}</span>
             </div>
           </div>
         </div>
