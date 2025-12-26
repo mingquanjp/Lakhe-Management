@@ -132,7 +132,7 @@ const TemporaryAbsenceList = () => {
             />
           </div>
           <button className="btn-tool" onClick={handleExport}>
-            <Download size={16} /> Export
+            <Download size={16} /> Xuất Excel
           </button>
         </div>
       </div>

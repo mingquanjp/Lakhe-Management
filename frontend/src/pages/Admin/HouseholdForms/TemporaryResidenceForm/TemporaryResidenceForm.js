@@ -34,6 +34,7 @@ const TemporaryResidenceForm = () => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedResidentId, setSelectedResidentId] = useState(null);
     const [households, setHouseholds] = useState([]); // List of households for selection
+    const [members, setMembers] = useState([]); // List of members for temporary absence selection
     const searchTimeoutRef = useRef(null);
     const wrapperRef = useRef(null);
 
@@ -49,9 +50,9 @@ const TemporaryResidenceForm = () => {
         };
     }, [wrapperRef]);
 
-    // Fetch households when switching to 'existing' type
+    // Fetch households when switching to 'existing' type or 'temporary_absence'
     useEffect(() => {
-        if (formData.type === 'temporary_residence_existing') {
+        if (formData.type === 'temporary_residence_existing' || formData.type === 'temporary_absence') {
             fetchHouseholds();
         }
     }, [formData.type]);
@@ -83,16 +84,60 @@ const TemporaryResidenceForm = () => {
         }
     };
 
-    const handleHouseholdChange = (e) => {
+    const handleHouseholdChange = async (e) => {
         const householdId = e.target.value;
         const selectedHousehold = households.find(h => h.household_id === parseInt(householdId));
         
-        setFormData(prev => ({
-            ...prev,
-            hostHouseholdId: householdId,
-            hostName: selectedHousehold ? selectedHousehold.owner_name : '',
-            tempAddress: selectedHousehold ? selectedHousehold.address : ''
-        }));
+        if (formData.type === 'temporary_residence_existing') {
+            setFormData(prev => ({
+                ...prev,
+                hostHouseholdId: householdId,
+                hostName: selectedHousehold ? selectedHousehold.owner_name : '',
+                tempAddress: selectedHousehold ? selectedHousehold.address : ''
+            }));
+        } else if (formData.type === 'temporary_absence') {
+            setFormData(prev => ({
+                ...prev,
+                hostHouseholdId: householdId,
+                householdCode: selectedHousehold ? selectedHousehold.household_code : '',
+                permanentAddress: selectedHousehold ? selectedHousehold.address : ''
+            }));
+            
+            if (householdId) {
+                try {
+                    const token = getAuthToken();
+                    const response = await fetch(`http://localhost:5000/api/households/${householdId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        setMembers(data.residents || []);
+                    }
+                } catch (error) {
+                    console.error("Error fetching members:", error);
+                }
+            } else {
+                setMembers([]);
+            }
+        }
+    };
+
+    const handleMemberChange = (e) => {
+        const residentId = e.target.value;
+        const selectedMember = members.find(m => m.resident_id === parseInt(residentId));
+        
+        if (selectedMember) {
+            setSelectedResidentId(selectedMember.resident_id);
+            setFormData(prev => ({
+                ...prev,
+                fullName: `${selectedMember.last_name} ${selectedMember.first_name}`,
+                dob: selectedMember.dob ? new Date(selectedMember.dob).toISOString().split('T')[0] : '',
+                identityCard: selectedMember.identity_card_number || '',
+            }));
+        } else {
+             setSelectedResidentId(null);
+             setFormData(prev => ({ ...prev, fullName: '', dob: '', identityCard: '' }));
+        }
     };
 
     const handleSearchChange = (e) => {
@@ -326,7 +371,7 @@ const TemporaryResidenceForm = () => {
                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin cá nhân</h3>
                         
                         {/* Conditional Household Code / Selection */}
-                        {formData.type === 'temporary_residence_existing' ? (
+                        {(formData.type === 'temporary_residence_existing' || formData.type === 'temporary_absence') ? (
                             <div className="input-group">
                                 <label className="input-label">Chọn hộ khẩu thường trú</label>
                                 <select 
@@ -356,29 +401,51 @@ const TemporaryResidenceForm = () => {
                         )}
                         
                         <div style={{ position: 'relative' }} ref={wrapperRef}>
-                            <Input
-                                label="Họ và tên"
-                                name="fullName"
-                                value={formData.fullName}
-                                onChange={!isTemporaryResidence ? handleSearchChange : handleChange}
-                                required
-                                autoComplete="off"
-                            />
-                            {!isTemporaryResidence && showSuggestions && searchResults.length > 0 && (
-                                <div className="suggestion-box">
-                                    {searchResults.map(resident => (
-                                        <div 
-                                            key={resident.resident_id}
-                                            className="suggestion-item"
-                                            onClick={() => handleSelectResident(resident)}
-                                        >
-                                            <span className="suggestion-name">{resident.last_name} {resident.first_name}</span>
-                                            <span className="suggestion-details">
-                                                {new Date(resident.dob).toLocaleDateString('vi-VN')} - {resident.household_code}
-                                            </span>
-                                        </div>
-                                    ))}
+                            {formData.type === 'temporary_absence' ? (
+                                <div className="input-group">
+                                    <label className="input-label">Chọn thành viên</label>
+                                    <select 
+                                        className="input-field"
+                                        onChange={handleMemberChange}
+                                        value={selectedResidentId || ''}
+                                        required
+                                        disabled={!formData.hostHouseholdId}
+                                    >
+                                        <option value="">-- Chọn thành viên --</option>
+                                        {members.map(m => (
+                                            <option key={m.resident_id} value={m.resident_id}>
+                                                {m.last_name} {m.first_name} ({new Date(m.dob).getFullYear()})
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
+                            ) : (
+                                <>
+                                    <Input
+                                        label="Họ và tên"
+                                        name="fullName"
+                                        value={formData.fullName}
+                                        onChange={!isTemporaryResidence ? handleSearchChange : handleChange}
+                                        required
+                                        autoComplete="off"
+                                    />
+                                    {!isTemporaryResidence && showSuggestions && searchResults.length > 0 && (
+                                        <div className="suggestion-box">
+                                            {searchResults.map(resident => (
+                                                <div 
+                                                    key={resident.resident_id}
+                                                    className="suggestion-item"
+                                                    onClick={() => handleSelectResident(resident)}
+                                                >
+                                                    <span className="suggestion-name">{resident.last_name} {resident.first_name}</span>
+                                                    <span className="suggestion-details">
+                                                        {new Date(resident.dob).toLocaleDateString('vi-VN')} - {resident.household_code}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
 

@@ -691,7 +691,7 @@ const getTemporaryAbsences = async (req, res) => {
       FROM temporary_absences ta
       LEFT JOIN residents r ON ta.resident_id = r.resident_id
       LEFT JOIN households h ON r.household_id = h.household_id
-      ORDER BY ta.start_date DESC
+      ORDER BY ta.absence_id DESC
     `;
     const result = await pool.query(query);
     res.status(200).json({
