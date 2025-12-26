@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Search, Filter, Download, Split, X } from "lucide-react";
+import { Search, Filter, Download, Split} from "lucide-react";
 import "./HouseholdList.css";
 import HouseholdTable from "./HouseholdTable";
 import Pagination from "../../../components/commons/Pagination";
 import HouseholdAddModal from "./HouseholdAddModal";
 import HouseholdSplitModal from "./HouseholdSplitModal";
+import Modal from "../../../components/commons/Modal/Modal";
 import {
   fetchHouseholds,
   createHousehold,
@@ -27,6 +28,8 @@ const HouseholdList = () => {
     minMembers: "",
     maxMembers: "",
   });
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [householdToDelete, setHouseholdToDelete] = useState(null);
   const itemsPerPage = 8;
 
   const loadData = async () => {
@@ -74,12 +77,6 @@ const HouseholdList = () => {
     setCurrentPage(1);
   };
 
-  const clearFilters = () => {
-    setFilters({ minMembers: "", maxMembers: "" });
-    setSearchTerm("");
-    setCurrentPage(1);
-  };
-
   const handleSaveHousehold = async (formData) => {
     try {
       await createHousehold(formData);
@@ -93,13 +90,23 @@ const HouseholdList = () => {
   };
 
   const handleDelete = async (id) => {
+    setHouseholdToDelete(id);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!householdToDelete) return;
     try {
-      await deleteHousehold(id);
+      await deleteHousehold(householdToDelete);
       toast.success("Xóa thành công!");
+      setIsDeleteConfirmOpen(false);
+      setHouseholdToDelete(null);
       loadData();
     } catch (error) {
       console.error("Lỗi xóa:", error);
       alert(error.message || "Không thể xóa hộ khẩu này");
+      setIsDeleteConfirmOpen(false);
+      setHouseholdToDelete(null);
     }
   };
 
@@ -314,6 +321,54 @@ const HouseholdList = () => {
           onSave={handleSplitHousehold}
         />
       )}
+
+      <Modal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => {
+          setIsDeleteConfirmOpen(false);
+          setHouseholdToDelete(null);
+        }}
+        title="Xác nhận xóa"
+        size="sm"
+      >
+        <div style={{ padding: "20px" }}>
+          <p style={{ marginBottom: "20px", color: "#333" }}>
+            Bạn có chắc chắn muốn xóa hộ khẩu này? Thao tác này không thể hoàn tác.
+          </p>
+          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+            <button
+              className="btn-cancel"
+              onClick={() => {
+                setIsDeleteConfirmOpen(false);
+                setHouseholdToDelete(null);
+              }}
+              style={{
+                padding: "8px 16px",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                backgroundColor: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              Hủy
+            </button>
+            <button
+              className="btn-delete"
+              onClick={handleConfirmDelete}
+              style={{
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: "4px",
+                backgroundColor: "#f5222d",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              Xóa
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
