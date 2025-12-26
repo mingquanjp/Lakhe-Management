@@ -306,7 +306,7 @@ const TemporaryResidenceForm = () => {
                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin cá nhân</h3>
                         
                         {/* Conditional Household Code / Selection */}
-                        {formData.type === 'temporary_residence_existing' ? (
+                        {formData.type === 'temporary_residence_existing' && (
                             <div className="input-group">
                                 <label className="input-label">Chọn hộ khẩu thường trú</label>
                                 <select 
@@ -324,15 +324,6 @@ const TemporaryResidenceForm = () => {
                                     ))}
                                 </select>
                             </div>
-                        ) : (
-                            <Input
-                                label={isTemporaryResidence ? "Mã hộ khẩu (HKXXXXX)" : "Mã tạm vắng (HKXXXXX)"}
-                                name="householdCode"
-                                value={formData.householdCode}
-                                onChange={handleChange}
-                                required
-                                placeholder={isTemporaryResidence ? "Ví dụ: HK00001" : "Ví dụ: HK00001"}
-                            />
                         )}
                         
                         {/* Temporary Absence: Household and Member Selector */}
