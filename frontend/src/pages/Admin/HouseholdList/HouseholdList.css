@@ -29,7 +29,7 @@
 .search-icon { color: #adb5bd; margin-right: 8px; }
 .search-box input { border: none; outline: none; font-size: 14px; width: 100%; color: #525f7f; }
 
-.btn-tool {
+.btn-add-tool {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -38,7 +38,7 @@
   border-radius: 4px;
   padding: 8px 12px;
   font-size: 14px;
-  color: #525f7f;
+  color: #ffffff;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15);
   transition: all 0.2s;

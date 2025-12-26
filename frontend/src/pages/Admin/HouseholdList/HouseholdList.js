@@ -222,7 +222,7 @@ const HouseholdList = () => {
             <Download size={16} /> Xuất Excel
           </button>
           <button
-            className="btn-tool btn-add"
+            className="btn-add-tool btn-add"
             onClick={() => setIsAddModalOpen(true)}
           >
             <Split size={16} /> Thêm hộ khẩu
