@@ -477,7 +477,7 @@ const registerTemporaryAbsence = async (req, res) => {
 
     // If not found by ID card, try by name and dob
     if (!residentId) {
-      const fullName = `${last_name} ${first_name}`.trim();
+      const fullName = `${first_name} ${last_name}`.trim();
       console.log('Searching resident by Name/DOB:', { fullName, dob });
 
       // DEBUG: Check if we can find by name ONLY

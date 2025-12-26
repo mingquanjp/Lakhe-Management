@@ -57,7 +57,7 @@ const ChangeOwnerForm = () => {
                     setCurrentHeadId(data.household.head_of_household_id || null);
                     setFormData(prev => ({
                         ...prev,
-                        currentOwner: data.household.owner_name || 'Chưa có chủ hộ',
+                        currentOwner: data.household.head_name || 'Chưa có chủ hộ',
                         newOwnerId: ''
                     }));
                 }
@@ -132,7 +132,7 @@ const ChangeOwnerForm = () => {
                         <option value="">-- Chọn hộ khẩu --</option>
                         {households.map(h => (
                             <option key={h.household_id} value={h.household_id}>
-                                {h.household_code} - {h.owner_name}
+                                {h.household_code} - {h.head_name}
                             </option>
                         ))}
                     </select>

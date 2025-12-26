@@ -70,7 +70,7 @@ const MemberStatusChangeForm = () => {
     const handleSelectResident = (resident) => {
         setFormData(prev => ({
             ...prev,
-            memberName: `${resident.last_name} ${resident.first_name}`,
+            memberName: `${resident.first_name} ${resident.last_name}`,
             residentId: resident.resident_id
         }));
         setShowSuggestions(false);
@@ -167,7 +167,7 @@ const MemberStatusChangeForm = () => {
                                     className="suggestion-item"
                                     onClick={() => handleSelectResident(resident)}
                                 >
-                                    <div className="suggestion-name">{resident.last_name} {resident.first_name}</div>
+                                    <div className="suggestion-name">{resident.first_name} {resident.last_name}</div>
                                     <div className="suggestion-details">
                                         <span>HK: {resident.household_code || 'N/A'}</span>
                                         <span>•</span>

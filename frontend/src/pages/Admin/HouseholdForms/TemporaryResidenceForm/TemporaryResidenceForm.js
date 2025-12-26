@@ -79,7 +79,7 @@ const TemporaryResidenceForm = () => {
         setFormData(prev => ({
             ...prev,
             hostHouseholdId: householdId,
-            hostName: selectedHousehold ? selectedHousehold.owner_name : '',
+            hostName: selectedHousehold ? selectedHousehold.head_name : '',
             tempAddress: selectedHousehold ? selectedHousehold.address : ''
         }));
     };
@@ -318,7 +318,7 @@ const TemporaryResidenceForm = () => {
                                     <option value="">-- Chọn hộ khẩu --</option>
                                     {households.map(h => (
                                         <option key={h.household_id} value={h.household_id}>
-                                            {h.household_code} - {h.owner_name}
+                                            {h.household_code} - {h.head_name}
                                         </option>
                                     ))}
                                 </select>
@@ -339,7 +339,7 @@ const TemporaryResidenceForm = () => {
                                         <option value="">-- Chọn hộ khẩu --</option>
                                         {households.map(h => (
                                             <option key={h.household_id} value={h.household_id}>
-                                                {h.household_code} - {h.owner_name}
+                                                {h.household_code} - {h.head_name}
                                             </option>
                                         ))}
                                     </select>
@@ -364,15 +364,6 @@ const TemporaryResidenceForm = () => {
                                 </div>
                             </>
                         )}
-                        
-                        <Input
-                            label={isTemporaryResidence ? "Mã hộ khẩu (HKTT2025-XX)" : "Mã tạm vắng (HKTV2025-XX)"}
-                            name="householdCode"
-                            value={formData.householdCode}
-                            onChange={handleChange}
-                            required
-                            readOnly={formData.type === 'temporary_absence'}
-                        />
 
                         <Input
                             label="Ngày sinh"

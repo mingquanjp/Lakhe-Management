@@ -36,7 +36,7 @@ const TemporaryAbsenceTable = ({ data, onDetail, onDelete }) => {
           {data.map((row, index) => (
             <tr key={index}>
               <td>{row.household_code}</td>
-              <td className="owner-name">{row.last_name} {row.first_name}</td>
+              <td className="owner-name">{row.first_name} {row.last_name}</td>
               <td>{row.identity_card_number}</td>
               <td>{row.temporary_address}</td>
               <td>{formatDate(row.start_date)}</td>

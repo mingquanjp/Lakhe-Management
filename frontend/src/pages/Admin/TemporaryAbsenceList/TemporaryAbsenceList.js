@@ -175,7 +175,7 @@ const TemporaryAbsenceList = () => {
               <strong>Mã hộ khẩu:</strong> {selectedItem.household_code}
             </div>
             <div className="detail-row">
-              <strong>Họ và tên:</strong> {selectedItem.last_name} {selectedItem.first_name}
+              <strong>Họ và tên:</strong> {selectedItem.first_name} {selectedItem.last_name}
             </div>
             <div className="detail-row">
               <strong>Ngày sinh:</strong> {new Date(selectedItem.dob).toLocaleDateString('vi-VN')}
