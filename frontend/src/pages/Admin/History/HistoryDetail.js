@@ -17,7 +17,7 @@ const HistoryDetail = () => {
             try {
                 const [historyRes, householdRes] = await Promise.all([
                     fetchHistory(id),
-                    getHouseholdById(id)
+                    getHouseholdById(id, true) 
                 ]);
                 
                 setHistoryData(historyRes.data);
@@ -68,6 +68,10 @@ const HistoryDetail = () => {
             case 'TemporaryAbsence':
                 label = 'Tạm vắng';
                 className = 'bg-orange-100 text-orange-800';
+                break;
+            case 'Removed':
+                label = 'Loại bỏ';
+                className = 'bg-red-100 text-red-800';
                 break;
             default:
                 label = type;

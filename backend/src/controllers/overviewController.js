@@ -108,7 +108,12 @@ const getOverviewData = async (req, res) => {
 
   } catch (error) {
     console.error("Lỗi lấy dữ liệu Overview:", error);
-    res.status(500).json({ success: false, message: "Lỗi server" });
+    // Trả về chi tiết lỗi để dễ debug
+    res.status(500).json({ 
+        success: false, 
+        message: "Lỗi server: " + error.message,
+        error: error.toString() 
+    });
   }
 };
 

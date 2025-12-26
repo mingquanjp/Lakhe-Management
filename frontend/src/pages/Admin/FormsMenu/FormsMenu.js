@@ -25,7 +25,7 @@ const FormsMenu = () => {
         },
         {
             id: 'temporary-residence',
-            title: 'Đăng ký Tạm trú / Tạm vắng',
+            title: 'Tạm trú / Tạm vắng',
             description: 'Khai báo thông tin tạm trú cho người mới đến hoặc tạm vắng.',
             icon: '📝',
             themeClass: 'card-yellow'
@@ -53,7 +53,7 @@ const FormsMenu = () => {
     return (
         <div className="forms-menu-container">
             <div className="forms-menu-header">
-                <h1 className="forms-menu-title">Các biểu mẫu khai báo</h1>
+                <h2 className="page-title">Các biểu mẫu khai báo</h2>
                 <p className="forms-menu-subtitle">Chọn loại biểu mẫu bạn cần thực hiện khai báo</p>
             </div>
 
