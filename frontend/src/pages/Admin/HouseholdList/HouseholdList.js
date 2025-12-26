@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, Filter, Download, Split, X } from "lucide-react";
+import { Search, Filter, Download, Split} from "lucide-react";
 import "./HouseholdList.css";
 import HouseholdTable from "./HouseholdTable";
 import Pagination from "../../../components/commons/Pagination";
@@ -71,12 +71,6 @@ const HouseholdList = () => {
       ...prev,
       [name]: value,
     }));
-    setCurrentPage(1);
-  };
-
-  const clearFilters = () => {
-    setFilters({ minMembers: "", maxMembers: "" });
-    setSearchTerm("");
     setCurrentPage(1);
   };
 
