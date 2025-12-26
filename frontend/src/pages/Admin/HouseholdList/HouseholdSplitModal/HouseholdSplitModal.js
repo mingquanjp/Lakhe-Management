@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "../../../../components/commons/Modal/Modal";
 import "./HouseholdSplitModal.css";
 import { fetchResidents } from "../../../../utils/api";
@@ -25,16 +24,18 @@ const HouseholdSplitModal = ({ isOpen, onClose, householdData, onSave }) => {
   const [errors, setErrors] = useState({});
 
   const [membersList, setMembersList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen && householdData?.id) {
       const loadMembers = async () => {
         try {
+          setLoading(true);
           const response = await fetchResidents(householdData.id);
           if (response.success && response.data) {
             const formattedMembers = response.data.map((r) => ({
               id: r.resident_id,
-              name: `${r.last_name} ${r.first_name}`,
+              name: `${r.first_name} ${r.last_name}`,
               dob: r.dob,
             }));
             setMembersList(formattedMembers);
@@ -42,6 +43,8 @@ const HouseholdSplitModal = ({ isOpen, onClose, householdData, onSave }) => {
         } catch (error) {
           console.error("Lỗi tải thành viên:", error);
           alert("Không thể tải danh sách thành viên của hộ này");
+        } finally {
+          setLoading(false);
         }
       };
       loadMembers();
@@ -385,7 +388,7 @@ const HouseholdSplitModal = ({ isOpen, onClose, householdData, onSave }) => {
         )}
 
         <div className="form-actions">
-          <button className="btn-cancel" onClick={handleClose}>
+          <button className="btn-split-cancel" onClick={handleClose}>
             Hủy
           </button>
           {newHouseholds.length > 0 && (
