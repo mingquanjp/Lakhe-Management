@@ -15,7 +15,10 @@ router.delete('/:id', requireAdmin, residentController.deleteResident); // Only 
 
 // Special Actions
 router.post('/temporary-residence', residentController.registerTemporaryResidence);
+router.get('/list/temporary-residence', residentController.getTemporaryResidents);
 router.post('/temporary-absence', residentController.registerTemporaryAbsence);
+router.get('/list/temporary-absence', residentController.getTemporaryAbsences);
+router.delete('/temporary-absence/:id', residentController.deleteTemporaryAbsence);
 router.post('/:id/death', residentController.declareDeath);
 router.get('/expiring/temporary', residentController.getExpiringTemporaryResidents);
 

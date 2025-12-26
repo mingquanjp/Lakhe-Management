@@ -51,7 +51,7 @@ const TemporaryAbsenceTable = ({ data, onDetail, onDelete }) => {
                 </button>
                 <button 
                   className="btn-action btn-delete"
-                  onClick={() => onDelete && onDelete(row.id)}
+                  onClick={() => onDelete && onDelete(row.absence_id)}
                 >
                   Xóa
                 </button>

@@ -83,13 +83,12 @@ const TemporaryAbsenceList = () => {
       (startDate && startDate.includes(searchLower)) ||
       (endDate && endDate.includes(searchLower)) ||
       (item.reason && item.reason.toLowerCase().includes(searchLower));
-    
     return matchesSearch;
   });
 
   const handleExport = () => {
     const exportData = filteredData.map(item => ({
-      "Mã hộ khẩu": item.absence_code,
+      "Mã hộ khẩu": item.household_code,
       "Họ tên": `${item.last_name} ${item.first_name}`,
       "Ngày sinh": new Date(item.dob).toLocaleDateString('vi-VN'),
       "CMND/CCCD": item.identity_card_number,
@@ -133,7 +132,7 @@ const TemporaryAbsenceList = () => {
             />
           </div>
           <button className="btn-tool" onClick={handleExport}>
-            <Download size={16} /> Export
+            <Download size={16} /> Xuất Excel
           </button>
         </div>
       </div>
@@ -165,7 +164,7 @@ const TemporaryAbsenceList = () => {
         {selectedItem && (
           <div className="detail-modal-content">
             <div className="detail-row">
-              <strong>Mã hộ khẩu:</strong> {selectedItem.absence_code}
+              <strong>Mã hộ khẩu:</strong> {selectedItem.household_code}
             </div>
             <div className="detail-row">
               <strong>Họ và tên:</strong> {selectedItem.last_name} {selectedItem.first_name}

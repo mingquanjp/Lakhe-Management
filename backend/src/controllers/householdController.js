@@ -1,12 +1,28 @@
 const pool = require("../config/database");
 
-const logChange = async (client, householdId, residentId, changeType, userId) => {
+const logChange = async (client, householdId, residentId, changeType, userId, notes = null, changeDate = null) => {
   if (!userId) return; 
-  const query = `
-    INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
-    VALUES ($1, $2, $3, $4)
-  `;
-  await client.query(query, [householdId, residentId, changeType, userId]);
+  
+  let query, values;
+  
+  if (changeDate) {
+      const date = new Date(changeDate);
+      const now = new Date();
+      date.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+      
+      query = `
+        INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id, notes, change_date)
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `;
+      values = [householdId, residentId, changeType, userId, notes, date];
+  } else {
+      query = `
+        INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id, notes)
+        VALUES ($1, $2, $3, $4, $5)
+      `;
+      values = [householdId, residentId, changeType, userId, notes];
+  }
+  await client.query(query, values);
 };
 
 const getHouseholds = async (req, res) => {
@@ -315,7 +331,7 @@ const getTemporaryHouseholds = async (req, res) => {
     res.status(200).json({ success: true, data: result.rows });
   } catch (error) {
     console.error("Lỗi lấy danh sách hộ tạm trú:", error);
-    res.status(500).json({ success: false, message: "Lỗi server" });
+    res.status(500).json({ success: false, message: "Lỗi server: " + error.message });
   }
 };
 
@@ -328,7 +344,7 @@ const getTemporaryHouseholdById = async (req, res) => {
         h.household_id, h.household_code, h.address, h.date_created,
         r.first_name, r.last_name, r.dob, r.gender, 
         r.identity_card_number as cccd,
-        r.temp_start_date, r.temp_end_date, r.temp_reason, r.phone_number
+        r.temp_start_date, r.temp_end_date, r.temp_reason
       FROM households h
       LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
       WHERE h.household_id = $1 AND h.status = 'Temporary'
@@ -430,12 +446,115 @@ const createTemporaryHousehold = async (req, res) => {
   }
 };
 
+const getHouseholdById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { includeDeleted } = req.query;
+    
+    const deletedCondition = includeDeleted === 'true' ? '' : 'AND h.deleted_at IS NULL';
+    
+    const householdQuery = `
+      SELECT 
+        h.*,
+        CONCAT(r.first_name, ' ', r.last_name) as owner_name
+      FROM households h
+      LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
+      WHERE h.household_id = $1 ${deletedCondition}
+    `;
+    const householdResult = await pool.query(householdQuery, [id]);
+
+    if (householdResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy hộ khẩu" });
+    }
+
+    // 2. Lấy danh sách thành viên (bao gồm cả đã xóa nếu includeDeleted=true)
+    const residentsDeletedCondition = includeDeleted === 'true' ? '' : 'AND deleted_at IS NULL';
+    const residentsQuery = `
+      SELECT * FROM residents 
+      WHERE household_id = $1 ${residentsDeletedCondition}
+    `;
+    const residentsResult = await pool.query(residentsQuery, [id]);
+
+    res.status(200).json({
+      success: true,
+      household: householdResult.rows[0],
+      residents: residentsResult.rows
+    });
+  } catch (error) {
+    console.error("Lỗi lấy chi tiết hộ khẩu:", error);
+    res.status(500).json({ success: false, message: "Lỗi server" });
+  }
+};
+
+const changeHead = async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { household_id, new_head_id, reason, change_date } = req.body;
+    const currentUserId = req.user ? req.user.user_id : null;
+
+    if (!household_id || !new_head_id) {
+      return res.status(400).json({ success: false, message: "Thiếu thông tin hộ khẩu hoặc chủ hộ mới" });
+    }
+
+    await client.query("BEGIN");
+
+    // 1. Get current head
+    const currentHeadRes = await client.query(
+      "SELECT head_of_household_id FROM households WHERE household_id = $1",
+      [household_id]
+    );
+    
+    if (currentHeadRes.rows.length === 0) {
+      throw new Error("Không tìm thấy hộ khẩu");
+    }
+    
+    const oldHeadId = currentHeadRes.rows[0].head_of_household_id;
+
+    // 2. Update old head to 'Thành viên' if exists
+    if (oldHeadId) {
+      await client.query(
+        "UPDATE residents SET relationship_to_head = 'Thành viên' WHERE resident_id = $1",
+        [oldHeadId]
+      );
+    }
+
+    // 3. Update new head to 'Chủ hộ'
+    await client.query(
+      "UPDATE residents SET relationship_to_head = 'Chủ hộ' WHERE resident_id = $1",
+      [new_head_id]
+    );
+
+    // 4. Update household table
+    await client.query(
+      "UPDATE households SET head_of_household_id = $1 WHERE household_id = $2",
+      [new_head_id, household_id]
+    );
+
+    // 5. Log change
+    if (currentUserId) {
+      await logChange(client, household_id, new_head_id, 'ChangeHeadOfHousehold', currentUserId, reason, change_date);
+    }
+
+    await client.query("COMMIT");
+    res.json({ success: true, message: "Thay đổi chủ hộ thành công" });
+
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Lỗi thay đổi chủ hộ:", error);
+    res.status(500).json({ success: false, message: error.message || "Lỗi server" });
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   getHouseholds,
+  getHouseholdById,
   createHousehold,
   deleteHousehold,
   splitHousehold,
   getTemporaryHouseholds,
   getTemporaryHouseholdById,
   createTemporaryHousehold,
+  changeHead,
 };

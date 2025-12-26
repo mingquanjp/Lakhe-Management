@@ -16,9 +16,13 @@ import Admin from "./pages/Admin";
 import Staff from "./pages/Staff";
 import PopulationDashboard from "./pages/Admin/PopulationDashboard/PopulationDashboard";
 import StatsFinanceDashboard from "./pages/Admin/StatsFinanceDashboard/StatsFinanceDashboard";
-import HouseholdDetail from "./pages/HouseholdDetail";
+import HouseholdDetail from "./pages/Admin/HouseholdList/HouseholdDetail";
 import Declaration from "./pages/Declaration";
 import FormsMenu from "./pages/Admin/FormsMenu/FormsMenu";
+import Overview from "./pages/Admin/Overview/Overview";
+import HistoryList from "./pages/Admin/History/HistoryList";
+import HistoryDetail from "./pages/Admin/History/HistoryDetail";
+import StaffManagement from "./pages/Admin/StaffManagement/StaffManagement";
 
 // Import Forms
 import NewHouseholdForm from "./pages/Admin/HouseholdForms/NewHouseholdForm";
@@ -26,9 +30,9 @@ import NewMemberForm from "./pages/Admin/HouseholdForms/NewMemberForm";
 import MemberStatusChangeForm from "./pages/Admin/HouseholdForms/MemberStatusChangeForm";
 import TemporaryResidenceForm from "./pages/Admin/HouseholdForms/TemporaryResidenceForm";
 import ChangeOwnerForm from "./pages/Admin/HouseholdForms/ChangeOwnerForm/ChangeOwnerForm";
-import Overview from "./pages/Admin/Overview/Overview";
 import HouseholdList from "./pages/Admin/HouseholdList/HouseholdList";
 import HouseholdTemporaryList from "./pages/Admin/HouseholdTemporaryList/HouseholdTemporaryList";
+import TemporaryAbsenceList from "./pages/Admin/TemporaryAbsenceList/TemporaryAbsenceList";
 
 
 // Import Staff Pages
@@ -81,8 +85,12 @@ function AppRoutes() {
         <Route path="household/:id" element={<HouseholdDetail />} />
         <Route path="householdtemporary" element={<HouseholdTemporaryList />} />
         <Route path="householdtemporary/:id" element={<HouseholdDetail />} />
+        <Route path="temporary-absence" element={<TemporaryAbsenceList />} />
+        <Route path="history" element={<HistoryList />} />
+        <Route path="history/:id" element={<HistoryDetail />} />
         <Route path="stats/citizen" element={<PopulationDashboard />} />
         <Route path="stats/finance" element={<StatsFinanceDashboard />} />
+        <Route path="staff-management" element={<StaffManagement />} />
         <Route path="citizen" element={<Declaration />} />
         <Route path="form" element={<FormsMenu />} />
         <Route path="form/new-household-form" element={<NewHouseholdForm />} />

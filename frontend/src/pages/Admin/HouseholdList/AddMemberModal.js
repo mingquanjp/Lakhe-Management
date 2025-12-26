@@ -33,14 +33,23 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
       if (initialData) {
         setFormData({
           ...initialData,
+          first_name: initialData.first_name || "",
+          last_name: initialData.last_name || "",
           nickname: initialData.nickname || "",
-          place_of_origin: initialData.place_of_origin || "",
-          workplace: initialData.workplace || "",
-          identity_card_place: initialData.identity_card_place || "",
-          notes: initialData.notes || "",
           dob: initialData.dob ? new Date(initialData.dob).toISOString().split('T')[0] : "",
+          gender: initialData.gender || "Male",
+          relationship_to_head: initialData.relationship_to_head || "",
+          place_of_birth: initialData.place_of_birth || "",
+          place_of_origin: initialData.place_of_origin || "",
+          ethnicity: initialData.ethnicity || "Kinh",
+          occupation: initialData.occupation || "",
+          workplace: initialData.workplace || "",
+          identity_card_number: initialData.identity_card_number || "",
           identity_card_date: initialData.identity_card_date ? new Date(initialData.identity_card_date).toISOString().split('T')[0] : "",
+          identity_card_place: initialData.identity_card_place || "",
+          previous_address: initialData.previous_address || "",
           registration_date: initialData.registration_date ? new Date(initialData.registration_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          notes: initialData.notes || "",
           temp_home_address: initialData.temp_home_address || "",
           temp_start_date: initialData.temp_start_date ? new Date(initialData.temp_start_date).toISOString().split('T')[0] : "",
           temp_end_date: initialData.temp_end_date ? new Date(initialData.temp_end_date).toISOString().split('T')[0] : "",
@@ -243,7 +252,9 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
           </div>
         </div>
 
-        {type !== 'NewBirth' && (
+        {/* Fields hidden for NewBirth */}
+        {/* Show these fields if type is NOT NewBirth OR if we are editing a Temporary resident (which uses MoveIn type) */}
+        {(type !== 'NewBirth' || (initialData && initialData.status === 'Temporary')) && (
           <>
             <div className="form-row">
               <div className="form-group">
