@@ -358,7 +358,7 @@ const TemporaryResidenceForm = () => {
                                         <option value="">-- Chọn thành viên --</option>
                                         {householdMembers.map(member => (
                                             <option key={member.resident_id} value={member.resident_id}>
-                                                {member.last_name} {member.first_name} - {member.dob ? new Date(member.dob).toLocaleDateString('vi-VN') : 'N/A'}
+                                                {member.first_name} {member.last_name} - {member.dob ? new Date(member.dob).toLocaleDateString('vi-VN') : 'N/A'}
                                             </option>
                                         ))}
                                     </select>

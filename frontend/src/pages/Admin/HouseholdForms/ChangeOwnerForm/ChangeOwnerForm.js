@@ -8,6 +8,7 @@ const ChangeOwnerForm = () => {
     // 1. Khai báo các state còn thiếu
     const [households, setHouseholds] = useState([]);
     const [selectedHouseholdId, setSelectedHouseholdId] = useState('');
+    const [currentHeadId, setCurrentHeadId] = useState(null);
     const [members, setMembers] = useState([]);
     
     const [formData, setFormData] = useState({
@@ -52,7 +53,8 @@ const ChangeOwnerForm = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setMembers(data.residents || []); // Đảm bảo luôn là mảng
+                    setMembers(data.residents || []);
+                    setCurrentHeadId(data.household.head_of_household_id || null);
                     setFormData(prev => ({
                         ...prev,
                         currentOwner: data.household.owner_name || 'Chưa có chủ hộ',
@@ -156,10 +158,10 @@ const ChangeOwnerForm = () => {
                     >
                         <option value="">-- Chọn chủ hộ mới --</option>
                         {members && members
-                            .filter(m => m.status === 'Permanent' || m.status === 'Thường trú') 
+                            .filter(m => (m.status === 'Permanent' || m.status === 'Thường trú') && m.resident_id !== currentHeadId) 
                             .map(member => (
                             <option key={member.resident_id} value={member.resident_id}>
-                                {member.last_name} {member.first_name} ({new Date(member.dob).getFullYear()})
+                                {member.first_name} {member.last_name} ({new Date(member.dob).getFullYear()})
                             </option>
                         ))}
                     </select>
