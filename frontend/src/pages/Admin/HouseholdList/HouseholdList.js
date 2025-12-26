@@ -5,6 +5,7 @@ import HouseholdTable from "./HouseholdTable";
 import Pagination from "../../../components/commons/Pagination";
 import HouseholdAddModal from "./HouseholdAddModal";
 import HouseholdSplitModal from "./HouseholdSplitModal";
+import DeleteConfirmationModal from "../../../components/commons/Modal/DeleteConfirmationModal";
 import {
   fetchHouseholds,
   createHousehold,
@@ -20,6 +21,8 @@ const HouseholdList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilter, setShowFilter] = useState(false);
@@ -92,11 +95,19 @@ const HouseholdList = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
+    setItemToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
     try {
-      await deleteHousehold(id);
+      await deleteHousehold(itemToDelete);
       toast.success("Xóa thành công!");
       loadData();
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
     } catch (error) {
       console.error("Lỗi xóa:", error);
       alert(error.message || "Không thể xóa hộ khẩu này");
@@ -314,6 +325,13 @@ const HouseholdList = () => {
           onSave={handleSplitHousehold}
         />
       )}
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        message="Bạn có chắc chắn muốn xóa hộ khẩu này? Thao tác này không thể hoàn tác."
+      />
     </div>
   );
 };

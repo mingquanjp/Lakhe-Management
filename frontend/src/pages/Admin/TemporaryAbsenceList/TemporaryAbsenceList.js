@@ -5,6 +5,7 @@ import "./TemporaryAbsenceList.css";
 import TemporaryAbsenceTable from "./TemporaryAbsenceTable";
 import Pagination from "../../../components/commons/Pagination";
 import Modal from "../../../components/commons/Modal";
+import DeleteConfirmationModal from "../../../components/commons/Modal/DeleteConfirmationModal";
 import { exportToCSV } from "../../../utils/exportUtils";
 import { toast } from "react-toastify";
 import { getAuthToken } from "../../../utils/api";
@@ -14,6 +15,8 @@ const TemporaryAbsenceList = () => {
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,28 +44,34 @@ const TemporaryAbsenceList = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa bản ghi tạm vắng này?")) {
-      try {
-        const token = getAuthToken();
-        const response = await fetch(`http://localhost:5000/api/residents/temporary-absence/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+  const handleDelete = (id) => {
+    setItemToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
 
-        const result = await response.json();
-        if (response.ok && result.success) {
-          toast.success("Xóa thành công!");
-          fetchData();
-        } else {
-          toast.error(result.message || "Lỗi khi xóa");
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+    try {
+      const token = getAuthToken();
+      const response = await fetch(`http://localhost:5000/api/residents/temporary-absence/${itemToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      } catch (error) {
-        console.error("Error deleting:", error);
-        toast.error("Lỗi kết nối server");
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        toast.success("Xóa thành công!");
+        fetchData();
+        setIsDeleteModalOpen(false);
+        setItemToDelete(null);
+      } else {
+        toast.error(result.message || "Lỗi khi xóa");
       }
+    } catch (error) {
+      console.error("Error deleting:", error);
+      toast.error("Lỗi kết nối server");
     }
   };
 
@@ -193,6 +202,13 @@ const TemporaryAbsenceList = () => {
           </div>
         )}
       </Modal>
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        message="Bạn có chắc chắn muốn xóa bản ghi tạm vắng này? Thao tác này không thể hoàn tác."
+      />
     </div>
   );
 };
