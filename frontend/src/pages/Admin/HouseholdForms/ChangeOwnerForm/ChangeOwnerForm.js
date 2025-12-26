@@ -138,13 +138,15 @@ const ChangeOwnerForm = () => {
                     </select>
                 </div>
 
-                <Input
-                    label="Chủ hộ hiện tại"
-                    name="currentOwner"
-                    value={formData.currentOwner}
-                    readOnly
-                    className="bg-gray-100"
-                />
+                <div className="input-group">
+                    <label className="input-label">Chủ hộ hiện tại</label>
+                    <input 
+                        className="input-field bg-gray-100"
+                        name="currentOwner"
+                        value={formData.currentOwner}
+                        readOnly
+                    />
+                </div>
                 
                 <div className="input-group">
                     <label className="input-label">Chủ hộ mới</label>
