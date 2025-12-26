@@ -1,23 +1,23 @@
-const express = require("express");
+﻿const express = require("express");
 const cors = require("cors");
 const pool = require("./config/database");
 const authRoutes = require("./routes/authRoutes");
+const feeRoutes = require("./routes/feeRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const financeRoutes = require("./routes/financeRoutes");
-const { verifyToken, requireAdmin } = require("./middleware/authMiddleware");
 const householdRoutes = require('./routes/householdRoutes');
 const residentRoutes = require("./routes/residentRoutes");
-const feeRoutes = require('./routes/feeRoutes');
 const overviewRoutes = require("./routes/overviewRoutes");
+const historyRoutes = require("./routes/historyRoutes");
 
 const app = express();
+// Middleware
 app.use(cors());
 app.use(express.json());
-
+// Root endpoint
 app.get("/", (req, res) => {
   res.send("Backend running successfully!");
 });
-
 // Test database endpoint
 app.get("/api/test-db", async (req, res) => {
   try {
@@ -36,36 +36,17 @@ app.get("/api/test-db", async (req, res) => {
   }
 });
 
-// Auth routes
+// API Routes
 app.use("/api/auth", authRoutes);
-// Dashboard routes
+app.use("/api/fees", feeRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/finance", financeRoutes);
-
-// Example protected route - requires valid JWT token
-app.get("/api/test-protected", verifyToken, (req, res) => {
-  res.json({
-    success: true,
-    message: "Bạn đã truy cập route được bảo vệ thành công!",
-    user: req.user,
-  });
-});
-
-// Example admin-only route
-app.get("/api/test-admin", verifyToken, requireAdmin, (req, res) => {
-  res.json({
-    success: true,
-    message: "Chào mừng Admin!",
-    user: req.user,
-  });
-});
-
-app.use('/api/households', householdRoutes); 
+app.use('/api/households', householdRoutes);
 app.use("/api/residents", residentRoutes);
-app.use('/api/fees', feeRoutes);
 app.use("/api/overview", overviewRoutes);
+app.use("/api/history", historyRoutes);
 
-
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log('Server running on port ' + PORT);
 });

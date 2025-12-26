@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "./Sidebar.css";
@@ -8,6 +9,7 @@ import {
   Staff,
   Statistic,
   logoutIcon,
+  accountIcon
 } from "../../assets/icons";
 import { Button } from "../commons";
 
@@ -43,12 +45,12 @@ const Sidebar = () => {
       icon: People,
       subItems: [
         { id: "household", label: "Quản lý hộ khẩu thường trú", path: "/admin/household" },
-        { id: "householdtemporary", label: "Quản lý hộ khẩu tạm trú", path: "/admin/householdtemporary" },
-        { id: "citizen", label: "Quản lý nhân khẩu", path: "/admin/citizen" },
+        { id: "temporary-household", label: "Quản lý hộ khẩu tạm trú", path: "/admin/temporary-household" },
+        { id: "temporary-absence", label: "Quản lý tạm vắng", path: "/admin/temporary-absence" },
+        { id: "history", label: "Lịch sử biến động", path: "/admin/history" },
         { id: "form", label: "Form khai báo", path: "/admin/form" },
       ],
     },
-
     {
       id: "stats",
       label: "Thống kê",
@@ -67,10 +69,10 @@ const Sidebar = () => {
       ],
     },
     {
-      id: "staff",
+      id: "accounts",
       label: "Quản lý cán bộ",
-      icon: Staff,
-      path: "/admin/staff-management",
+      icon: Staff, // Hoặc dùng icon khác
+      path: "/admin/accounts",
     },
   ];
 
