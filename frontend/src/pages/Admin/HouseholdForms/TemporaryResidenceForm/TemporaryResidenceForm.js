@@ -29,28 +29,15 @@ const TemporaryResidenceForm = () => {
         tempAddress: '' 
     });
 
-    // Search state
-    const [searchResults, setSearchResults] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
+    // State for temporary absence
+    const [selectedAbsenceHouseholdId, setSelectedAbsenceHouseholdId] = useState('');
+    const [householdMembers, setHouseholdMembers] = useState([]);
     const [selectedResidentId, setSelectedResidentId] = useState(null);
+    
+    // State for temporary residence
     const [households, setHouseholds] = useState([]); // List of households for selection
-    const [members, setMembers] = useState([]); // List of members for temporary absence selection
-    const searchTimeoutRef = useRef(null);
-    const wrapperRef = useRef(null);
 
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-                setShowSuggestions(false);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [wrapperRef]);
-
-    // Fetch households when switching to 'existing' type or 'temporary_absence'
+    // Fetch households when switching to 'existing' or 'absence' type
     useEffect(() => {
         if (formData.type === 'temporary_residence_existing' || formData.type === 'temporary_absence') {
             fetchHouseholds();
@@ -88,116 +75,64 @@ const TemporaryResidenceForm = () => {
         const householdId = e.target.value;
         const selectedHousehold = households.find(h => h.household_id === parseInt(householdId));
         
-        if (formData.type === 'temporary_residence_existing') {
-            setFormData(prev => ({
-                ...prev,
-                hostHouseholdId: householdId,
-                hostName: selectedHousehold ? selectedHousehold.owner_name : '',
-                tempAddress: selectedHousehold ? selectedHousehold.address : ''
-            }));
-        } else if (formData.type === 'temporary_absence') {
-            setFormData(prev => ({
-                ...prev,
-                hostHouseholdId: householdId,
-                householdCode: selectedHousehold ? selectedHousehold.household_code : '',
-                permanentAddress: selectedHousehold ? selectedHousehold.address : ''
-            }));
-            
-            if (householdId) {
-                try {
-                    const token = getAuthToken();
-                    const response = await fetch(`http://localhost:5000/api/households/${householdId}`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        setMembers(data.residents || []);
-                    }
-                } catch (error) {
-                    console.error("Error fetching members:", error);
-                }
-            } else {
-                setMembers([]);
-            }
-        }
-    };
-
-    const handleMemberChange = (e) => {
-        const residentId = e.target.value;
-        const selectedMember = members.find(m => m.resident_id === parseInt(residentId));
-        
-        if (selectedMember) {
-            setSelectedResidentId(selectedMember.resident_id);
-            setFormData(prev => ({
-                ...prev,
-                fullName: `${selectedMember.last_name} ${selectedMember.first_name}`,
-                dob: selectedMember.dob ? new Date(selectedMember.dob).toISOString().split('T')[0] : '',
-                identityCard: selectedMember.identity_card_number || '',
-            }));
-        } else {
-             setSelectedResidentId(null);
-             setFormData(prev => ({ ...prev, fullName: '', dob: '', identityCard: '' }));
-        }
-    };
-
-    const handleSearchChange = (e) => {
-        const value = e.target.value;
-        setFormData(prev => ({ ...prev, fullName: value }));
-        
-        if (formData.type !== 'temporary_absence') return;
-
-        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-
-        if (value.length > 1) {
-            searchTimeoutRef.current = setTimeout(async () => {
-                try {
-                    const token = getAuthToken();
-                    const response = await fetch(`http://localhost:5000/api/residents?search=${encodeURIComponent(value)}`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (response.ok) {
-                        const result = await response.json();
-                        setSearchResults(result.data);
-                        setShowSuggestions(true);
-                    }
-                } catch (error) {
-                    console.error("Error searching residents:", error);
-                }
-            }, 300);
-        } else {
-            setSearchResults([]);
-            setShowSuggestions(false);
-        }
-    };
-
-    const handleSelectResident = async (resident) => {
-        setSelectedResidentId(resident.resident_id);
         setFormData(prev => ({
             ...prev,
-            fullName: `${resident.last_name} ${resident.first_name}`,
-            dob: resident.dob ? new Date(resident.dob).toISOString().split('T')[0] : '',
-            gender: resident.gender === 'Male' ? 'Nam' : 'Nữ',
-            identityCard: resident.identity_card_number || '',
+            hostHouseholdId: householdId,
+            hostName: selectedHousehold ? selectedHousehold.owner_name : '',
+            tempAddress: selectedHousehold ? selectedHousehold.address : ''
         }));
-        setShowSuggestions(false);
+    };
 
-        try {
-            const token = getAuthToken();
-            const response = await fetch(`http://localhost:5000/api/residents/${resident.resident_id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                const detail = data.data;
-                setFormData(prev => ({
-                    ...prev,
-                    permanentAddress: detail.household_address || detail.place_of_origin || '',
-                }));
+    // Handle household selection for temporary absence
+    const handleAbsenceHouseholdChange = async (e) => {
+        const householdId = e.target.value;
+        setSelectedAbsenceHouseholdId(householdId);
+        setSelectedResidentId(null);
+        
+        if (householdId) {
+            try {
+                const token = getAuthToken();
+                const response = await fetch(`http://localhost:5000/api/residents?household_id=${householdId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    setHouseholdMembers(result.data || []);
+                } else {
+                    setHouseholdMembers([]);
+                }
+            } catch (error) {
+                console.error('Error fetching household members:', error);
+                setHouseholdMembers([]);
             }
-        } catch (error) {
-            console.error("Error fetching resident details:", error);
+        } else {
+            setHouseholdMembers([]);
         }
     };
+
+    // Handle member selection for temporary absence
+    const handleMemberChange = (e) => {
+        const residentId = e.target.value;
+        if (!residentId) {
+            setSelectedResidentId(null);
+            return;
+        }
+        
+        const member = householdMembers.find(m => m.resident_id === parseInt(residentId));
+        if (member) {
+            setSelectedResidentId(member.resident_id);
+            setFormData(prev => ({
+                ...prev,
+                fullName: `${member.last_name} ${member.first_name}`,
+                dob: member.dob ? new Date(member.dob).toISOString().split('T')[0] : '',
+                identityCard: member.identity_card_number || '',
+            }));
+        }
+    };
+
+    // Remove search change handler - no longer needed for temporary absence
+
+    // Remove handleSelectResident - replaced by handleMemberChange
 
     const splitName = (fullName) => {
         const parts = fullName.trim().split(' ');
@@ -400,54 +335,54 @@ const TemporaryResidenceForm = () => {
                             />
                         )}
                         
-                        <div style={{ position: 'relative' }} ref={wrapperRef}>
-                            {formData.type === 'temporary_absence' ? (
+                        {/* Temporary Absence: Household and Member Selector */}
+                        {formData.type === 'temporary_absence' && (
+                            <>
                                 <div className="input-group">
-                                    <label className="input-label">Chọn thành viên</label>
+                                    <label className="input-label">Chọn hộ khẩu</label>
                                     <select 
                                         className="input-field"
-                                        onChange={handleMemberChange}
-                                        value={selectedResidentId || ''}
+                                        value={selectedAbsenceHouseholdId}
+                                        onChange={handleAbsenceHouseholdChange}
                                         required
-                                        disabled={!formData.hostHouseholdId}
                                     >
-                                        <option value="">-- Chọn thành viên --</option>
-                                        {members.map(m => (
-                                            <option key={m.resident_id} value={m.resident_id}>
-                                                {m.last_name} {m.first_name} ({new Date(m.dob).getFullYear()})
+                                        <option value="">-- Chọn hộ khẩu --</option>
+                                        {households.map(h => (
+                                            <option key={h.household_id} value={h.household_id}>
+                                                {h.household_code} - {h.owner_name}
                                             </option>
                                         ))}
                                     </select>
                                 </div>
-                            ) : (
-                                <>
-                                    <Input
-                                        label="Họ và tên"
-                                        name="fullName"
-                                        value={formData.fullName}
-                                        onChange={!isTemporaryResidence ? handleSearchChange : handleChange}
+                                
+                                <div className="input-group">
+                                    <label className="input-label">Chọn thành viên</label>
+                                    <select 
+                                        className="input-field"
+                                        value={selectedResidentId || ''}
+                                        onChange={handleMemberChange}
                                         required
-                                        autoComplete="off"
-                                    />
-                                    {!isTemporaryResidence && showSuggestions && searchResults.length > 0 && (
-                                        <div className="suggestion-box">
-                                            {searchResults.map(resident => (
-                                                <div 
-                                                    key={resident.resident_id}
-                                                    className="suggestion-item"
-                                                    onClick={() => handleSelectResident(resident)}
-                                                >
-                                                    <span className="suggestion-name">{resident.last_name} {resident.first_name}</span>
-                                                    <span className="suggestion-details">
-                                                        {new Date(resident.dob).toLocaleDateString('vi-VN')} - {resident.household_code}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                        </div>
+                                        disabled={!selectedAbsenceHouseholdId}
+                                    >
+                                        <option value="">-- Chọn thành viên --</option>
+                                        {householdMembers.map(member => (
+                                            <option key={member.resident_id} value={member.resident_id}>
+                                                {member.last_name} {member.first_name} - {member.dob ? new Date(member.dob).toLocaleDateString('vi-VN') : 'N/A'}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </>
+                        )}
+                        
+                        <Input
+                            label="Họ và tên"
+                            name="fullName"
+                            value={formData.fullName}
+                            onChange={handleChange}
+                            required
+                            readOnly={formData.type === 'temporary_absence'}
+                        />
 
                         <Input
                             label="Ngày sinh"

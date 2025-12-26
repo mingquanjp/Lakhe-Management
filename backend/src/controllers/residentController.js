@@ -550,7 +550,7 @@ const registerTemporaryAbsence = async (req, res) => {
         const userId = req.user ? req.user.user_id : 1;
         await pool.query(
           `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
-           VALUES ($1, $2, 'TemporaryAbsence', $3)`,
+           VALUES ($1, $2, 'MoveOut', $3)`,
           [householdId, residentId, userId]
         );
     } catch (histError) {
