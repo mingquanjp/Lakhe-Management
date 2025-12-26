@@ -8,6 +8,7 @@ router.use(verifyToken);
 router.get('/', householdController.getHouseholds);
 router.post('/', householdController.createHousehold);
 router.post('/split', householdController.splitHousehold);
+router.post('/change-head', householdController.changeHead);
 
 // Specific routes MUST come before /:id
 router.get('/temporary', householdController.getTemporaryHouseholds);
