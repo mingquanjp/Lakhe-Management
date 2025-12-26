@@ -47,7 +47,7 @@ const createFee = async (req, res) => {
     await client.query(
       `INSERT INTO change_history (change_date, change_type, changed_by_user_id, fee_id)
        VALUES (NOW(), 'CreateFee', $1, $2)`,
-       [user_id,result.rows[0].fee_id]
+      [user_id, result.rows[0].fee_id]
     );
 
     await client.query('COMMIT');
@@ -161,7 +161,7 @@ const updateFee = async (req, res) => {
 
     // Kiểm tra khoản thu có tồn tại không
     const checkFee = await client.query('SELECT * FROM fees WHERE fee_id = $1 AND deleted_at IS NULL', [feeId]);
-    
+
     if (checkFee.rows.length === 0) {
       return res.status(404).json({
         success: false,
@@ -195,7 +195,7 @@ const updateFee = async (req, res) => {
     await client.query(
       `INSERT INTO change_history (change_date, change_type, changed_by_user_id, fee_id)
        VALUES (NOW(), 'UpdateFee', $1, $2)`,
-      [user_id,feeId]
+      [user_id, feeId]
     );
 
     await client.query('COMMIT');
@@ -252,7 +252,7 @@ const deleteFee = async (req, res) => {
     await client.query(
       `INSERT INTO change_history (change_date, change_type, changed_by_user_id,fee_id)
        VALUES (NOW(), 'DeleteFee', $1, $2)`,
-      [user_id,feeIdToDelete],
+      [user_id, feeIdToDelete],
     );
 
     await client.query("COMMIT");
@@ -284,7 +284,7 @@ const createPayment = async (req, res) => {
   try {
     const { fee_id, household_id, amount_paid, notes, payment_date } = req.body;
     const collected_by_user_id = req.user?.user_id || req.user?.userId || 1;
-    
+
     // Validation
     if (!fee_id || !household_id || !amount_paid) {
       return res.status(400).json({
@@ -735,9 +735,9 @@ const getAllHouseholdsForFee = async (req, res) => {
         message: 'Không tìm thấy khoản thu'
       });
     }
-    
+
     const result = await pool.query(
-     `SELECT 
+      `SELECT 
     h.household_id,
     h.household_code,
     h.address,
@@ -780,7 +780,8 @@ const getAllHouseholdsForFee = async (req, res) => {
  */
 const getFeeStatistics = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { feeId } = req.params;
+    const id = feeId; // Alias để tương thích code bên dưới
 
     // Lấy thông tin khoản thu
     const feeQuery = await pool.query(
@@ -788,9 +789,9 @@ const getFeeStatistics = async (req, res) => {
       [id]
     );
     if (feeQuery.rows.length === 0) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Không tìm thấy khoản thu" 
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy khoản thu"
       });
     }
 
@@ -870,7 +871,8 @@ const getFeeStatistics = async (req, res) => {
  */
 const getHouseholdPaymentStatus = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { feeId } = req.params;
+    const id = feeId; // Alias để tương thích code bên dưới
 
     const query = `
       WITH fee_info AS (
@@ -1134,7 +1136,7 @@ module.exports = {
   getFeeById,
   updateFee,
   deleteFee,
-  
+
   // Payment management
   createPayment,
   updatePayment,
@@ -1143,7 +1145,7 @@ module.exports = {
   getFeeSummary,
   getHouseholdPaymentHistory,
   getAllHouseholdsForFee,
-  
+
   // Extended statistics & queries
   getFeeStatistics,
   getHouseholdPaymentStatus,

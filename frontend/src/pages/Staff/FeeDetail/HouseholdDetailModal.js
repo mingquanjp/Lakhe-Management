@@ -30,8 +30,8 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
             feeType: p.fee_type === 'Mandatory' ? 'mandatory' : 'donation',
             required: p.required_amount || 0,
             paid: p.paid_amount || 0,
-            paymentDate: p.payment_date 
-              ? new Date(p.payment_date).toLocaleDateString('vi-VN') 
+            paymentDate: p.payment_date
+              ? new Date(p.payment_date).toLocaleDateString('vi-VN')
               : 'Chưa nộp',
             status: p.status
           })));
@@ -43,7 +43,7 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
             name: r.full_name,
             birthDate: r.dob ? new Date(r.dob).toLocaleDateString('vi-VN') : '',
             relationship: r.relationship_to_head,
-            residenceStatus: r.residence_status === 'Temporary' ? 'temporary' 
+            residenceStatus: r.residence_status === 'Temporary' ? 'temporary'
               : r.absence_destination ? 'absent' : 'permanent'
           })));
         }
@@ -70,13 +70,13 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
         </span>
       )
     },
-    { 
-      key: "required", 
+    {
+      key: "required",
       title: "Phải nộp",
       render: (value) => new Intl.NumberFormat('vi-VN').format(value)
     },
-    { 
-      key: "paid", 
+    {
+      key: "paid",
       title: "Đã nộp",
       render: (value) => new Intl.NumberFormat('vi-VN').format(value)
     },
@@ -159,7 +159,7 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
           </button>
         </div>
 
-            <div className="tab-content-wrapper">
+        <div className="tab-content-wrapper">
           {loading ? (
             <p>Đang tải dữ liệu...</p>
           ) : activeTab === "payment" ? (

@@ -568,7 +568,6 @@ module.exports = {
   createHousehold,
   deleteHousehold,
   splitHousehold,
-  changeHeadOfHousehold,
   getTemporaryHouseholds,
   getTemporaryHouseholdById,
   createTemporaryHousehold,
