@@ -4,6 +4,7 @@ import "./HouseholdTemporaryList.css";
 import HouseholdTemporaryTable from "./HouseholdTemporaryTable/HouseholdTemporaryTable";
 import Pagination from "../../../components/commons/Pagination";
 import HouseholdTemporaryAddModal from "./HouseholdTemporaryAddModal/HouseholdTemporaryAddModal";
+import Modal from "../../../components/commons/Modal/Modal";
 import {
   fetchTemporaryHouseholds,
   deleteHousehold,
@@ -25,6 +26,8 @@ const HouseholdTemporaryList = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [householdToDelete, setHouseholdToDelete] = useState(null);
   const itemsPerPage = 8;
 
   const loadData = async () => {
@@ -141,19 +144,27 @@ const HouseholdTemporaryList = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await deleteHousehold(id);
+    setHouseholdToDelete(id);
+    setIsDeleteConfirmOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!householdToDelete) return;
+    try {
+      await deleteHousehold(householdToDelete);
       toast.success("Xóa hộ tạm trú thành công!");
+      setIsDeleteConfirmOpen(false);
+      setHouseholdToDelete(null);
       loadData();
     } catch (error) {
       console.error("Lỗi xóa:", error);
-
       toast.error(
         error?.response?.data?.message ||
           error.message ||
           "Không thể xóa hộ tạm trú"
       );
+      setIsDeleteConfirmOpen(false);
+      setHouseholdToDelete(null);
     }
   };
 
@@ -301,6 +312,54 @@ const HouseholdTemporaryList = () => {
         onSave={handleSaveHousehold}
         size="xl"
       />
+
+      <Modal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => {
+          setIsDeleteConfirmOpen(false);
+          setHouseholdToDelete(null);
+        }}
+        title="Xác nhận xóa"
+        size="sm"
+      >
+        <div style={{ padding: "20px" }}>
+          <p style={{ marginBottom: "20px", color: "#333" }}>
+            Bạn có chắc chắn muốn xóa hộ khẩu này? Thao tác này không thể hoàn tác.
+          </p>
+          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+            <button
+              className="btn-cancel"
+              onClick={() => {
+                setIsDeleteConfirmOpen(false);
+                setHouseholdToDelete(null);
+              }}
+              style={{
+                padding: "8px 16px",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                backgroundColor: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              Hủy
+            </button>
+            <button
+              className="btn-delete"
+              onClick={handleConfirmDelete}
+              style={{
+                padding: "8px 16px",
+                border: "none",
+                borderRadius: "4px",
+                backgroundColor: "#f5222d",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              Xóa
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "./Sidebar.css";
@@ -9,7 +8,6 @@ import {
   Staff,
   Statistic,
   logoutIcon,
-  accountIcon
 } from "../../assets/icons";
 import { Button } from "../commons";
 
@@ -51,6 +49,7 @@ const Sidebar = () => {
         { id: "form", label: "Form khai báo", path: "/admin/form" },
       ],
     },
+
     {
       id: "stats",
       label: "Thống kê",
@@ -69,10 +68,10 @@ const Sidebar = () => {
       ],
     },
     {
-      id: "accounts",
+      id: "staff",
       label: "Quản lý cán bộ",
-      icon: Staff, // Hoặc dùng icon khác
-      path: "/admin/accounts",
+      icon: Staff,
+      path: "/admin/staff-management",
     },
   ];
 

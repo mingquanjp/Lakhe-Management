@@ -272,13 +272,35 @@ const splitHousehold = async (req, res) => {
     const remainingMembers = parseInt(countRes.rows[0].count, 10);
 
     if (remainingMembers === 0) {
-      console.log(`-> Hộ cũ (ID: ${original_household_id}) đã rỗng. Tiến hành xóa...`);
-      await client.query("DELETE FROM change_history WHERE household_id = $1", [original_household_id]);
-      
-      await client.query("UPDATE households SET head_of_household_id = NULL WHERE household_id = $1", [original_household_id]);
-      await client.query("DELETE FROM households WHERE household_id = $1", [original_household_id]);
+      console.log(
+        `-> Hộ cũ (ID: ${original_household_id}) đã rỗng. Đánh dấu đã tách.`
+      );
+
+      await client.query(
+        `
+    UPDATE households
+    SET status = 'MovedOut',
+        deleted_at = NOW(),
+        head_of_household_id = NULL
+    WHERE household_id = $1
+  `,
+        [original_household_id]
+      );
+
+      if (currentUserId) {
+        await logChange(
+          client,
+          original_household_id,
+          null,
+          "Split",
+          currentUserId,
+          "Hộ đã tách hết nhân khẩu"
+        );
+      }
     } else {
-      console.log(`-> Hộ cũ (ID: ${original_household_id}) còn ${remainingMembers} nhân khẩu, KHÔNG xóa.`);
+      console.log(
+        `-> Hộ cũ (ID: ${original_household_id}) còn ${remainingMembers} nhân khẩu, KHÔNG xóa.`
+      );
     }
 
     await client.query("COMMIT");
