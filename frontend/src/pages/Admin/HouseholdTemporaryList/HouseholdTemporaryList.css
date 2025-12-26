@@ -95,3 +95,34 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 6px rgba(45, 206, 137, 0.3); 
 }
+/* Modal confirmation buttons */
+.modal-btn-cancel {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  color: #333;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.modal-btn-cancel:hover {
+  background-color: #f5f5f5;
+  border-color: #999;
+}
+
+.modal-btn-delete {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #f5222d;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.modal-btn-delete:hover {
+  background-color: #d41d1d;
+}

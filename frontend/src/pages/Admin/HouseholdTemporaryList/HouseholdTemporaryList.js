@@ -328,32 +328,17 @@ const HouseholdTemporaryList = () => {
           </p>
           <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
             <button
-              className="btn-cancel"
+              className="modal-btn-cancel"
               onClick={() => {
                 setIsDeleteConfirmOpen(false);
                 setHouseholdToDelete(null);
-              }}
-              style={{
-                padding: "8px 16px",
-                border: "1px solid #ddd",
-                borderRadius: "4px",
-                backgroundColor: "#fff",
-                cursor: "pointer",
               }}
             >
               Hủy
             </button>
             <button
-              className="btn-delete"
+              className="modal-btn-delete"
               onClick={handleConfirmDelete}
-              style={{
-                padding: "8px 16px",
-                border: "none",
-                borderRadius: "4px",
-                backgroundColor: "#f5222d",
-                color: "#fff",
-                cursor: "pointer",
-              }}
             >
               Xóa
             </button>
