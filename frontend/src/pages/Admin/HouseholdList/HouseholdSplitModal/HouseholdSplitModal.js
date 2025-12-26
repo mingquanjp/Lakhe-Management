@@ -24,13 +24,11 @@ const HouseholdSplitModal = ({ isOpen, onClose, householdData, onSave }) => {
   const [errors, setErrors] = useState({});
 
   const [membersList, setMembersList] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen && householdData?.id) {
       const loadMembers = async () => {
         try {
-          setLoading(true);
           const response = await fetchResidents(householdData.id);
           if (response.success && response.data) {
             const formattedMembers = response.data.map((r) => ({
@@ -43,8 +41,6 @@ const HouseholdSplitModal = ({ isOpen, onClose, householdData, onSave }) => {
         } catch (error) {
           console.error("Lỗi tải thành viên:", error);
           alert("Không thể tải danh sách thành viên của hộ này");
-        } finally {
-          setLoading(false);
         }
       };
       loadMembers();
