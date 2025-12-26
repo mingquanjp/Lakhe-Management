@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import { Card } from "../../../components/commons";
 import "./StatsFinanceDashboard.css";
 import { getFees, getFinanceStats } from "../../../utils/api";

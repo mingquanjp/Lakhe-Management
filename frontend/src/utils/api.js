@@ -50,7 +50,19 @@ export const getUserInfo = () => {
   return user ? JSON.parse(user) : null;
 };
 
-// Dashboard API calls
+// Remove user info from localStorage
+export const removeUserInfo = () => {
+  localStorage.removeItem("user");
+};
+
+// Clear all auth data
+export const clearAuthData = () => {
+  removeAuthToken();
+  removeUserInfo();
+};
+
+// ========== DASHBOARD APIs ==========
+
 export const getDashboardStats = async (startDate, endDate) => {
   try {
     const token = getAuthToken();
@@ -83,16 +95,6 @@ export const getDashboardStats = async (startDate, endDate) => {
 };
 
 // Remove user info from localStorage
-export const removeUserInfo = () => {
-  localStorage.removeItem("user");
-};
-
-// Clear all auth data
-export const clearAuthData = () => {
-  removeAuthToken();
-  removeUserInfo();
-};
-
 export const fetchHouseholds = async () => {
   const token = getAuthToken();
 
@@ -120,10 +122,10 @@ export const fetchHouseholds = async () => {
 export const getHouseholdById = async (id, includeDeleted = false) => {
   const token = getAuthToken();
   try {
-    const url = includeDeleted 
+    const url = includeDeleted
       ? `${API_BASE_URL}/api/households/${id}?includeDeleted=true`
       : `${API_BASE_URL}/api/households/${id}`;
-      
+
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -187,6 +189,27 @@ export const deleteHousehold = async (id) => {
   }
 };
 
+export const splitHousehold = async (data) => {
+  const token = getAuthToken();
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/households/split`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data),
+    });
+    const resData = await response.json();
+    if (!response.ok) throw new Error(resData.message);
+    return resData;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// ========== RESIDENT APIs ==========
+
 export const fetchResidents = async (householdId) => {
   const token = getAuthToken();
   // Nếu có householdId thì thêm vào đường dẫn query
@@ -206,25 +229,6 @@ export const fetchResidents = async (householdId) => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message);
     return data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const splitHousehold = async (data) => {
-  const token = getAuthToken();
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/households/split`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
-    const resData = await response.json();
-    if (!response.ok) throw new Error(resData.message);
-    return resData;
   } catch (error) {
     throw error;
   }
@@ -284,7 +288,7 @@ export const fetchFees = async () => {
   const token = getAuthToken();
   try {
     const response = await fetch(`${API_BASE_URL}/api/fees`, {
-      method: "GET",
+      method: 'GET',
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -447,14 +451,14 @@ export const fetchAllHouseholdsWithPaymentSummary = async () => {
   }
 };
 export const fetchOverviewStats = async () => {
-  const token = getAuthToken(); 
-  
+  const token = getAuthToken();
+
   try {
     const response = await fetch(`${API_BASE_URL}/api/overview`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` 
+        'Authorization': `Bearer ${token}`
       },
     });
 
@@ -464,7 +468,7 @@ export const fetchOverviewStats = async () => {
       throw new Error(data.message || 'Lỗi khi lấy dữ liệu thống kê');
     }
 
-    return data; 
+    return data;
   } catch (error) {
     throw error;
   }
@@ -473,7 +477,7 @@ export const fetchOverviewStats = async () => {
 
 export const fetchTemporaryHouseholds = async (searchTerm = '') => {
   const token = getAuthToken();
-  
+
   let url = `${API_BASE_URL}/api/households/temporary`;
   if (searchTerm) {
     url += `?search=${encodeURIComponent(searchTerm)}`;
@@ -484,7 +488,7 @@ export const fetchTemporaryHouseholds = async (searchTerm = '') => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` 
+        'Authorization': `Bearer ${token}`
       },
     });
 
@@ -494,7 +498,7 @@ export const fetchTemporaryHouseholds = async (searchTerm = '') => {
       throw new Error(data.message || 'Lỗi khi lấy danh sách tạm trú');
     }
 
-    return data; 
+    return data;
   } catch (error) {
     throw error;
   }

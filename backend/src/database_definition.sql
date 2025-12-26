@@ -3,10 +3,10 @@
 CREATE TABLE users
 (
     user_id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL, -- Tên đăng nhập
-    password VARCHAR(255) NOT NULL, -- Mật khẩu
-    full_name VARCHAR(100) NOT NULL, -- Họ và tên
-    role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'staff')) -- 'admin', 'staff'
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'staff'))
 );
 
 -- 2. Bảng Households (Hộ khẩu)
@@ -18,7 +18,8 @@ CREATE TABLE households
     address VARCHAR(100) NOT NULL, -- Địa chỉ
     date_created DATE DEFAULT CURRENT_DATE, -- Ngày tạo
     deleted_at TIMESTAMP DEFAULT NULL,
-    status VARCHAR(20) DEFAULT 'Active' CHECK (status IN ('Active', 'MovedOut', 'Temporary')) -- 'Active', 'MovedOut'
+    status VARCHAR(20) DEFAULT 'Active' CHECK (status IN ('Active', 'MovedOut', 'Temporary'))
+    -- 'Active', 'MovedOut', 'Temporary'
 );
 
 -- 3. Bảng Residents (Nhân khẩu)
@@ -34,26 +35,42 @@ CREATE TABLE residents
     dob DATE NOT NULL, -- Ngày sinh
     gender VARCHAR(10) NOT NULL CHECK (gender IN ('Male', 'Female')), -- 'Male', 'Female'
     -- 3. Quê quán
-    place_of_birth VARCHAR(255), -- Nơi sinh
-    place_of_origin VARCHAR(255), -- Nguyên quán
-    ethnicity VARCHAR(50), -- Dân tộc
+    place_of_birth VARCHAR(255),
+    -- Nơi sinh
+    place_of_origin VARCHAR(255),
+    -- Nguyên quán
+    ethnicity VARCHAR(50),
+    -- Dân tộc
     -- 4. Nghề nghiệp
-    occupation VARCHAR(100), -- Nghề nghiệp
-    workplace VARCHAR(255), -- Nơi làm việc
+    occupation VARCHAR(100),
+    -- Nghề nghiệp
+    workplace VARCHAR(255),
+    -- Nơi làm việc
     -- 5. Giấy tờ
-    identity_card_number VARCHAR(20) UNIQUE, -- CMND/CCCD
-    identity_card_date DATE, -- Ngày cấp
-    identity_card_place VARCHAR(100), -- Nơi cấp
+    identity_card_number VARCHAR(20) UNIQUE,
+    -- CMND/CCCD
+    identity_card_date DATE,
+    -- Ngày cấp
+    identity_card_place VARCHAR(100),
+    -- Nơi cấp
     -- 6. Thông tin thường trú
-    registration_date DATE DEFAULT CURRENT_DATE, -- Ngày đăng ký thường trú
-    previous_address VARCHAR(255), -- Địa chỉ trước
-    relationship_to_head VARCHAR(50) NOT NULL, -- Quan hệ với chủ hộ
-    notes TEXT, -- Ghi chú
+    registration_date DATE DEFAULT CURRENT_DATE,
+    -- Ngày đăng ký thường trú
+    previous_address VARCHAR(255),
+    -- Địa chỉ trước
+    relationship_to_head VARCHAR(50) NOT NULL,
+    -- Quan hệ với chủ hộ
+    notes TEXT,
+    -- Ghi chú
     -- 7. Thông tin tạm trú
-    temp_home_address VARCHAR(255), -- Địa chỉ tạm trú
-    temp_start_date DATE, -- Ngày bắt đầu tạm trú
-    temp_end_date DATE, -- Ngày kết thúc tạm trú
-    temp_reason TEXT, -- Lý do tạm trú
+    temp_home_address VARCHAR(255),
+    -- Địa chỉ tạm trú
+    temp_start_date DATE,
+    -- Ngày bắt đầu tạm trú
+    temp_end_date DATE,
+    -- Ngày kết thúc tạm trú
+    temp_reason TEXT,
+    -- Lý do tạm trú
     -- 8. Trạng thái
     deleted_at TIMESTAMP DEFAULT NULL,
     status VARCHAR(20) DEFAULT 'Permanent' CHECK (status IN ('Permanent', 'MovedOut', 'Deceased', 'Temporary')) , -- 'Permanent', 'MovedOut', 'Deceased', 'Temporary'
@@ -97,12 +114,18 @@ CREATE TABLE temporary_absences
 CREATE TABLE fees
 (
     fee_id SERIAL PRIMARY KEY,
-    fee_name VARCHAR(100) NOT NULL, -- Tên khoản thu 'Phí vệ sinh 2024', 'Ủng hộ bão lụt'
-    fee_type VARCHAR(20) NOT NULL CHECK (fee_type IN ('Mandatory', 'Voluntary')), -- 'Mandatory', 'Voluntary'
-    amount BIGINT CHECK (amount >= 0), -- Số tiền (NULL nếu là tự nguyện đóng góp tùy tâm)
-    start_date DATE NOT NULL, -- Ngày bắt đầu
-    end_date DATE, -- Ngày kết thúc
-    deleted_at TIMESTAMP DEFAULT NULL -- Soft delete
+    fee_name VARCHAR(100) NOT NULL,
+    -- Tên khoản thu 'Phí vệ sinh 2024', 'Ủng hộ bão lụt'
+    fee_type VARCHAR(20) NOT NULL CHECK (fee_type IN ('Mandatory', 'Voluntary')),
+    -- 'Mandatory', 'Voluntary'
+    amount BIGINT CHECK (amount >= 0),
+    -- Số tiền (NULL nếu là tự nguyện đóng góp tùy tâm)
+    start_date DATE NOT NULL,
+    -- Ngày bắt đầu
+    end_date DATE,
+    -- Ngày kết thúc
+    deleted_at TIMESTAMP DEFAULT NULL
+    -- Soft delete
 );
 
 -- 7. Bảng Payment_History (Lịch sử nộp tiền - Bảng trung gian N-N)

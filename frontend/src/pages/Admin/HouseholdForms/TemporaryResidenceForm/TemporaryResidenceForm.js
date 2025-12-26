@@ -13,6 +13,7 @@ const TemporaryResidenceForm = () => {
         hostHouseholdId: '', // For existing household
         fullName: '',
         dob: '',
+        gender: 'Nam',
         identityCard: '',
         fromDate: '',
         toDate: '',
@@ -365,9 +366,9 @@ const TemporaryResidenceForm = () => {
                         )}
                         
                         <Input
-                            label="Họ và tên"
-                            name="fullName"
-                            value={formData.fullName}
+                            label={isTemporaryResidence ? "Mã hộ khẩu (HKTT2025-XX)" : "Mã tạm vắng (HKTV2025-XX)"}
+                            name="householdCode"
+                            value={formData.householdCode}
                             onChange={handleChange}
                             required
                             readOnly={formData.type === 'temporary_absence'}
@@ -381,6 +382,18 @@ const TemporaryResidenceForm = () => {
                             onChange={handleChange}
                             required
                         />
+                        <div className="form-group">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Giới tính</label>
+                            <select
+                                name="gender"
+                                value={formData.gender}
+                                onChange={handleChange}
+                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
                         <Input
                             label="Số CMND/CCCD"
                             name="identityCard"
@@ -463,7 +476,15 @@ const TemporaryResidenceForm = () => {
                                     <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mb-3">Thông tin chủ hộ (Nơi tạm trú)</h3>
                                     <div className="grid grid-cols-2 gap-3">
                                         <Input
-                                            label="Tên chủ hộ"
+                                            label="Địa chỉ tạm trú"
+                                            name="temporaryAddress"
+                                            value={formData.temporaryAddress}
+                                            onChange={handleChange}
+                                            required
+                                            placeholder="Nhập địa chỉ tạm trú"
+                                        />
+                                        <Input
+                                            label="Tên chủ hộ (nếu có)"
                                             name="hostName"
                                             value={formData.hostName}
                                             onChange={handleChange}
@@ -479,14 +500,24 @@ const TemporaryResidenceForm = () => {
                                 </div>
                             </>
                         ) : (
-                            <Input
-                                label="Nơi đến (Địa chỉ tạm trú)"
-                                name="tempAddress"
-                                value={formData.tempAddress}
-                                onChange={handleChange}
-                                required
-                                placeholder="Nhập địa chỉ nơi sẽ đến tạm trú"
-                            />
+                            <>
+                                <Input
+                                    label="Địa chỉ thường trú (Hiện tại)"
+                                    name="permanentAddress"
+                                    value={formData.permanentAddress}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Nhập địa chỉ thường trú hiện tại"
+                                />
+                                <Input
+                                    label="Nơi đến (Địa chỉ tạm trú)"
+                                    name="tempAddress"
+                                    value={formData.tempAddress}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Nhập địa chỉ nơi sẽ đến tạm trú"
+                                />
+                            </>
                         )}
                     </div>
                 </div>

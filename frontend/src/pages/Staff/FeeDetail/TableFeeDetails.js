@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Table, Button, Modal, Pagination, Loading } from '../../../components/commons';
 import PaymentForm from '../../../components/forms/Paymentform';
-import { 
-  getAllFees, 
-  getFeeById, 
-  getFeeSummary, 
+import {
+  getAllFees,
+  getFeeById,
+  getFeeSummary,
   getAllHouseholdsForFee,
   createPayment,
   updatePayment,
@@ -31,7 +31,7 @@ const TableFeeDetail = () => {
   const [paymentMode, setPaymentMode] = useState('create'); // 'create' hoặc 'edit'
   const [editingPayment, setEditingPayment] = useState(null); // Lưu payment đang edit
   const itemsPerPage = 6;
-  
+
   // ← THÊM: Fetch all fees và redirect nếu không có feeId
   useEffect(() => {
     const initializeFees = async () => {
@@ -39,13 +39,13 @@ const TableFeeDetail = () => {
         const feesResponse = await getAllFees();
         if (feesResponse.success && feesResponse.data.length > 0) {
           setAllFees(feesResponse.data);
-          
+
           // Nếu không có feeId trong URL, redirect đến fee đầu tiên
           if (!feeId) {
             navigate(`/staff/table-detail/${feesResponse.data[0].fee_id}`, { replace: true });
           }
         } else if (!feeId) {
-  
+
           setError('Chưa có khoản thu nào. Vui lòng tạo khoản thu mới.');
           setLoading(false);
         }
@@ -156,8 +156,8 @@ const TableFeeDetail = () => {
 
   const handlePaymentSubmit = async (paymentData) => {
     try {
-      const amountToPay = currentFee.fee_type === 'Mandatory' 
-        ? currentFee.amount 
+      const amountToPay = currentFee.fee_type === 'Mandatory'
+        ? currentFee.amount
         : paymentData.amount;
 
       if (paymentMode === 'edit') {
@@ -173,9 +173,9 @@ const TableFeeDetail = () => {
           setPaymentMode('create');
           setEditingPayment(null);
           setSelectedHousehold(null);
-          
+
           await fetchFeeData();
-          
+
           toast.success('Cập nhật thanh toán thành công!');
         }
       } else {
@@ -193,9 +193,9 @@ const TableFeeDetail = () => {
           setPaymentMode('create');
           setEditingPayment(null);
           setSelectedHousehold(null);
-          
+
           await fetchFeeData();
-          
+
           toast.success('Ghi nhận thanh toán thành công!');
         }
       }
@@ -226,9 +226,9 @@ const TableFeeDetail = () => {
         setPaymentMode('create');
         setEditingPayment(null);
         setSelectedHousehold(null);
-        
+
         await fetchFeeData();
-        
+
         toast.success('Xóa thanh toán thành công! Hộ đã được chuyển về trạng thái chưa nộp.');
       }
     } catch (err) {
@@ -292,7 +292,7 @@ const TableFeeDetail = () => {
       return {
         ...col,
         render: (value, row) => (
-          <Button 
+          <Button
             variant={row.payment_status === 'Đã nộp' ? 'outline' : 'primary'}
             size="small"
             onClick={() => handleViewDetail(row)}
@@ -350,9 +350,9 @@ const TableFeeDetail = () => {
 
       // Export
       const success = exportToExcelWithHeaders(
-        exportData, 
-        headers, 
-        fileName, 
+        exportData,
+        headers,
+        fileName,
         sheetName
       );
 
@@ -393,16 +393,16 @@ const TableFeeDetail = () => {
     <div className="fee-detail-page">
       <div className="fee-detail-header">
         <div className="header-left">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="small"
             onClick={() => navigate("/staff/fee-management")}
           >
             ← Quay lại dashboard
           </Button>
           <h1>Chi tiết đợt thu</h1>
-          
-          <select 
+
+          <select
             className="fee-selector"
             value={feeId}
             onChange={handleFeeChange}
@@ -444,7 +444,7 @@ const TableFeeDetail = () => {
             Chi tiết thu phí: {currentFee.fee_name}
             {filteredData.length > 0 && ` (${filteredData.length} hộ)`}
           </p>
-          
+
           <div className="table-actions">
             <div className="search-box">
               <input
@@ -456,15 +456,15 @@ const TableFeeDetail = () => {
               />
             </div>
             <div className="action-buttons">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="small"
                 onClick={fetchFeeData}
               >
                 Làm mới
               </Button>
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 size="small"
                 onClick={handleExportExcel}
               >
@@ -478,54 +478,54 @@ const TableFeeDetail = () => {
           <>
             <Table columns={enhancedColumns} data={enhancedData} />
 
-             {/* Pagination */}
-                  {totalPages > 1 && (
-                    <div className="pagination">
-                      <button 
-                        className="pagination-btn"
-                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        disabled={currentPage === 1}
-                      >
-                        ← Trước
-                      </button>
-                      <div className="pagination-info">
-                        <span>Trang </span>
-                        <input
-                          type="number"
-                          className="pagination-input"
-                          min="1"
-                          max={totalPages}
-                          value={currentPage}
-                          onChange={(e) => {
-                            const value = parseInt(e.target.value);
-                            if (value >= 1 && value <= totalPages) {
-                              setCurrentPage(value);
-                            }
-                          }}
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              const value = parseInt(e.target.value);
-                              if (value >= 1 && value <= totalPages) {
-                                setCurrentPage(value);
-                              } else if (value < 1) {
-                                setCurrentPage(1);
-                              } else if (value > totalPages) {
-                                setCurrentPage(totalPages);
-                              }
-                            }
-                          }}
-                        />
-                        <span> / {totalPages}</span>
-                      </div>
-                      <button 
-                        className="pagination-btn"
-                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                        disabled={currentPage === totalPages}
-                      >
-                        Sau →
-                      </button>
-                    </div>
-                  )}
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  ← Trước
+                </button>
+                <div className="pagination-info">
+                  <span>Trang </span>
+                  <input
+                    type="number"
+                    className="pagination-input"
+                    min="1"
+                    max={totalPages}
+                    value={currentPage}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (value >= 1 && value <= totalPages) {
+                        setCurrentPage(value);
+                      }
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        const value = parseInt(e.target.value);
+                        if (value >= 1 && value <= totalPages) {
+                          setCurrentPage(value);
+                        } else if (value < 1) {
+                          setCurrentPage(1);
+                        } else if (value > totalPages) {
+                          setCurrentPage(totalPages);
+                        }
+                      }
+                    }}
+                  />
+                  <span> / {totalPages}</span>
+                </div>
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Sau →
+                </button>
+              </div>
+            )}
           </>
         ) : (
           <div className="no-data">

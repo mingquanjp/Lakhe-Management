@@ -4,7 +4,7 @@ import "./HouseholdTemporaryList.css";
 import HouseholdTemporaryTable from "./HouseholdTemporaryTable/HouseholdTemporaryTable";
 import Pagination from "../../../components/commons/Pagination";
 import HouseholdTemporaryAddModal from "./HouseholdTemporaryAddModal/HouseholdTemporaryAddModal";
-import DeleteConfirmationModal from "../../../components/commons/Modal/DeleteConfirmationModal";
+import Modal from "../../../components/commons/Modal/Modal";
 import {
   fetchTemporaryHouseholds,
   deleteHousehold,
@@ -26,8 +26,8 @@ const HouseholdTemporaryList = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [householdToDelete, setHouseholdToDelete] = useState(null);
   const itemsPerPage = 8;
 
   const loadData = async () => {
@@ -143,28 +143,28 @@ const HouseholdTemporaryList = () => {
     XLSX.writeFile(workbook, "Danh_Sach_Ho_Khau_Tam_Tru.xlsx");
   };
 
-  const handleDelete = (id) => {
-    setItemToDelete(id);
-    setIsDeleteModalOpen(true);
+  const handleDelete = async (id) => {
+    setHouseholdToDelete(id);
+    setIsDeleteConfirmOpen(true);
   };
 
-  const confirmDelete = async () => {
-    if (!itemToDelete) return;
+  const handleConfirmDelete = async () => {
+    if (!householdToDelete) return;
     try {
-      await deleteHousehold(itemToDelete);
-
+      await deleteHousehold(householdToDelete);
       toast.success("Xóa hộ tạm trú thành công!");
+      setIsDeleteConfirmOpen(false);
+      setHouseholdToDelete(null);
       loadData();
-      setIsDeleteModalOpen(false);
-      setItemToDelete(null);
     } catch (error) {
       console.error("Lỗi xóa:", error);
-
       toast.error(
         error?.response?.data?.message ||
           error.message ||
           "Không thể xóa hộ tạm trú"
       );
+      setIsDeleteConfirmOpen(false);
+      setHouseholdToDelete(null);
     }
   };
 
@@ -313,12 +313,38 @@ const HouseholdTemporaryList = () => {
         size="xl"
       />
 
-      <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={confirmDelete}
-        message="Bạn có chắc chắn muốn xóa hộ khẩu này? Thao tác này không thể hoàn tác."
-      />
+      <Modal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => {
+          setIsDeleteConfirmOpen(false);
+          setHouseholdToDelete(null);
+        }}
+        title="Xác nhận xóa"
+        size="sm"
+      >
+        <div style={{ padding: "20px" }}>
+          <p style={{ marginBottom: "20px", color: "#333" }}>
+            Bạn có chắc chắn muốn xóa hộ khẩu này? Thao tác này không thể hoàn tác.
+          </p>
+          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+            <button
+              className="modal-btn-cancel"
+              onClick={() => {
+                setIsDeleteConfirmOpen(false);
+                setHouseholdToDelete(null);
+              }}
+            >
+              Hủy
+            </button>
+            <button
+              className="modal-btn-delete"
+              onClick={handleConfirmDelete}
+            >
+              Xóa
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -5,7 +5,6 @@ import "./TemporaryAbsenceList.css";
 import TemporaryAbsenceTable from "./TemporaryAbsenceTable";
 import Pagination from "../../../components/commons/Pagination";
 import Modal from "../../../components/commons/Modal";
-import DeleteConfirmationModal from "../../../components/commons/Modal/DeleteConfirmationModal";
 import { exportToCSV } from "../../../utils/exportUtils";
 import { toast } from "react-toastify";
 import { getAuthToken } from "../../../utils/api";
@@ -15,7 +14,7 @@ const TemporaryAbsenceList = () => {
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   
   // Filter states
@@ -46,10 +45,10 @@ const TemporaryAbsenceList = () => {
 
   const handleDelete = (id) => {
     setItemToDelete(id);
-    setIsDeleteModalOpen(true);
+    setIsDeleteConfirmOpen(true);
   };
 
-  const confirmDelete = async () => {
+  const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
     try {
       const token = getAuthToken();
@@ -64,7 +63,7 @@ const TemporaryAbsenceList = () => {
       if (response.ok && result.success) {
         toast.success("Xóa thành công!");
         fetchData();
-        setIsDeleteModalOpen(false);
+        setIsDeleteConfirmOpen(false);
         setItemToDelete(null);
       } else {
         toast.error(result.message || "Lỗi khi xóa");
@@ -203,12 +202,38 @@ const TemporaryAbsenceList = () => {
         )}
       </Modal>
 
-      <DeleteConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={confirmDelete}
-        message="Bạn có chắc chắn muốn xóa bản ghi tạm vắng này? Thao tác này không thể hoàn tác."
-      />
+      <Modal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => {
+          setIsDeleteConfirmOpen(false);
+          setItemToDelete(null);
+        }}
+        title="Xác nhận xóa"
+        size="sm"
+      >
+        <div style={{ padding: "20px" }}>
+          <p style={{ marginBottom: "20px", color: "#333" }}>
+            Bạn có chắc chắn muốn xóa bản ghi tạm vắng này? Thao tác này không thể hoàn tác.
+          </p>
+          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+            <button
+              className="modal-btn-cancel"
+              onClick={() => {
+                setIsDeleteConfirmOpen(false);
+                setItemToDelete(null);
+              }}
+            >
+              Hủy
+            </button>
+            <button
+              className="modal-btn-delete"
+              onClick={handleConfirmDelete}
+            >
+              Xóa
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
