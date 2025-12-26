@@ -262,42 +262,29 @@ const TemporaryResidenceForm = () => {
     return (
         <div className={`temporary-residence-form ${themeClass}`}>
             <form className="space-y-6" onSubmit={handleSubmit}>
-                <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Loại khai báo</h3>
-                    <div className="flex flex-col space-y-4 mb-4">
-                        <label className="inline-flex items-center cursor-pointer">
-                            <input 
-                                type="radio" 
-                                className="form-radio text-yellow-600"
-                                name="type" 
-                                value="temporary_residence_new" 
-                                checked={formData.type === 'temporary_residence_new'}
-                                onChange={handleChange}
-                            />
-                            <span className="ml-2 font-medium">Khai báo Tạm trú (Hộ mới)</span>
-                        </label>
-                        <label className="inline-flex items-center cursor-pointer">
-                            <input 
-                                type="radio" 
-                                className="form-radio text-yellow-600"
-                                name="type" 
-                                value="temporary_residence_existing" 
-                                checked={formData.type === 'temporary_residence_existing'}
-                                onChange={handleChange}
-                            />
-                            <span className="ml-2 font-medium">Khai báo Tạm trú (Vào hộ đã có)</span>
-                        </label>
-                        <label className="inline-flex items-center cursor-pointer">
-                            <input 
-                                type="radio" 
-                                className="form-radio text-red-600"
-                                name="type" 
-                                value="temporary_absence" 
-                                checked={formData.type === 'temporary_absence'}
-                                onChange={handleChange}
-                            />
-                            <span className="ml-2 font-medium">Khai báo Tạm vắng</span>
-                        </label>
+                <div className="declaration-tabs-container">
+                    <div className="declaration-tabs">
+                        <button
+                            type="button"
+                            className={`tab-button ${formData.type === 'temporary_residence_new' ? 'active-yellow' : ''}`}
+                            onClick={() => handleChange({ target: { name: 'type', value: 'temporary_residence_new' } })}
+                        >
+                            Tạm trú (Hộ mới)
+                        </button>
+                        <button
+                            type="button"
+                            className={`tab-button ${formData.type === 'temporary_residence_existing' ? 'active-yellow' : ''}`}
+                            onClick={() => handleChange({ target: { name: 'type', value: 'temporary_residence_existing' } })}
+                        >
+                            Tạm trú (Vào hộ có)
+                        </button>
+                        <button
+                            type="button"
+                            className={`tab-button ${formData.type === 'temporary_absence' ? 'active-red' : ''}`}
+                            onClick={() => handleChange({ target: { name: 'type', value: 'temporary_absence' } })}
+                        >
+                            Tạm vắng
+                        </button>
                     </div>
                 </div>
                 
@@ -306,6 +293,17 @@ const TemporaryResidenceForm = () => {
                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin cá nhân</h3>
                         
                         {/* Conditional Household Code / Selection */}
+                        {formData.type === 'temporary_residence_new' && (
+                            <Input
+                                label="Mã hộ khẩu mới"
+                                name="householdCode"
+                                value={formData.householdCode}
+                                onChange={handleChange}
+                                required
+                                placeholder="Nhập mã hộ khẩu mới"
+                            />
+                        )}
+                        
                         {formData.type === 'temporary_residence_existing' && (
                             <div className="input-group">
                                 <label className="input-label">Chọn hộ khẩu thường trú</label>
@@ -461,8 +459,8 @@ const TemporaryResidenceForm = () => {
                                         onChange={handleChange}
                                     />
                                 </div>
-                                <div className="bg-yellow-50 p-3 rounded border border-yellow-100 mt-2">
-                                    <p className="text-sm font-medium text-yellow-800 mb-2">Thông tin chủ hộ (Nơi tạm trú)</p>
+                                <div className="bg-yellow-50 p-4 rounded border border-yellow-100 mt-4">
+                                    <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mb-3">Thông tin chủ hộ (Nơi tạm trú)</h3>
                                     <div className="grid grid-cols-2 gap-3">
                                         <Input
                                             label="Tên chủ hộ"
