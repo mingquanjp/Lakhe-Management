@@ -71,7 +71,7 @@ const TemporaryResidenceForm = () => {
         }
     };
 
-    const handleHouseholdChange = async (e) => {
+    const handleHouseholdChange = (e) => {
         const householdId = e.target.value;
         const selectedHousehold = households.find(h => h.household_id === parseInt(householdId));
         
@@ -306,7 +306,7 @@ const TemporaryResidenceForm = () => {
                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin cá nhân</h3>
                         
                         {/* Conditional Household Code / Selection */}
-                        {(formData.type === 'temporary_residence_existing' || formData.type === 'temporary_absence') ? (
+                        {formData.type === 'temporary_residence_existing' ? (
                             <div className="input-group">
                                 <label className="input-label">Chọn hộ khẩu thường trú</label>
                                 <select 
