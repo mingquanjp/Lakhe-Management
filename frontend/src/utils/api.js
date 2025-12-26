@@ -117,10 +117,14 @@ export const fetchHouseholds = async () => {
   }
 };
 
-export const getHouseholdById = async (id) => {
+export const getHouseholdById = async (id, includeDeleted = false) => {
   const token = getAuthToken();
   try {
-    const response = await fetch(`${API_BASE_URL}/api/households/${id}`, {
+    const url = includeDeleted 
+      ? `${API_BASE_URL}/api/households/${id}?includeDeleted=true`
+      : `${API_BASE_URL}/api/households/${id}`;
+      
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

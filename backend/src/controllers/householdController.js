@@ -433,15 +433,17 @@ const createTemporaryHousehold = async (req, res) => {
 const getHouseholdById = async (req, res) => {
   try {
     const { id } = req.params;
+    const { includeDeleted } = req.query;
     
-    // 1. Lấy thông tin hộ khẩu
+    const deletedCondition = includeDeleted === 'true' ? '' : 'AND h.deleted_at IS NULL';
+    
     const householdQuery = `
       SELECT 
         h.*,
         CONCAT(r.first_name, ' ', r.last_name) as owner_name
       FROM households h
       LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
-      WHERE h.household_id = $1 AND h.deleted_at IS NULL
+      WHERE h.household_id = $1 ${deletedCondition}
     `;
     const householdResult = await pool.query(householdQuery, [id]);
 
@@ -449,10 +451,11 @@ const getHouseholdById = async (req, res) => {
       return res.status(404).json({ success: false, message: "Không tìm thấy hộ khẩu" });
     }
 
-    // 2. Lấy danh sách thành viên
+    // 2. Lấy danh sách thành viên (bao gồm cả đã xóa nếu includeDeleted=true)
+    const residentsDeletedCondition = includeDeleted === 'true' ? '' : 'AND deleted_at IS NULL';
     const residentsQuery = `
       SELECT * FROM residents 
-      WHERE household_id = $1 AND deleted_at IS NULL
+      WHERE household_id = $1 ${residentsDeletedCondition}
     `;
     const residentsResult = await pool.query(residentsQuery, [id]);
 

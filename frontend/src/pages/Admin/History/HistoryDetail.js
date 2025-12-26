@@ -17,7 +17,7 @@ const HistoryDetail = () => {
             try {
                 const [historyRes, householdRes] = await Promise.all([
                     fetchHistory(id),
-                    getHouseholdById(id)
+                    getHouseholdById(id, true) 
                 ]);
                 
                 setHistoryData(historyRes.data);
