@@ -4,12 +4,17 @@ const logChange = async (client, householdId, residentId, changeType, userId, no
   if (!userId) return; 
   
   let query, values;
+  
   if (changeDate) {
+      const date = new Date(changeDate);
+      const now = new Date();
+      date.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+      
       query = `
         INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id, notes, change_date)
         VALUES ($1, $2, $3, $4, $5, $6)
       `;
-      values = [householdId, residentId, changeType, userId, notes, changeDate];
+      values = [householdId, residentId, changeType, userId, notes, date];
   } else {
       query = `
         INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id, notes)
