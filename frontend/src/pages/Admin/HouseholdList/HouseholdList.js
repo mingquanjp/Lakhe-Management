@@ -42,7 +42,7 @@ const HouseholdList = () => {
           ...item,
           id: item.household_id,
           code: item.household_code,
-          owner: item.owner_name || "Chưa có chủ hộ",
+          owner: item.head_name || "Chưa có chủ hộ",
           address: item.address,
           members: parseInt(item.member_count) || 0,
         }));
