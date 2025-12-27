@@ -71,7 +71,7 @@ const Sidebar = () => {
       id: "staff",
       label: "Quản lý cán bộ",
       icon: Staff,
-      path: "/admin/staff-management",
+      path: "/admin/accounts",
     },
   ];
 
