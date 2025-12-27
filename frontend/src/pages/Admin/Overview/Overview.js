@@ -48,15 +48,17 @@ const Overview = () => {
     <div className="overview-container">
       {/* 1. Hàng Thống kê (Cards) */}
       <div className="stats-grid">
-        {data.stats.map((item, index) => (
-          <StatCard
-            key={index}
-            title={item.title}
-            value={item.value}
-            change={item.change}
-            isPositive={item.isPositive}
-          />
-        ))}
+        {data.stats.map((item, index) => {
+          const colors = ["#1890ff", "#722ed1", "#fa8c16", "#52c41a", "#eb2f96"];
+          return (
+            <StatCard
+              key={index}
+              title={item.title}
+              value={item.value}
+              color={colors[index % colors.length]}
+            />
+          );
+        })}
       </div>
 
       {/* 2. Hàng Biểu đồ Dân số & Hoạt động */}
