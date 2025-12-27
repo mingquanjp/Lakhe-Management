@@ -173,47 +173,47 @@ const HouseholdTemporaryList = () => {
 
   return (
     <div className="household-page">
-      <div className="page-header">
         <h2 className="page-title">Danh sách hộ khẩu tạm trú</h2>
         <div className="toolbar">
-          <div className="search-box">
-            <Search size={18} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
+          <div className="toolbar-left">
+            
+            <div className="search-householdtemporary-box">
+              <Search size={18} className="search-icon" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <button
+              className={`btn-householdtemporary-tool ${showFilter ? "active" : ""}`}
+              onClick={() => setShowFilter(!showFilter)}
+              style={
+                showFilter
+                  ? {
+                      backgroundColor: "#e6f7ff",
+                      borderColor: "#1890ff",
+                      color: "#1890ff",
+                    }
+                  : {}
+              }
+            >
+              <Filter size={16} /> Lọc
+            </button>
+            <button className="btn-householdtemporary-tool" onClick={handleExport}>
+              <Download size={16} /> Xuất Excel
+            </button>
+            
           </div>
 
           <button
-            className={`btn-tool ${showFilter ? "active" : ""}`}
-            onClick={() => setShowFilter(!showFilter)}
-            style={
-              showFilter
-                ? {
-                    backgroundColor: "#e6f7ff",
-                    borderColor: "#1890ff",
-                    color: "#1890ff",
-                  }
-                : {}
-            }
-          >
-            <Filter size={16} /> Lọc
-          </button>
-
-          <button className="btn-tool" onClick={handleExport}>
-            <Download size={16} /> Xuất Excel
-          </button>
-
-          <button
-            className="btn-tool btn-add"
+            className="btn-householdtemporary-add"
             onClick={() => setIsAddModalOpen(true)}
           >
             <Split size={16} /> Thêm hộ khẩu
           </button>
-        </div>
-      </div>
+       </div>
 
       {showFilter && (
         <div
