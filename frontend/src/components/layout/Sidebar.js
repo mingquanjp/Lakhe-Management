@@ -42,11 +42,11 @@ const Sidebar = () => {
       label: "Quản lý dân cư",
       icon: People,
       subItems: [
-        { id: "household", label: "Quản lý hộ khẩu thường trú", path: "/admin/household" },
-        { id: "householdtemporary", label: "Quản lý hộ khẩu tạm trú", path: "/admin/householdtemporary" },
+        { id: "household", label: "Quản lý hộ thường trú", path: "/admin/household" },
+        { id: "householdtemporary", label: "Quản lý hộ tạm trú", path: "/admin/householdtemporary" },
         { id: "temporary-absence", label: "Quản lý tạm vắng", path: "/admin/temporary-absence" },
         { id: "history", label: "Lịch sử biến động", path: "/admin/history" },
-        { id: "form", label: "Form khai báo", path: "/admin/form" },
+        { id: "form", label: "Biểu mẫu khai báo", path: "/admin/form" },
       ],
     },
 
@@ -71,7 +71,7 @@ const Sidebar = () => {
       id: "staff",
       label: "Quản lý cán bộ",
       icon: Staff,
-      path: "/admin/staff-management",
+      path: "/admin/accounts",
     },
   ];
 

@@ -4,6 +4,7 @@ import "./HouseholdTemporaryList.css";
 import HouseholdTemporaryTable from "./HouseholdTemporaryTable/HouseholdTemporaryTable";
 import Pagination from "../../../components/commons/Pagination";
 import HouseholdTemporaryAddModal from "./HouseholdTemporaryAddModal/HouseholdTemporaryAddModal";
+import Modal from "../../../components/commons/Modal/Modal";
 import {
   fetchTemporaryHouseholds,
   deleteHousehold,
@@ -25,6 +26,8 @@ const HouseholdTemporaryList = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [householdToDelete, setHouseholdToDelete] = useState(null);
   const itemsPerPage = 8;
 
   const loadData = async () => {
@@ -141,19 +144,27 @@ const HouseholdTemporaryList = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await deleteHousehold(id);
+    setHouseholdToDelete(id);
+    setIsDeleteConfirmOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!householdToDelete) return;
+    try {
+      await deleteHousehold(householdToDelete);
       toast.success("Xóa hộ tạm trú thành công!");
+      setIsDeleteConfirmOpen(false);
+      setHouseholdToDelete(null);
       loadData();
     } catch (error) {
       console.error("Lỗi xóa:", error);
-
       toast.error(
         error?.response?.data?.message ||
           error.message ||
           "Không thể xóa hộ tạm trú"
       );
+      setIsDeleteConfirmOpen(false);
+      setHouseholdToDelete(null);
     }
   };
 
@@ -162,47 +173,47 @@ const HouseholdTemporaryList = () => {
 
   return (
     <div className="household-page">
-      <div className="page-header">
         <h2 className="page-title">Danh sách hộ khẩu tạm trú</h2>
         <div className="toolbar">
-          <div className="search-box">
-            <Search size={18} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
+          <div className="toolbar-left">
+            
+            <div className="search-householdtemporary-box">
+              <Search size={18} className="search-icon" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <button
+              className={`btn-householdtemporary-tool ${showFilter ? "active" : ""}`}
+              onClick={() => setShowFilter(!showFilter)}
+              style={
+                showFilter
+                  ? {
+                      backgroundColor: "#e6f7ff",
+                      borderColor: "#1890ff",
+                      color: "#1890ff",
+                    }
+                  : {}
+              }
+            >
+              <Filter size={16} /> Lọc
+            </button>
+            <button className="btn-householdtemporary-tool" onClick={handleExport}>
+              <Download size={16} /> Xuất Excel
+            </button>
+            
           </div>
 
           <button
-            className={`btn-tool ${showFilter ? "active" : ""}`}
-            onClick={() => setShowFilter(!showFilter)}
-            style={
-              showFilter
-                ? {
-                    backgroundColor: "#e6f7ff",
-                    borderColor: "#1890ff",
-                    color: "#1890ff",
-                  }
-                : {}
-            }
-          >
-            <Filter size={16} /> Lọc
-          </button>
-
-          <button className="btn-tool" onClick={handleExport}>
-            <Download size={16} /> Xuất Excel
-          </button>
-
-          <button
-            className="btn-tool btn-add"
+            className="btn-householdtemporary-add"
             onClick={() => setIsAddModalOpen(true)}
           >
             <Split size={16} /> Thêm hộ khẩu
           </button>
-        </div>
-      </div>
+       </div>
 
       {showFilter && (
         <div
@@ -301,6 +312,39 @@ const HouseholdTemporaryList = () => {
         onSave={handleSaveHousehold}
         size="xl"
       />
+
+      <Modal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => {
+          setIsDeleteConfirmOpen(false);
+          setHouseholdToDelete(null);
+        }}
+        title="Xác nhận xóa"
+        size="sm"
+      >
+        <div style={{ padding: "20px" }}>
+          <p style={{ marginBottom: "20px", color: "#333" }}>
+            Bạn có chắc chắn muốn xóa hộ khẩu này? Thao tác này không thể hoàn tác.
+          </p>
+          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+            <button
+              className="modal-btn-cancel"
+              onClick={() => {
+                setIsDeleteConfirmOpen(false);
+                setHouseholdToDelete(null);
+              }}
+            >
+              Hủy
+            </button>
+            <button
+              className="modal-btn-delete"
+              onClick={handleConfirmDelete}
+            >
+              Xóa
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
+import Modal from '../../../../components/commons/Modal';
 import { getAuthToken } from '../../../../utils/api';
 import './ChangeOwnerForm.css';
 
@@ -16,6 +17,11 @@ const ChangeOwnerForm = () => {
         newOwnerId: '', // Đổi tên cho khớp với logic xử lý
         reason: '',
         date: new Date().toISOString().split('T')[0]
+    });
+    const [notification, setNotification] = useState({
+        isOpen: false,
+        type: 'success',
+        message: ''
     });
 
     useEffect(() => {
@@ -57,7 +63,7 @@ const ChangeOwnerForm = () => {
                     setCurrentHeadId(data.household.head_of_household_id || null);
                     setFormData(prev => ({
                         ...prev,
-                        currentOwner: data.household.owner_name || 'Chưa có chủ hộ',
+                        currentOwner: data.household.owner_name || data.household.head_name || 'Chưa có chủ hộ',
                         newOwnerId: ''
                     }));
                 }
@@ -82,7 +88,11 @@ const ChangeOwnerForm = () => {
         e.preventDefault();
         
         if (!selectedHouseholdId || !formData.newOwnerId) {
-            alert('Vui lòng chọn hộ khẩu và chủ hộ mới');
+            setNotification({
+                isOpen: true,
+                message: 'Vui lòng chọn hộ khẩu và chủ hộ mới',
+                type: 'error'
+            });
             return;
         }
 
@@ -105,16 +115,28 @@ const ChangeOwnerForm = () => {
             const result = await response.json();
 
             if (response.ok) {
-                alert('Đã thay đổi chủ hộ thành công!');
+                setNotification({
+                    isOpen: true,
+                    message: 'Đã thay đổi chủ hộ thành công!',
+                    type: 'success'
+                });
                 // Refresh data
                 handleHouseholdChange({ target: { value: selectedHouseholdId } });
                 setFormData(prev => ({ ...prev, reason: '', newOwnerId: '' }));
             } else {
-                alert(`Lỗi: ${result.message}`);
+                setNotification({
+                    isOpen: true,
+                    message: `Lỗi: ${result.message}`,
+                    type: 'error'
+                });
             }
         } catch (error) {
             console.error('Error changing owner:', error);
-            alert('Có lỗi xảy ra khi thay đổi chủ hộ');
+            setNotification({
+                isOpen: true,
+                message: 'Có lỗi xảy ra khi thay đổi chủ hộ',
+                type: 'error'
+            });
         }
     };
 
@@ -132,7 +154,7 @@ const ChangeOwnerForm = () => {
                         <option value="">-- Chọn hộ khẩu --</option>
                         {households.map(h => (
                             <option key={h.household_id} value={h.household_id}>
-                                {h.household_code} - {h.owner_name}
+                                {h.household_code} - {h.head_name}
                             </option>
                         ))}
                     </select>
@@ -194,6 +216,25 @@ const ChangeOwnerForm = () => {
                     <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">Lưu thay đổi</Button>
                 </div>
             </form>
+
+            <Modal
+                isOpen={notification.isOpen}
+                onClose={() => setNotification({ ...notification, isOpen: false })}
+                title={notification.type === 'success' ? 'Thành công' : 'Lỗi'}
+                size="sm"
+            >
+                <div style={{ padding: "20px" }}>
+                    <p style={{ marginBottom: "20px", color: "#333" }}>{notification.message}</p>
+                    <div className="modal-footer">
+                        <button 
+                            className={notification.type === 'success' ? "modal-btn-success" : "modal-btn-delete"}
+                            onClick={() => setNotification({ ...notification, isOpen: false })}
+                        >
+                            Đóng
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };

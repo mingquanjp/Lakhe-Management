@@ -321,51 +321,215 @@ const HouseholdDetail = () => {
                 size="medium"
             >
                 {selectedResidentDetail && (
-                    <div className="p-0">
-                        <table className="w-full text-sm text-left text-gray-500">
-                            <tbody>
-                                <tr className="border-b border-gray-100">
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 w-1/3">
-                                        Họ và tên
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-900 font-semibold text-lg">
-                                        {selectedResidentDetail.first_name} {selectedResidentDetail.last_name}
-                                    </td>
-                                </tr>
-                                <tr className="border-b border-gray-100">
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">
-                                        Ngày sinh
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-900">
-                                        {new Date(selectedResidentDetail.dob).toLocaleDateString('vi-VN')}
-                                    </td>
-                                </tr>
-                                <tr className="border-b border-gray-100">
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">
-                                        CCCD
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-900">
-                                        {selectedResidentDetail.identity_card_number || 'Chưa có'}
-                                    </td>
-                                </tr>
-                                <tr className="border-b border-gray-100">
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">
-                                        Trạng thái
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <StatusBadge status={selectedResidentDetail.status} />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 align-top">
-                                        Chi tiết biến động
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-800 whitespace-pre-wrap bg-yellow-50">
-                                        {selectedResidentDetail.notes || 'Không có ghi chú'}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div style={{ padding: '20px' }}>
+                        <div style={{ display: 'flex', marginBottom: '30px' }}>
+                            <div style={{ flex: 1, textAlign: 'center', borderRight: '1px solid #eee' }}>
+                                <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#8898aa', textTransform: 'uppercase', marginBottom: '5px' }}>
+                                    Họ và tên
+                                </div>
+                                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#32325d' }}>
+                                    {selectedResidentDetail.first_name} {selectedResidentDetail.last_name}
+                                </div>
+                            </div>
+                            <div style={{ flex: 1, textAlign: 'center', borderRight: '1px solid #eee' }}>
+                                <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#8898aa', textTransform: 'uppercase', marginBottom: '5px' }}>
+                                    Ngày sinh
+                                </div>
+                                <div style={{ fontSize: '15px', fontWeight: '600', color: '#32325d' }}>
+                                    {new Date(selectedResidentDetail.dob).toLocaleDateString('vi-VN')}
+                                </div>
+                            </div>
+                            <div style={{ flex: 1, textAlign: 'center' }}>
+                                <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#8898aa', textTransform: 'uppercase', marginBottom: '5px' }}>
+                                    CCCD
+                                </div>
+                                <div style={{ fontSize: '15px', fontWeight: '600', color: '#32325d' }}>
+                                    {selectedResidentDetail.identity_card_number || 'Chưa có'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#8898aa', textTransform: 'uppercase', marginBottom: '10px' }}>
+                                Trạng thái
+                            </div>
+                            <div>
+                                <StatusBadge status={selectedResidentDetail.status} />
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#8898aa', textTransform: 'uppercase', marginBottom: '8px' }}>
+                                Chi tiết biến động
+                            </div>
+                            <div style={{ fontSize: '14px', color: '#333', lineHeight: '1.6' }}>
+                                {(() => {
+                                    const notes = selectedResidentDetail.notes || '';
+                                    if (!notes) return 'Không có ghi chú';
+
+                                    // Xử lý hiển thị cho trường hợp Chuyển đi
+                                    if (notes.includes('Chuyển đi ngày:')) {
+                                        const dateMatch = notes.match(/Chuyển đi ngày:\s*(.*?)(?=\s*Lý do:|$)/);
+                                        const reasonMatch = notes.match(/Lý do:\s*(.*?)(?=\s*Địa chỉ mới:|$)/);
+                                        const addressMatch = notes.match(/Địa chỉ mới:\s*(.*)/);
+
+                                        return (
+                                            <div style={{ backgroundColor: '#f8f9fa', borderRadius: '8px', padding: '16px', border: '1px solid #e9ecef' }}>
+                                                {dateMatch && (
+                                                    <div style={{ marginBottom: '12px' }}>
+                                                        <span style={{ display: 'block', fontSize: '11px', color: '#8898aa', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                            Ngày chuyển đi
+                                                        </span>
+                                                        <span style={{ color: '#32325d', fontWeight: '500' }}>{dateMatch[1].trim()}</span>
+                                                    </div>
+                                                )}
+                                                {reasonMatch && (
+                                                    <div style={{ marginBottom: '12px' }}>
+                                                        <span style={{ display: 'block', fontSize: '11px', color: '#8898aa', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                            Lý do
+                                                        </span>
+                                                        <span style={{ color: '#32325d', fontWeight: '500' }}>{reasonMatch[1].trim()}</span>
+                                                    </div>
+                                                )}
+                                                {addressMatch && (
+                                                    <div>
+                                                        <span style={{ display: 'block', fontSize: '11px', color: '#8898aa', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                            Địa chỉ mới
+                                                        </span>
+                                                        <span style={{ color: '#32325d', fontWeight: '500' }}>{addressMatch[1].trim()}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    }
+
+                                    // Xử lý hiển thị cho trường hợp Qua đời
+                                    if (notes.includes('Mất ngày:') || notes.includes('Khai tử') || selectedResidentDetail.status === 'Deceased' || selectedResidentDetail.status === 'Đã qua đời') {
+                                        let dateDisplay = '';
+                                        let certDisplay = '';
+                                        let reasonDisplay = '';
+
+                                        // 1. Extract Date
+                                        const datePattern = /(\d{1,2}[\/-]\d{1,2}[\/-]\d{4}|\d{4}[\/-]\d{1,2}[\/-]\d{1,2})/;
+                                        const dateMatch = notes.match(datePattern);
+                                        if (dateMatch) {
+                                            dateDisplay = dateMatch[1];
+                                            try {
+                                                const d = new Date(dateDisplay);
+                                                if (!isNaN(d.getTime())) {
+                                                    dateDisplay = d.toLocaleDateString('vi-VN');
+                                                }
+                                            } catch (e) {}
+                                        }
+
+                                        // 2. Extract Certificate (Manual parsing for robustness)
+                                        const certLabelPattern = /(?:Số giấy chứng tử|Giấy chứng tử)\s*:\s*/i;
+                                        const certLabelMatch = notes.match(certLabelPattern);
+                                        
+                                        if (certLabelMatch) {
+                                            // Start after the label
+                                            const startIndex = certLabelMatch.index + certLabelMatch[0].length;
+                                            let content = notes.substring(startIndex);
+                                            
+                                            // Find the nearest delimiter: "Lý do:", "Nguyên nhân:", "|", or end of string
+                                            // We look for ". Lý do:" or " Lý do:" or just "Lý do:"
+                                            const delimiterPattern = /(?:\.?\s*(?:Lý do|Nguyên nhân)\s*:)|\|/i;
+                                            const delimiterMatch = content.match(delimiterPattern);
+                                            
+                                            if (delimiterMatch) {
+                                                content = content.substring(0, delimiterMatch.index);
+                                            }
+                                            
+                                            certDisplay = content.trim().replace(/[.,;]+$/, '');
+                                        }
+
+                                        // 3. Extract Reason
+                                        const reasonLabelPattern = /(?:Lý do|Nguyên nhân)\s*:\s*/i;
+                                        const reasonLabelMatch = notes.match(reasonLabelPattern);
+                                        
+                                        if (reasonLabelMatch) {
+                                            const startIndex = reasonLabelMatch.index + reasonLabelMatch[0].length;
+                                            let content = notes.substring(startIndex);
+                                            
+                                            // Stop at pipe |
+                                            const pipeIndex = content.indexOf('|');
+                                            if (pipeIndex !== -1) {
+                                                content = content.substring(0, pipeIndex);
+                                            }
+                                            
+                                            reasonDisplay = content.trim().replace(/[.,;]+$/, '');
+                                        } else {
+                                            // Fallback: If no explicit reason, try to get text that is NOT the date and NOT the certificate
+                                            let cleanNotes = notes;
+                                            
+                                            // Remove "Mất ngày: ..." part
+                                            cleanNotes = cleanNotes.replace(/(?:Mất ngày|Ngày mất)\s*:\s*(\d{1,2}[\/-]\d{1,2}[\/-]\d{4}|\d{4}[\/-]\d{1,2}[\/-]\d{1,2})/i, '');
+                                            
+                                            // Remove Certificate part (using the same logic as extraction)
+                                            if (certLabelMatch) {
+                                                const startIndex = certLabelMatch.index;
+                                                let endIndex = notes.length;
+                                                const contentAfterLabel = notes.substring(startIndex + certLabelMatch[0].length);
+                                                const delimiterMatch = contentAfterLabel.match(/(?:\.?\s*(?:Lý do|Nguyên nhân)\s*:)|\|/i);
+                                                if (delimiterMatch) {
+                                                    endIndex = startIndex + certLabelMatch[0].length + delimiterMatch.index;
+                                                }
+                                                // Replace the whole certificate part with empty string
+                                                const certPart = notes.substring(startIndex, endIndex);
+                                                cleanNotes = cleanNotes.replace(certPart, '');
+                                            }
+                                            
+                                            // Remove keywords
+                                            cleanNotes = cleanNotes.replace(/Khai tử/i, '');
+                                            cleanNotes = cleanNotes.replace(/\|/g, '');
+                                            
+                                            // Clean up punctuation
+                                            cleanNotes = cleanNotes.replace(/^[.\s,]+/, '').replace(/[.\s,]+$/, '').trim();
+                                            
+                                            if (cleanNotes) {
+                                                reasonDisplay = cleanNotes;
+                                            }
+                                        }
+
+                                        return (
+                                            <div style={{ backgroundColor: '#fff5f5', borderRadius: '8px', padding: '16px', border: '1px solid #feb2b2' }}>
+                                                <div style={{ marginBottom: '12px' }}>
+                                                    <span style={{ display: 'block', fontSize: '11px', color: '#e53e3e', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                        Ngày mất
+                                                    </span>
+                                                    <span style={{ color: '#c53030', fontWeight: '500' }}>{dateDisplay || 'Chưa cập nhật'}</span>
+                                                </div>
+                                                
+                                                <div style={{ marginBottom: '12px' }}>
+                                                    <span style={{ display: 'block', fontSize: '11px', color: '#e53e3e', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                        Số giấy chứng tử
+                                                    </span>
+                                                    <span style={{ color: '#c53030', fontWeight: '500' }}>{certDisplay || 'Chưa cập nhật'}</span>
+                                                </div>
+                                                
+                                                <div>
+                                                    <span style={{ display: 'block', fontSize: '11px', color: '#e53e3e', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                        Lý do / Ghi chú
+                                                    </span>
+                                                    <span style={{ color: '#c53030', fontWeight: '500' }}>{reasonDisplay || 'Không có ghi chú'}</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    
+                                    return notes;
+                                })()}
+                            </div>
+                        </div>
+
+                        <div className="modal-footer">
+                            <button 
+                                className="modal-btn-cancel"
+                                onClick={() => setSelectedResidentDetail(null)}
+                            >
+                                Đóng
+                            </button>
+                        </div>
                     </div>
                 )}
             </Modal>

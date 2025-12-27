@@ -13,21 +13,60 @@
   margin-bottom: 15px;
 }
 
-.toolbar { display: flex; gap: 15px; align-items: center; }
+.toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
 
-.search-box {
+.toolbar-left {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-householdtemporary-box {
   position: relative;
   background: white;
-  border-radius: 20px;
+  border-radius: 6px;
   border: 1px solid #e9ecef;
-  padding: 8px 15px;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
-  width: 250px;
-  box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15), 0 1px 0 rgba(0, 0, 0, 0.02);
+  gap: 10px;
+  width: 300px;
+  box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15);
+  transition: all 0.2s ease;
 }
-.search-icon { color: #adb5bd; margin-right: 8px; }
-.search-box input { border: none; outline: none; font-size: 14px; width: 100%; color: #525f7f; }
+
+.search-householdtemporary-box:focus-within {
+  border-color: #2dce89;
+  box-shadow: 0 2px 6px rgba(45, 206, 137, 0.2);
+}
+
+.search-icon {
+  color: #adb5bd;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.search-householdtemporary-box input {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  flex: 1;
+  min-width: 0;
+  color: #525f7f;
+  background: transparent;
+  padding-left: 20px;
+}
+
+.search-householdtemporary-box input::placeholder {
+  color: #adb5bd;
+}
 
 .btn-tool {
   display: flex;
@@ -44,6 +83,92 @@
   transition: all 0.2s;
 }
 .btn-tool:hover { transform: translateY(-1px); }
+
+.btn-tool.active {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+.btn-householdtemporary-tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #525f7f;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15);
+  transition: all 0.2s;
+}
+.btn-householdtemporary-tool:hover {
+  transform: translateY(-1px);
+}
+.btn-householdtemporary-tool.active {
+  background-color: #e6f7ff;
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.btn-householdtemporary-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  background-color: #2dce89;
+  border: 1px solid #2dce89;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(45, 206, 137, 0.11);
+}
+.btn-householdtemporary-add:hover {
+  background-color: #25a972;
+  border-color: #25a972;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(45, 206, 137, 0.3);
+}
+
+.filter-panel {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filter-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #525f7f;
+}
+
+.filter-input {
+  padding: 8px 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  font-size: 14px;
+  min-width: 200px;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #5e72e4;
+}
 
 .table-card {
   background: white;
@@ -94,4 +219,51 @@
   border-color: #25a972;
   transform: translateY(-1px);
   box-shadow: 0 4px 6px rgba(45, 206, 137, 0.3); 
+}
+.btn-householdtemporary-add {
+  margin-left: auto; 
+  background-color: #2dce89; 
+  border: 1px solid #2dce89;
+  border-radius: 6px;
+  color: #fff; 
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(45, 206, 137, 0.11); 
+}
+.btn-householdtemporary-add:hover {
+  background-color: #25a972; 
+  border-color: #25a972;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(45, 206, 137, 0.3); 
+}
+/* Modal confirmation buttons */
+.modal-btn-cancel {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  color: #333;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.modal-btn-cancel:hover {
+  background-color: #f5f5f5;
+  border-color: #999;
+}
+
+.modal-btn-delete {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #f5222d;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.modal-btn-delete:hover {
+  background-color: #d41d1d;
 }

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+﻿import React from "react";
+import { useState } from "react";
 import Modal from "../../../../components/commons/Modal/Modal";
 import "./HouseholdAddModal.css";
 import { toast } from "react-toastify";
@@ -253,7 +254,7 @@ const HouseholdAddModal = ({ isOpen, onClose, onSave }) => {
         )}
 
         <div className="form-actions">
-          <button className="btn-cancel" onClick={handleClose}>
+          <button className="btn-add-cancel" onClick={handleClose}>
             Hủy bỏ
           </button>
           <button className="btn-save" onClick={handleSubmit}>

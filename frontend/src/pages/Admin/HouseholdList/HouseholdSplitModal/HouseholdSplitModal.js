@@ -35,7 +35,7 @@ const HouseholdSplitModal = ({ isOpen, onClose, householdData, onSave }) => {
           if (response.success && response.data) {
             const formattedMembers = response.data.map((r) => ({
               id: r.resident_id,
-              name: `${r.last_name} ${r.first_name}`,
+              name: `${r.first_name} ${r.last_name}`,
               dob: r.dob,
             }));
             setMembersList(formattedMembers);
@@ -388,7 +388,7 @@ const HouseholdSplitModal = ({ isOpen, onClose, householdData, onSave }) => {
         )}
 
         <div className="form-actions">
-          <button className="btn-cancel" onClick={handleClose}>
+          <button className="btn-split-cancel" onClick={handleClose}>
             Hủy
           </button>
           {newHouseholds.length > 0 && (

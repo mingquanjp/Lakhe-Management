@@ -95,9 +95,9 @@ const HistoryDetail = () => {
         date: new Date(item.change_date).toLocaleDateString('vi-VN'),
         type: getChangeTypeBadge(item.change_type),
         user: item.changed_by || 'Admin',
-        resident: (item.last_name || item.first_name) 
-            ? `${item.last_name || ''} ${item.first_name || ''}`.trim() 
-            : '-'
+        resident: (item.first_name || item.last_name) 
+            ? `${item.first_name || ''} ${item.last_name || ''}`.trim() 
+            : 'Tất cả'
     }));
 
     if (loading) return <div>Loading...</div>;

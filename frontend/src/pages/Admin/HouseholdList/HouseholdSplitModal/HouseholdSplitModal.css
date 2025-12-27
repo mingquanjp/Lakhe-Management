@@ -188,7 +188,7 @@
   flex-shrink: 0;
 }
 
-.btn-cancel,
+.btn-split-cancel,
 .btn-back,
 .btn-next,
 .btn-save {
@@ -201,13 +201,13 @@
   border: none;
 }
 
-.btn-cancel {
+.btn-split-cancel {
   border: 1px solid #e9ecef;
   background: white;
   color: #525f7f;
 }
 
-.btn-cancel:hover {
+.btn-split-cancel:hover {
   background-color: #f5f7fb;
 }
 

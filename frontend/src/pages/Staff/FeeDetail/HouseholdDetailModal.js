@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import "./HouseholdDetailModal.css";
 import { Modal } from "../../../components/commons";
 import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
@@ -29,8 +30,8 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
             feeType: p.fee_type === 'Mandatory' ? 'mandatory' : 'donation',
             required: p.required_amount || 0,
             paid: p.paid_amount || 0,
-            paymentDate: p.payment_date 
-              ? new Date(p.payment_date).toLocaleDateString('vi-VN') 
+            paymentDate: p.payment_date
+              ? new Date(p.payment_date).toLocaleDateString('vi-VN')
               : 'Chưa nộp',
             status: p.status
           })));
@@ -42,7 +43,7 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
             name: r.full_name,
             birthDate: r.dob ? new Date(r.dob).toLocaleDateString('vi-VN') : '',
             relationship: r.relationship_to_head,
-            residenceStatus: r.residence_status === 'Temporary' ? 'temporary' 
+            residenceStatus: r.residence_status === 'Temporary' ? 'temporary'
               : r.absence_destination ? 'absent' : 'permanent'
           })));
         }
@@ -69,13 +70,13 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
         </span>
       )
     },
-    { 
-      key: "required", 
+    {
+      key: "required",
       title: "Phải nộp",
       render: (value) => new Intl.NumberFormat('vi-VN').format(value)
     },
-    { 
-      key: "paid", 
+    {
+      key: "paid",
       title: "Đã nộp",
       render: (value) => new Intl.NumberFormat('vi-VN').format(value)
     },
@@ -123,21 +124,21 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
       className="household-detail-modal-wrapper"
     >
       <div className="household-detail-content">
-        <div className="household-info-card">
-          <div className="household-info-row">
-            <div className="info-item">
-              <span className="info-label">Số hộ khẩu:</span>
-              <span className="info-value">{household.household_code || household.householdId}</span>
+        <div className="staff-household-info-card">
+          <div className="staff-household-info-row">
+            <div className="staff-info-item">
+              <span className="staff-info-label">Số hộ khẩu:</span>
+              <span className="staff-info-value">{household.household_code || household.householdId}</span>
             </div>
-            <div className="info-item">
-              <span className="info-label">Họ và tên chủ hộ:</span>
-              <span className="info-value">{household.owner_name || household.ownerName}</span>
+            <div className="staff-info-item">
+              <span className="staff-info-label">Họ và tên chủ hộ:</span>
+              <span className="staff-info-value">{household.owner_name || household.ownerName}</span>
             </div>
           </div>
-          <div className="household-info-row">
-            <div className="info-item">
-              <span className="info-label">Địa chỉ:</span>
-              <span className="info-value">{household.address || household.houseNumber}</span>
+          <div className="staff-household-info-row">
+            <div className="staff-info-item">
+              <span className="staff-info-label">Địa chỉ:</span>
+              <span className="staff-info-value">{household.address || household.houseNumber}</span>
             </div>
           </div>
         </div>
@@ -158,7 +159,7 @@ const HouseholdDetailModal = ({ isOpen, onClose, household }) => {
           </button>
         </div>
 
-            <div className="tab-content-wrapper">
+        <div className="tab-content-wrapper">
           {loading ? (
             <p>Đang tải dữ liệu...</p>
           ) : activeTab === "payment" ? (

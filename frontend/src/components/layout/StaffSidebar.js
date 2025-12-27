@@ -40,7 +40,7 @@ const StaffSidebar = () => {
       id: "fee-management",
       label: "Quản lý thu phí",
       icon: overView,
-      // path: "/staff/fee-management", 
+      path: "/staff/fee-management", 
     },
     {
       id: "statistics",
@@ -145,5 +145,4 @@ const StaffSidebar = () => {
 };
 
 export default StaffSidebar;
-
 

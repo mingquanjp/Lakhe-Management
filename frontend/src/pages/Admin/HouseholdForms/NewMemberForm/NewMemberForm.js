@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React from "react";
+import { useState } from "react";
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
 import Card from '../../../../components/commons/Card/Card';
+import Modal from '../../../../components/commons/Modal';
 import './NewMemberForm.css';
 
 const NewMemberForm = () => {
@@ -25,6 +27,11 @@ const NewMemberForm = () => {
         moveInDate: '', // Only for move_in
         address: 'Số 1, Đại Cồ Việt, Hai Bà Trưng, Hà Nội' // Auto-filled for newborn
     });
+    const [notification, setNotification] = useState({
+        isOpen: false,
+        message: '',
+        type: 'success'
+    });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -41,7 +48,11 @@ const NewMemberForm = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('New Member Data:', { type: declarationType, ...formData });
-        alert('Đã thêm nhân khẩu mới thành công!');
+        setNotification({
+            isOpen: true,
+            message: 'Đã thêm nhân khẩu mới thành công!',
+            type: 'success'
+        });
     };
 
     return (
@@ -228,6 +239,24 @@ const NewMemberForm = () => {
                     </Button>
                 </div>
             </form>
+            <Modal
+                isOpen={notification.isOpen}
+                onClose={() => setNotification({ ...notification, isOpen: false })}
+                title={notification.type === 'success' ? 'Thành công' : 'Lỗi'}
+                size="sm"
+            >
+                <div style={{ padding: "20px" }}>
+                    <p style={{ marginBottom: "20px", color: "#333" }}>{notification.message}</p>
+                    <div className="modal-footer">
+                        <button 
+                            className={notification.type === 'success' ? "modal-btn-success" : "modal-btn-delete"}
+                            onClick={() => setNotification({ ...notification, isOpen: false })}
+                        >
+                            Đóng
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </Card>
     );
 };

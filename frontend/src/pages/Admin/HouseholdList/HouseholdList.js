@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Search, Filter, Download, Split, X } from "lucide-react";
+import { Search, Filter, Download, Split} from "lucide-react";
 import "./HouseholdList.css";
 import HouseholdTable from "./HouseholdTable";
 import Pagination from "../../../components/commons/Pagination";
 import HouseholdAddModal from "./HouseholdAddModal";
 import HouseholdSplitModal from "./HouseholdSplitModal";
+import Modal from "../../../components/commons/Modal/Modal";
 import {
   fetchHouseholds,
   createHousehold,
@@ -20,6 +21,8 @@ const HouseholdList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilter, setShowFilter] = useState(false);
@@ -27,6 +30,8 @@ const HouseholdList = () => {
     minMembers: "",
     maxMembers: "",
   });
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [householdToDelete, setHouseholdToDelete] = useState(null);
   const itemsPerPage = 8;
 
   const loadData = async () => {
@@ -39,7 +44,7 @@ const HouseholdList = () => {
           ...item,
           id: item.household_id,
           code: item.household_code,
-          owner: item.owner_name || "Chưa có chủ hộ",
+          owner: item.head_name || "Chưa có chủ hộ",
           address: item.address,
           members: parseInt(item.member_count) || 0,
         }));
@@ -74,12 +79,6 @@ const HouseholdList = () => {
     setCurrentPage(1);
   };
 
-  const clearFilters = () => {
-    setFilters({ minMembers: "", maxMembers: "" });
-    setSearchTerm("");
-    setCurrentPage(1);
-  };
-
   const handleSaveHousehold = async (formData) => {
     try {
       await createHousehold(formData);
@@ -93,13 +92,25 @@ const HouseholdList = () => {
   };
 
   const handleDelete = async (id) => {
+    setHouseholdToDelete(id);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!householdToDelete) return;
     try {
-      await deleteHousehold(id);
+      await deleteHousehold(householdToDelete);
       toast.success("Xóa thành công!");
+      setIsDeleteConfirmOpen(false);
+      setHouseholdToDelete(null);
       loadData();
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
     } catch (error) {
       console.error("Lỗi xóa:", error);
       alert(error.message || "Không thể xóa hộ khẩu này");
+      setIsDeleteConfirmOpen(false);
+      setHouseholdToDelete(null);
     }
   };
 
@@ -183,10 +194,11 @@ const HouseholdList = () => {
 
   return (
     <div className="household-page">
-      <div className="page-header">
-        <h2 className="page-title">Danh sách hộ khẩu thường trú</h2>
-        <div className="toolbar">
-          <div className="search-box">
+      <h2 className="page-title">Danh sách hộ khẩu thường trú</h2>
+      <div className="toolbar">
+        <div className="toolbar-left">
+
+          <div className="search-household-box">
             <Search size={18} className="search-icon" />
             <input
               type="text"
@@ -196,7 +208,7 @@ const HouseholdList = () => {
             />
           </div>
           <button
-            className={`btn-tool ${showFilter ? "active" : ""}`}
+            className={`btn-household-tool ${showFilter ? "active" : ""}`}
             onClick={() => setShowFilter(!showFilter)}
             style={
               showFilter
@@ -211,16 +223,17 @@ const HouseholdList = () => {
             <Filter size={16} /> Lọc
           </button>
 
-          <button className="btn-tool" onClick={handleExport}>
+          <button className="btn-household-tool" onClick={handleExport}>
             <Download size={16} /> Xuất Excel
           </button>
-          <button
-            className="btn-tool btn-add"
-            onClick={() => setIsAddModalOpen(true)}
-          >
-            <Split size={16} /> Thêm hộ khẩu
-          </button>
         </div>
+        
+        <button
+          className="btn-household-add"
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          <Split size={16} /> Thêm hộ khẩu
+        </button>
       </div>
 
       {showFilter && (
@@ -314,6 +327,39 @@ const HouseholdList = () => {
           onSave={handleSplitHousehold}
         />
       )}
+
+      <Modal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => {
+          setIsDeleteConfirmOpen(false);
+          setHouseholdToDelete(null);
+        }}
+        title="Xác nhận xóa"
+        size="sm"
+      >
+        <div style={{ padding: "20px" }}>
+          <p style={{ marginBottom: "20px", color: "#333" }}>
+            Bạn có chắc chắn muốn xóa hộ khẩu này? Thao tác này không thể hoàn tác.
+          </p>
+          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+            <button
+              className="modal-btn-cancel"
+              onClick={() => {
+                setIsDeleteConfirmOpen(false);
+                setHouseholdToDelete(null);
+              }}
+            >
+              Hủy
+            </button>
+            <button
+              className="modal-btn-delete"
+              onClick={handleConfirmDelete}
+            >
+              Xóa
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
