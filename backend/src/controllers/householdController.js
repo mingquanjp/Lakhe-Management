@@ -62,6 +62,9 @@ const getHouseholds = async (req, res) => {
  * POST /api/households
  */
 const createHousehold = async (req, res) => {
+  // 1. Initialize client here
+  const client = await pool.connect();
+  
   try {
     console.log("---- BẮT ĐẦU TẠO HỘ KHẨU ----");
     const { household_code, address, members } = req.body;
@@ -72,12 +75,16 @@ const createHousehold = async (req, res) => {
       return res.status(400).json({ success: false, message: "Thiếu Mã hộ hoặc Địa chỉ" });
     }
 
+    // 2. Start Transaction
+    await client.query("BEGIN");
+
     // Kiểm tra trùng household_code
-    const existingHousehold = await pool.query(
+    const existingHousehold = await client.query(
       'SELECT household_id FROM households WHERE household_code = $1',
       [household_code]
     );
-    if (checkDup.rows.length > 0) {
+    
+    if (existingHousehold.rows.length > 0) {
       throw new Error(`Mã hộ khẩu "${household_code}" đã tồn tại!`);
     }
 
@@ -86,6 +93,7 @@ const createHousehold = async (req, res) => {
       VALUES ($1, $2, 'Active', CURRENT_DATE) 
       RETURNING household_id
     `;
+    // client is now defined
     const houseRes = await client.query(insertHouseInfo, [household_code, address]);
     const newHouseholdId = houseRes.rows[0].household_id;
 
@@ -138,21 +146,17 @@ const createHousehold = async (req, res) => {
       );
     }
 
-    // Removed generic household log to avoid duplication
-    // if (currentUserId) {
-    //   await logChange(client, newHouseholdId, null, 'Added', currentUserId);
-    // }
-
     await client.query("COMMIT");
     console.log("-> Tạo thành công!");
 
     res.status(201).json({
       success: true,
       message: 'Tạo hộ khẩu thành công',
-      data: result.rows[0]
+      data: houseRes.rows[0] 
     });
   } catch (error) {
     await client.query("ROLLBACK");
+    console.error("Create Household Error:", error); // Log error for debugging
     res.status(400).json({ success: false, message: error.message || "Lỗi server" });
   } finally {
     client.release();

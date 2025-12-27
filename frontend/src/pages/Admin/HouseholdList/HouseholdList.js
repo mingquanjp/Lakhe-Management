@@ -42,7 +42,7 @@ const HouseholdList = () => {
           ...item,
           id: item.household_id,
           code: item.household_code,
-          owner: item.owner_name || "Chưa có chủ hộ",
+          owner: item.head_name || "Chưa có chủ hộ",
           address: item.address,
           members: parseInt(item.member_count) || 0,
         }));
@@ -190,10 +190,11 @@ const HouseholdList = () => {
 
   return (
     <div className="household-page">
-      <div className="page-header">
-        <h2 className="page-title">Danh sách hộ khẩu thường trú</h2>
-        <div className="toolbar">
-          <div className="search-box">
+      <h2 className="page-title">Danh sách hộ khẩu thường trú</h2>
+      <div className="toolbar">
+        <div className="toolbar-left">
+
+          <div className="search-household-box">
             <Search size={18} className="search-icon" />
             <input
               type="text"
@@ -203,7 +204,7 @@ const HouseholdList = () => {
             />
           </div>
           <button
-            className={`btn-tool ${showFilter ? "active" : ""}`}
+            className={`btn-household-tool ${showFilter ? "active" : ""}`}
             onClick={() => setShowFilter(!showFilter)}
             style={
               showFilter
@@ -218,16 +219,17 @@ const HouseholdList = () => {
             <Filter size={16} /> Lọc
           </button>
 
-          <button className="btn-tool" onClick={handleExport}>
+          <button className="btn-household-tool" onClick={handleExport}>
             <Download size={16} /> Xuất Excel
           </button>
-          <button
-            className="btn-tool btn-add"
-            onClick={() => setIsAddModalOpen(true)}
-          >
-            <Split size={16} /> Thêm hộ khẩu
-          </button>
         </div>
+        
+        <button
+          className="btn-household-add"
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          <Split size={16} /> Thêm hộ khẩu
+        </button>
       </div>
 
       {showFilter && (
