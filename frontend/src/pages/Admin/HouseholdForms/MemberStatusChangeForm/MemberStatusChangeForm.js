@@ -269,9 +269,9 @@ const MemberStatusChangeForm = () => {
             </form>
             <Modal
                 isOpen={notification.isOpen}
-                onClose={() => setNotification({ ...notification, isOpen: false })}
                 title={notification.type === 'success' ? 'Thành công' : 'Lỗi'}
                 size="sm"
+                // className="notification-modal"
             >
                 <div style={{ padding: "20px" }}>
                     <p style={{ marginBottom: "20px", color: "#333" }}>{notification.message}</p>

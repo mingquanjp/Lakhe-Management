@@ -142,3 +142,8 @@
     margin-top: 20px;
 }
 
+.modal-close,
+.modal-header button {
+    display: none !important;
+}
+

@@ -130,7 +130,7 @@ const TemporaryResidenceForm = () => {
             setSelectedResidentId(member.resident_id);
             setFormData(prev => ({
                 ...prev,
-                fullName: `${member.last_name} ${member.first_name}`,
+                fullName: `${member.first_name} ${member.last_name}`,
                 dob: member.dob ? new Date(member.dob).toISOString().split('T')[0] : '',
                 identityCard: member.identity_card_number || '',
             }));
@@ -304,14 +304,14 @@ const TemporaryResidenceForm = () => {
                             className={`tab-button ${formData.type === 'temporary_residence_new' ? 'active-yellow' : ''}`}
                             onClick={() => handleChange({ target: { name: 'type', value: 'temporary_residence_new' } })}
                         >
-                            Tạm trú (Hộ mới)
+                            Tạm trú (Thêm hộ mới)
                         </button>
                         <button
                             type="button"
                             className={`tab-button ${formData.type === 'temporary_residence_existing' ? 'active-yellow' : ''}`}
                             onClick={() => handleChange({ target: { name: 'type', value: 'temporary_residence_existing' } })}
                         >
-                            Tạm trú (Vào hộ có)
+                            Tạm trú (Vào hộ đã có)
                         </button>
                         <button
                             type="button"
@@ -371,121 +371,121 @@ const TemporaryResidenceForm = () => {
                         )}
                         
                         {/* Temporary Absence: Household and Member Selector */}
-                        {formData.type === 'temporary_absence' && (
-                            <>
-                                <div className="input-group">
-                                    <label className="input-label">Chọn hộ khẩu</label>
-                                    <select 
-                                        className="input-field"
-                                        value={selectedAbsenceHouseholdId}
-                                        onChange={handleAbsenceHouseholdChange}
-                                        required
-                                    >
-                                        <option value="">-- Chọn hộ khẩu --</option>
-                                        {households.map(h => (
-                                            <option key={h.household_id} value={h.household_id}>
-                                                {h.household_code} - {h.head_name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                
-                                <div className="input-group">
-                                    <label className="input-label">Chọn thành viên</label>
-                                    <select 
-                                        className="input-field"
-                                        value={selectedResidentId || ''}
-                                        onChange={handleMemberChange}
-                                        required
-                                        disabled={!selectedAbsenceHouseholdId}
-                                    >
-                                        <option value="">-- Chọn thành viên --</option>
-                                        {householdMembers.map(member => (
-                                            <option key={member.resident_id} value={member.resident_id}>
-                                                {member.first_name} {member.last_name} - {member.dob ? new Date(member.dob).toLocaleDateString('vi-VN') : 'N/A'}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </>
-                        )}
+                                                {formData.type === 'temporary_absence' && (
+                                                    <>
+                                                        <div className="input-group">
+                                                            <label className="input-label">Chọn hộ khẩu</label>
+                                                            <select 
+                                                                className="input-field"
+                                                                value={selectedAbsenceHouseholdId}
+                                                                onChange={handleAbsenceHouseholdChange}
+                                                                required
+                                                            >
+                                                                <option value="">-- Chọn hộ khẩu --</option>
+                                                                {households.map(h => (
+                                                                    <option key={h.household_id} value={h.household_id}>
+                                                                        {h.household_code} - {h.head_name}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                        
+                                                        <div className="input-group">
+                                                            <label className="input-label">Chọn thành viên</label>
+                                                            <select 
+                                                                className="input-field"
+                                                                value={selectedResidentId || ''}
+                                                                onChange={handleMemberChange}
+                                                                required
+                                                                disabled={!selectedAbsenceHouseholdId}
+                                                            >
+                                                                <option value="">-- Chọn thành viên --</option>
+                                                                {householdMembers.map(member => (
+                                                                    <option key={member.resident_id} value={member.resident_id}>
+                                                                        {member.first_name} {member.last_name} - {member.dob ? new Date(member.dob).toLocaleDateString('vi-VN') : 'N/A'}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    </>
+                                                )}
 
-                        <Input
-                            label="Ngày sinh"
-                            type="date"
-                            name="dob"
-                            value={formData.dob}
-                            onChange={handleChange}
-                            required
-                        />
-                        <div className="form-group">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Giới tính</label>
-                            <select
-                                name="gender"
-                                value={formData.gender}
-                                onChange={handleChange}
-                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                            >
-                                <option value="Nam">Nam</option>
-                                <option value="Nữ">Nữ</option>
-                            </select>
-                        </div>
-                        <Input
-                            label="Số CMND/CCCD"
-                            name="identityCard"
-                            value={formData.identityCard}
-                            onChange={handleChange}
-                            required
-                        />
-                        {isTemporaryResidence && (
-                            <>
-                                <Input
-                                    label="Số điện thoại"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                />
-                                <Input
-                                    label="Email"
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                />
-                            </>
-                        )}
-                    </div>
+                                                <Input
+                                                    label="Ngày sinh"
+                                                    type="date"
+                                                    name="dob"
+                                                    value={formData.dob}
+                                                    onChange={handleChange}
+                                                    required
+                                                />
+                                                <div className="input-group">
+                                                    <label className="input-label">Giới tính</label>
+                                                    <select
+                                                        name="gender"
+                                                        value={formData.gender}
+                                                        onChange={handleChange}
+                                                        className="input-field"
+                                                    >
+                                                        <option value="Nam">Nam</option>
+                                                        <option value="Nữ">Nữ</option>
+                                                    </select>
+                                                </div>
+                                                <Input
+                                                    label="Số CMND/CCCD"
+                                                    name="identityCard"
+                                                    value={formData.identityCard}
+                                                    onChange={handleChange}
+                                                    required
+                                                />
+                                                {isTemporaryResidence && (
+                                                    <>
+                                                        <Input
+                                                            label="Số điện thoại"
+                                                            name="phone"
+                                                            value={formData.phone}
+                                                            onChange={handleChange}
+                                                        />
+                                                        <Input
+                                                            label="Email"
+                                                            type="email"
+                                                            name="email"
+                                                            value={formData.email}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </>
+                                                )}
+                                            </div>
 
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin cư trú</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            <Input
-                                label="Từ ngày"
-                                type="date"
-                                name="fromDate"
-                                value={formData.fromDate}
-                                onChange={handleChange}
-                                required
-                            />
-                            <Input
-                                label="Đến ngày"
-                                type="date"
-                                name="toDate"
-                                value={formData.toDate}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
+                                            <div className="space-y-4">
+                                                <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin cư trú</h3>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <Input
+                                                        label="Từ ngày"
+                                                        type="date"
+                                                        name="fromDate"
+                                                        value={formData.fromDate}
+                                                        onChange={handleChange}
+                                                        required
+                                                    />
+                                                    <Input
+                                                        label="Đến ngày"
+                                                        type="date"
+                                                        name="toDate"
+                                                        value={formData.toDate}
+                                                        onChange={handleChange}
+                                                        required
+                                                    />
+                                                </div>
 
-                        {isTemporaryResidence ? (
-                            <>
-                                <Input
-                                    label="Địa chỉ tạm trú"
-                                    name="tempAddress"
-                                    value={formData.tempAddress}
-                                    onChange={handleChange}
-                                    required
-                                    readOnly={formData.type === 'temporary_residence_existing'} // Readonly if existing
+                                                {isTemporaryResidence ? (
+                                                    <>
+                                                        <Input
+                                                            label="Địa chỉ tạm trú"
+                                                            name="tempAddress"
+                                                            value={formData.tempAddress}
+                                                            onChange={handleChange}
+                                                            required
+                                                            readOnly={formData.type === 'temporary_residence_existing'} // Readonly if existing
                                 />
                                 <Input
                                     label="Địa chỉ thường trú (Quê quán)"

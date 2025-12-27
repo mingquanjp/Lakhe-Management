@@ -127,7 +127,7 @@ const getAllResidents = async (req, res) => {
       SELECT r.*, h.household_code 
       FROM residents r
       LEFT JOIN households h ON r.household_id = h.household_id
-      WHERE 1=1
+      WHERE 1=1 AND h.deleted_at IS NULL
     `;
     const values = [];
     let paramCount = 1;
@@ -525,7 +525,7 @@ const registerTemporaryAbsence = async (req, res) => {
     if (!residentId) {
       return res.status(404).json({
         success: false,
-        message: `Không tìm thấy nhân khẩu trong hệ thống. Đã tìm kiếm: Tên="${last_name} ${first_name}", Ngày sinh="${dob}", CCCD="${identity_card_number || 'Không có'}". Vui lòng kiểm tra chính xác họ tên (có dấu) và ngày sinh.`
+        message: `Không tìm thấy nhân khẩu trong hệ thống. Đã tìm kiếm: Tên="${first_name} ${last_name}", Ngày sinh="${dob}", CCCD="${identity_card_number || 'Không có'}". Vui lòng kiểm tra chính xác họ tên (có dấu) và ngày sinh.`
       });
     }
 

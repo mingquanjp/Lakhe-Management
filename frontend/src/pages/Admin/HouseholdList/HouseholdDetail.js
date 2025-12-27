@@ -321,51 +321,101 @@ const HouseholdDetail = () => {
                 size="medium"
             >
                 {selectedResidentDetail && (
-                    <div className="p-0">
-                        <table className="w-full text-sm text-left text-gray-500">
-                            <tbody>
-                                <tr className="border-b border-gray-100">
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 w-1/3">
-                                        Họ và tên
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-900 font-semibold text-lg">
-                                        {selectedResidentDetail.first_name} {selectedResidentDetail.last_name}
-                                    </td>
-                                </tr>
-                                <tr className="border-b border-gray-100">
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">
-                                        Ngày sinh
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-900">
-                                        {new Date(selectedResidentDetail.dob).toLocaleDateString('vi-VN')}
-                                    </td>
-                                </tr>
-                                <tr className="border-b border-gray-100">
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">
-                                        CCCD
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-900">
-                                        {selectedResidentDetail.identity_card_number || 'Chưa có'}
-                                    </td>
-                                </tr>
-                                <tr className="border-b border-gray-100">
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50">
-                                        Trạng thái
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <StatusBadge status={selectedResidentDetail.status} />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 align-top">
-                                        Chi tiết biến động
-                                    </td>
-                                    <td className="px-6 py-4 text-gray-800 whitespace-pre-wrap bg-yellow-50">
-                                        {selectedResidentDetail.notes || 'Không có ghi chú'}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div style={{ padding: '20px' }}>
+                        <div style={{ display: 'flex', marginBottom: '30px' }}>
+                            <div style={{ flex: 1, textAlign: 'center', borderRight: '1px solid #eee' }}>
+                                <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#8898aa', textTransform: 'uppercase', marginBottom: '5px' }}>
+                                    Họ và tên
+                                </div>
+                                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#32325d' }}>
+                                    {selectedResidentDetail.first_name} {selectedResidentDetail.last_name}
+                                </div>
+                            </div>
+                            <div style={{ flex: 1, textAlign: 'center', borderRight: '1px solid #eee' }}>
+                                <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#8898aa', textTransform: 'uppercase', marginBottom: '5px' }}>
+                                    Ngày sinh
+                                </div>
+                                <div style={{ fontSize: '15px', fontWeight: '600', color: '#32325d' }}>
+                                    {new Date(selectedResidentDetail.dob).toLocaleDateString('vi-VN')}
+                                </div>
+                            </div>
+                            <div style={{ flex: 1, textAlign: 'center' }}>
+                                <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#8898aa', textTransform: 'uppercase', marginBottom: '5px' }}>
+                                    CCCD
+                                </div>
+                                <div style={{ fontSize: '15px', fontWeight: '600', color: '#32325d' }}>
+                                    {selectedResidentDetail.identity_card_number || 'Chưa có'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                            <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#8898aa', textTransform: 'uppercase', marginBottom: '10px' }}>
+                                Trạng thái
+                            </div>
+                            <div>
+                                <StatusBadge status={selectedResidentDetail.status} />
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#8898aa', textTransform: 'uppercase', marginBottom: '8px' }}>
+                                Chi tiết biến động
+                            </div>
+                            <div style={{ fontSize: '14px', color: '#333', lineHeight: '1.6' }}>
+                                {(() => {
+                                    const notes = selectedResidentDetail.notes || '';
+                                    if (!notes) return 'Không có ghi chú';
+
+                                    // Xử lý hiển thị cho trường hợp Chuyển đi
+                                    if (notes.includes('Chuyển đi ngày:')) {
+                                        const dateMatch = notes.match(/Chuyển đi ngày:\s*(.*?)(?=\s*Lý do:|$)/);
+                                        const reasonMatch = notes.match(/Lý do:\s*(.*?)(?=\s*Địa chỉ mới:|$)/);
+                                        const addressMatch = notes.match(/Địa chỉ mới:\s*(.*)/);
+
+                                        return (
+                                            <div style={{ backgroundColor: '#f8f9fa', borderRadius: '8px', padding: '16px', border: '1px solid #e9ecef' }}>
+                                                {dateMatch && (
+                                                    <div style={{ marginBottom: '12px' }}>
+                                                        <span style={{ display: 'block', fontSize: '11px', color: '#8898aa', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                            Ngày chuyển đi
+                                                        </span>
+                                                        <span style={{ color: '#32325d', fontWeight: '500' }}>{dateMatch[1].trim()}</span>
+                                                    </div>
+                                                )}
+                                                {reasonMatch && (
+                                                    <div style={{ marginBottom: '12px' }}>
+                                                        <span style={{ display: 'block', fontSize: '11px', color: '#8898aa', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                            Lý do
+                                                        </span>
+                                                        <span style={{ color: '#32325d', fontWeight: '500' }}>{reasonMatch[1].trim()}</span>
+                                                    </div>
+                                                )}
+                                                {addressMatch && (
+                                                    <div>
+                                                        <span style={{ display: 'block', fontSize: '11px', color: '#8898aa', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                            Địa chỉ mới
+                                                        </span>
+                                                        <span style={{ color: '#32325d', fontWeight: '500' }}>{addressMatch[1].trim()}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    }
+                                    
+                                    return notes;
+                                })()}
+                            </div>
+                        </div>
+
+                        <div className="modal-footer">
+                            <button 
+                                className="modal-btn-cancel"
+                                onClick={() => setSelectedResidentDetail(null)}
+                            >
+                                Đóng
+                            </button>
+                        </div>
                     </div>
                 )}
             </Modal>
