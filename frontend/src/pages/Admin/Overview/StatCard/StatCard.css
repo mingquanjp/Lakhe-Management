@@ -2,9 +2,83 @@
   background: white;
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-  border: 1px solid #f0f0f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  /* Default color if not provided */
+  --card-color: #1890ff; 
 }
+
+.stat-card-overview::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(
+    600px circle at var(--x) var(--y),
+    var(--card-color) 0%,
+    transparent 40%
+  );
+  opacity: var(--spotlight-opacity, 0);
+  transition: opacity 0.3s ease;
+  z-index: 1;
+  mix-blend-mode: soft-light;
+}
+
+.stat-header-overview,
+.stat-content-overview {
+  position: relative;
+  z-index: 2;
+}
+
+.stat-card-overview:hover {
+  border-color: var(--card-color);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 
+              0 0 0 1px var(--card-color) inset; 
+}
+
+.stat-card-overview::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  z-index: 2;
+  display: block;
+  content: "";
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  transform: skewX(-25deg);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.stat-card-overview:hover::before {
+  animation: shine 0.75s;
+  opacity: 1;
+}
+
+@keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+
+.stat-card-overview:hover {
+  transform: translateY(-5px) scale(1.02);
+}
+
 .stat-header-overview {
   margin-bottom: 10px;
   display: flex;
@@ -12,13 +86,20 @@
   justify-content: center;
   min-height: 32px;
 }
+
 .stat-title-overview {
   font-size: 22px;
   color: #666;
   font-weight: 600;
   text-align: center;
   width: 100%;
+  transition: color 0.3s ease;
 }
+
+.stat-card-overview:hover .stat-title-overview {
+  color: #333;
+}
+
 .stat-content-overview {
   position: relative;
   display: flex;
@@ -35,6 +116,11 @@
   font-weight: 700;
   margin: 0;
   color: #333;
+  transition: transform 0.3s ease;
+}
+
+.stat-card-overview:hover .stat-value-overview {
+  transform: translateX(-50%) scale(1.05);
 }
 
 .stat-change-overview {
@@ -43,5 +129,9 @@
   font-size: 12px;
   font-weight: 600;
   gap: 4px;
+  transition: opacity 0.3s ease;
 }
 
+.stat-card-overview:hover .stat-change-overview {
+  opacity: 1;
+}

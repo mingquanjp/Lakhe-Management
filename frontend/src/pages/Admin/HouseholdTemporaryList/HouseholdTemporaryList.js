@@ -3,7 +3,6 @@ import { Search, Filter, Download, Split} from "lucide-react";
 import "./HouseholdTemporaryList.css";
 import HouseholdTemporaryTable from "./HouseholdTemporaryTable/HouseholdTemporaryTable";
 import Pagination from "../../../components/commons/Pagination";
-import HouseholdTemporaryAddModal from "./HouseholdTemporaryAddModal/HouseholdTemporaryAddModal";
 import Modal from "../../../components/commons/Modal/Modal";
 import {
   fetchTemporaryHouseholds,
@@ -206,13 +205,6 @@ const HouseholdTemporaryList = () => {
             </button>
             
           </div>
-
-          <button
-            className="btn-householdtemporary-add"
-            onClick={() => setIsAddModalOpen(true)}
-          >
-            <Split size={16} /> Thêm hộ khẩu
-          </button>
        </div>
 
       {showFilter && (
@@ -305,13 +297,6 @@ const HouseholdTemporaryList = () => {
           />
         )}
       </div>
-
-      <HouseholdTemporaryAddModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSave={handleSaveHousehold}
-        size="xl"
-      />
 
       <Modal
         isOpen={isDeleteConfirmOpen}
