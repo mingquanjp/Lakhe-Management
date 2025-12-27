@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
+import Modal from '../../../../components/commons/Modal';
 import { getAuthToken } from '../../../../utils/api';
 import './MemberStatusChangeForm.css';
 
@@ -21,6 +22,11 @@ const MemberStatusChangeForm = () => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const searchTimeoutRef = useRef(null);
     const wrapperRef = useRef(null);
+    const [notification, setNotification] = useState({
+        isOpen: false,
+        message: '',
+        type: 'success'
+    });
 
     useEffect(() => {
         // Close suggestions when clicking outside
@@ -88,7 +94,11 @@ const MemberStatusChangeForm = () => {
         e.preventDefault();
         
         if (!formData.residentId) {
-            alert("Vui lòng chọn nhân khẩu từ danh sách gợi ý!");
+            setNotification({
+                isOpen: true,
+                message: "Vui lòng chọn nhân khẩu từ danh sách gợi ý!",
+                type: 'error'
+            });
             return;
         }
 
@@ -125,7 +135,11 @@ const MemberStatusChangeForm = () => {
             const result = await response.json();
             
             if (response.ok) {
-                alert('Đã cập nhật trạng thái nhân khẩu thành công!');
+                setNotification({
+                    isOpen: true,
+                    message: 'Đã cập nhật trạng thái nhân khẩu thành công!',
+                    type: 'success'
+                });
                 // Reset form
                 setFormData({
                     residentId: '',
@@ -138,11 +152,19 @@ const MemberStatusChangeForm = () => {
                     deathReason: ''
                 });
             } else {
-                alert(`Lỗi: ${result.message}`);
+                setNotification({
+                    isOpen: true,
+                    message: `Lỗi: ${result.message}`,
+                    type: 'error'
+                });
             }
         } catch (error) {
             console.error("Error submitting form:", error);
-            alert("Có lỗi xảy ra khi cập nhật trạng thái.");
+            setNotification({
+                isOpen: true,
+                message: 'Có lỗi xảy ra khi cập nhật trạng thái',
+                type: 'error'
+            });
         }
     };
 
@@ -245,6 +267,24 @@ const MemberStatusChangeForm = () => {
                     <Button type="submit" className="bg-yellow-600 hover:bg-yellow-700 text-white">Cập nhật trạng thái</Button>
                 </div>
             </form>
+            <Modal
+                isOpen={notification.isOpen}
+                onClose={() => setNotification({ ...notification, isOpen: false })}
+                title={notification.type === 'success' ? 'Thành công' : 'Lỗi'}
+                size="sm"
+            >
+                <div style={{ padding: "20px" }}>
+                    <p style={{ marginBottom: "20px", color: "#333" }}>{notification.message}</p>
+                    <div className="modal-footer">
+                        <button 
+                            className={notification.type === 'success' ? "modal-btn-success" : "modal-btn-delete"}
+                            onClick={() => setNotification({ ...notification, isOpen: false })}
+                        >
+                            Đóng
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };

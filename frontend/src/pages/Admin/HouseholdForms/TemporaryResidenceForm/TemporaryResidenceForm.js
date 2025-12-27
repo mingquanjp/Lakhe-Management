@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
+import Modal from '../../../../components/commons/Modal';
 import { getAuthToken } from '../../../../utils/api';
 import './TemporaryResidenceForm.css';
 
@@ -37,6 +38,11 @@ const TemporaryResidenceForm = () => {
     
     // State for temporary residence
     const [households, setHouseholds] = useState([]); // List of households for selection
+    const [notification, setNotification] = useState({
+        isOpen: false,
+        type: 'success',
+        message: ''
+    });
 
     // Fetch households when switching to 'existing' or 'absence' type
     useEffect(() => {
@@ -177,10 +183,18 @@ const TemporaryResidenceForm = () => {
                 });
                 const result = await response.json();
                 if (result.success) {
-                    alert('Đăng ký tạm trú vào hộ đã có thành công!');
-                    navigate('/admin/householdtemporary');
+                    setNotification({
+                        isOpen: true,
+                        type: 'success',
+                        message: 'Đăng ký tạm trú vào hộ đã có thành công!'
+                    });
+                    setTimeout(() => navigate('/admin/householdtemporary'), 2000);
                 } else {
-                    alert('Lỗi: ' + result.message);
+                    setNotification({
+                        isOpen: true,
+                        type: 'error',
+                        message: 'Lỗi: ' + result.message
+                    });
                 }
 
             } else if (formData.type === 'temporary_residence_new') {
@@ -210,10 +224,18 @@ const TemporaryResidenceForm = () => {
                 });
                 const result = await response.json();
                 if (result.success) {
-                    alert('Đăng ký tạm trú (hộ mới) thành công!');
-                    navigate('/admin/householdtemporary');
+                    setNotification({
+                        isOpen: true,
+                        type: 'success',
+                        message: 'Đăng ký tạm trú (hộ mới) thành công!'
+                    });
+                    setTimeout(() => navigate('/admin/householdtemporary'), 2000);
                 } else {
-                    alert('Lỗi: ' + result.message);
+                    setNotification({
+                        isOpen: true,
+                        type: 'error',
+                        message: 'Lỗi: ' + result.message
+                    });
                 }
             } else {
                 // Temporary Absence
@@ -242,15 +264,27 @@ const TemporaryResidenceForm = () => {
                 });
                 const result = await response.json();
                 if (result.success) {
-                    alert('Khai báo tạm vắng thành công!');
-                    navigate('/admin/temporary-absence');
+                    setNotification({
+                        isOpen: true,
+                        type: 'success',
+                        message: 'Khai báo tạm vắng thành công!'
+                    });
+                    setTimeout(() => navigate('/admin/temporary-absence'), 2000);
                 } else {
-                    alert('Lỗi: ' + result.message);
+                    setNotification({
+                        isOpen: true,
+                        type: 'error',
+                        message: 'Lỗi: ' + result.message
+                    });
                 }
             }
         } catch (error) {
             console.error('Error submitting form:', error);
-            alert('Có lỗi xảy ra khi gửi biểu mẫu.');
+            setNotification({
+                isOpen: true,
+                type: 'error',
+                message: 'Có lỗi xảy ra khi gửi biểu mẫu.'
+            });
         }
     };
 
@@ -323,6 +357,17 @@ const TemporaryResidenceForm = () => {
                                     ))}
                                 </select>
                             </div>
+                        )}
+
+                        {(formData.type === 'temporary_residence_new' || formData.type === 'temporary_residence_existing') && (
+                            <Input
+                                label="Họ và tên"
+                                name="fullName"
+                                value={formData.fullName}
+                                onChange={handleChange}
+                                required
+                                placeholder="Nhập họ và tên"
+                            />
                         )}
                         
                         {/* Temporary Absence: Household and Member Selector */}
@@ -530,6 +575,25 @@ const TemporaryResidenceForm = () => {
                     </Button>
                 </div>
             </form>
+
+            <Modal
+                isOpen={notification.isOpen}
+                onClose={() => setNotification({ ...notification, isOpen: false })}
+                title={notification.type === 'success' ? 'Thành công' : 'Lỗi'}
+                size="sm"
+            >
+                <div style={{ padding: "20px" }}>
+                    <p style={{ marginBottom: "20px", color: "#333" }}>{notification.message}</p>
+                    <div className="modal-footer">
+                        <button 
+                            className={notification.type === 'success' ? "modal-btn-success" : "modal-btn-delete"}
+                            onClick={() => setNotification({ ...notification, isOpen: false })}
+                        >
+                            Đóng
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };

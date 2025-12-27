@@ -97,7 +97,7 @@ const HistoryDetail = () => {
         user: item.changed_by || 'Admin',
         resident: (item.first_name || item.last_name) 
             ? `${item.first_name || ''} ${item.last_name || ''}`.trim() 
-            : '-'
+            : 'Tất cả'
     }));
 
     if (loading) return <div>Loading...</div>;

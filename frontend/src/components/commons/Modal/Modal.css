@@ -89,3 +89,56 @@
   flex: 1;
   min-height: 0;
 }
+.modal-btn-cancel {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background-color: white;
+  color: #333;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.modal-btn-cancel:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+.modal-btn-delete {
+  padding: 8px 16px;
+  border: none;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.modal-btn-delete:hover {
+  background-color: #c82333;
+}
+
+.modal-btn-success {
+  padding: 8px 16px;
+  border: none;
+  background-color: #28a745;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.modal-btn-success:hover {
+  background-color: #218838;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
