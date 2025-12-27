@@ -14,6 +14,8 @@ const TemporaryAbsenceList = () => {
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,28 +43,34 @@ const TemporaryAbsenceList = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa bản ghi tạm vắng này?")) {
-      try {
-        const token = getAuthToken();
-        const response = await fetch(`http://localhost:5000/api/residents/temporary-absence/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+  const handleDelete = (id) => {
+    setItemToDelete(id);
+    setIsDeleteConfirmOpen(true);
+  };
 
-        const result = await response.json();
-        if (response.ok && result.success) {
-          toast.success("Xóa thành công!");
-          fetchData();
-        } else {
-          toast.error(result.message || "Lỗi khi xóa");
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    try {
+      const token = getAuthToken();
+      const response = await fetch(`http://localhost:5000/api/residents/temporary-absence/${itemToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      } catch (error) {
-        console.error("Error deleting:", error);
-        toast.error("Lỗi kết nối server");
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        toast.success("Xóa thành công!");
+        fetchData();
+        setIsDeleteConfirmOpen(false);
+        setItemToDelete(null);
+      } else {
+        toast.error(result.message || "Lỗi khi xóa");
       }
+    } catch (error) {
+      console.error("Error deleting:", error);
+      toast.error("Lỗi kết nối server");
     }
   };
 
@@ -167,7 +175,7 @@ const TemporaryAbsenceList = () => {
               <strong>Mã hộ khẩu:</strong> {selectedItem.household_code}
             </div>
             <div className="detail-row">
-              <strong>Họ và tên:</strong> {selectedItem.last_name} {selectedItem.first_name}
+              <strong>Họ và tên:</strong> {selectedItem.first_name} {selectedItem.last_name}
             </div>
             <div className="detail-row">
               <strong>Ngày sinh:</strong> {new Date(selectedItem.dob).toLocaleDateString('vi-VN')}
@@ -192,6 +200,39 @@ const TemporaryAbsenceList = () => {
             </div>
           </div>
         )}
+      </Modal>
+
+      <Modal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => {
+          setIsDeleteConfirmOpen(false);
+          setItemToDelete(null);
+        }}
+        title="Xác nhận xóa"
+        size="sm"
+      >
+        <div style={{ padding: "20px" }}>
+          <p style={{ marginBottom: "20px", color: "#333" }}>
+            Bạn có chắc chắn muốn xóa bản ghi tạm vắng này? Thao tác này không thể hoàn tác.
+          </p>
+          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+            <button
+              className="modal-btn-cancel"
+              onClick={() => {
+                setIsDeleteConfirmOpen(false);
+                setItemToDelete(null);
+              }}
+            >
+              Hủy
+            </button>
+            <button
+              className="modal-btn-delete"
+              onClick={handleConfirmDelete}
+            >
+              Xóa
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
