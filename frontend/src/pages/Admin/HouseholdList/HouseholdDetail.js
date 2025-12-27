@@ -402,6 +402,120 @@ const HouseholdDetail = () => {
                                             </div>
                                         );
                                     }
+
+                                    // Xử lý hiển thị cho trường hợp Qua đời
+                                    if (notes.includes('Mất ngày:') || notes.includes('Khai tử') || selectedResidentDetail.status === 'Deceased' || selectedResidentDetail.status === 'Đã qua đời') {
+                                        let dateDisplay = '';
+                                        let certDisplay = '';
+                                        let reasonDisplay = '';
+
+                                        // 1. Extract Date
+                                        const datePattern = /(\d{1,2}[\/-]\d{1,2}[\/-]\d{4}|\d{4}[\/-]\d{1,2}[\/-]\d{1,2})/;
+                                        const dateMatch = notes.match(datePattern);
+                                        if (dateMatch) {
+                                            dateDisplay = dateMatch[1];
+                                            try {
+                                                const d = new Date(dateDisplay);
+                                                if (!isNaN(d.getTime())) {
+                                                    dateDisplay = d.toLocaleDateString('vi-VN');
+                                                }
+                                            } catch (e) {}
+                                        }
+
+                                        // 2. Extract Certificate (Manual parsing for robustness)
+                                        const certLabelPattern = /(?:Số giấy chứng tử|Giấy chứng tử)\s*:\s*/i;
+                                        const certLabelMatch = notes.match(certLabelPattern);
+                                        
+                                        if (certLabelMatch) {
+                                            // Start after the label
+                                            const startIndex = certLabelMatch.index + certLabelMatch[0].length;
+                                            let content = notes.substring(startIndex);
+                                            
+                                            // Find the nearest delimiter: "Lý do:", "Nguyên nhân:", "|", or end of string
+                                            // We look for ". Lý do:" or " Lý do:" or just "Lý do:"
+                                            const delimiterPattern = /(?:\.?\s*(?:Lý do|Nguyên nhân)\s*:)|\|/i;
+                                            const delimiterMatch = content.match(delimiterPattern);
+                                            
+                                            if (delimiterMatch) {
+                                                content = content.substring(0, delimiterMatch.index);
+                                            }
+                                            
+                                            certDisplay = content.trim().replace(/[.,;]+$/, '');
+                                        }
+
+                                        // 3. Extract Reason
+                                        const reasonLabelPattern = /(?:Lý do|Nguyên nhân)\s*:\s*/i;
+                                        const reasonLabelMatch = notes.match(reasonLabelPattern);
+                                        
+                                        if (reasonLabelMatch) {
+                                            const startIndex = reasonLabelMatch.index + reasonLabelMatch[0].length;
+                                            let content = notes.substring(startIndex);
+                                            
+                                            // Stop at pipe |
+                                            const pipeIndex = content.indexOf('|');
+                                            if (pipeIndex !== -1) {
+                                                content = content.substring(0, pipeIndex);
+                                            }
+                                            
+                                            reasonDisplay = content.trim().replace(/[.,;]+$/, '');
+                                        } else {
+                                            // Fallback: If no explicit reason, try to get text that is NOT the date and NOT the certificate
+                                            let cleanNotes = notes;
+                                            
+                                            // Remove "Mất ngày: ..." part
+                                            cleanNotes = cleanNotes.replace(/(?:Mất ngày|Ngày mất)\s*:\s*(\d{1,2}[\/-]\d{1,2}[\/-]\d{4}|\d{4}[\/-]\d{1,2}[\/-]\d{1,2})/i, '');
+                                            
+                                            // Remove Certificate part (using the same logic as extraction)
+                                            if (certLabelMatch) {
+                                                const startIndex = certLabelMatch.index;
+                                                let endIndex = notes.length;
+                                                const contentAfterLabel = notes.substring(startIndex + certLabelMatch[0].length);
+                                                const delimiterMatch = contentAfterLabel.match(/(?:\.?\s*(?:Lý do|Nguyên nhân)\s*:)|\|/i);
+                                                if (delimiterMatch) {
+                                                    endIndex = startIndex + certLabelMatch[0].length + delimiterMatch.index;
+                                                }
+                                                // Replace the whole certificate part with empty string
+                                                const certPart = notes.substring(startIndex, endIndex);
+                                                cleanNotes = cleanNotes.replace(certPart, '');
+                                            }
+                                            
+                                            // Remove keywords
+                                            cleanNotes = cleanNotes.replace(/Khai tử/i, '');
+                                            cleanNotes = cleanNotes.replace(/\|/g, '');
+                                            
+                                            // Clean up punctuation
+                                            cleanNotes = cleanNotes.replace(/^[.\s,]+/, '').replace(/[.\s,]+$/, '').trim();
+                                            
+                                            if (cleanNotes) {
+                                                reasonDisplay = cleanNotes;
+                                            }
+                                        }
+
+                                        return (
+                                            <div style={{ backgroundColor: '#fff5f5', borderRadius: '8px', padding: '16px', border: '1px solid #feb2b2' }}>
+                                                <div style={{ marginBottom: '12px' }}>
+                                                    <span style={{ display: 'block', fontSize: '11px', color: '#e53e3e', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                        Ngày mất
+                                                    </span>
+                                                    <span style={{ color: '#c53030', fontWeight: '500' }}>{dateDisplay || 'Chưa cập nhật'}</span>
+                                                </div>
+                                                
+                                                <div style={{ marginBottom: '12px' }}>
+                                                    <span style={{ display: 'block', fontSize: '11px', color: '#e53e3e', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                        Số giấy chứng tử
+                                                    </span>
+                                                    <span style={{ color: '#c53030', fontWeight: '500' }}>{certDisplay || 'Chưa cập nhật'}</span>
+                                                </div>
+                                                
+                                                <div>
+                                                    <span style={{ display: 'block', fontSize: '11px', color: '#e53e3e', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
+                                                        Lý do / Ghi chú
+                                                    </span>
+                                                    <span style={{ color: '#c53030', fontWeight: '500' }}>{reasonDisplay || 'Không có ghi chú'}</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
                                     
                                     return notes;
                                 })()}

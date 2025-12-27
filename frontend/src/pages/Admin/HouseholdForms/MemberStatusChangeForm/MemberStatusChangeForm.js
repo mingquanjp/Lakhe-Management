@@ -106,6 +106,7 @@ const MemberStatusChangeForm = () => {
             const token = getAuthToken();
             let response;
             if (formData.changeType === 'deceased') {
+                const deathNotes = `Số giấy chứng tử: ${formData.deathCertificateNumber}. Lý do: ${formData.deathReason}`;
                 response = await fetch(`http://localhost:5000/api/residents/${formData.residentId}/death`, {
                     method: 'POST',
                     headers: { 
@@ -114,7 +115,7 @@ const MemberStatusChangeForm = () => {
                     },
                     body: JSON.stringify({
                         death_date: formData.changeDate,
-                        notes: formData.deathReason
+                        notes: deathNotes
                     })
                 });
             } else {
