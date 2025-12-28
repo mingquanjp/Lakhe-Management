@@ -170,10 +170,12 @@ const AccountManagement = () => {
     setIsDeleteModalOpen(true);
   };
 
-  // Filter users
+  // Filter users (exclude admin accounts)
   const filteredUsers = users.filter((user) =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+    user.role !== "admin" && (
+      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
 
   return (
@@ -298,7 +300,6 @@ const AccountManagement = () => {
               className="form-select"
             >
               <option value="staff">Nhân viên</option>
-              <option value="admin">Quản trị viên</option>
             </select>
           </div>
           <div className="modal-actions">
@@ -346,7 +347,6 @@ const AccountManagement = () => {
               className="form-select"
             >
               <option value="staff">Nhân viên</option>
-              <option value="admin">Quản trị viên</option>
             </select>
           </div>
           <div className="modal-actions">
