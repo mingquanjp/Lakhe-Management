@@ -4,6 +4,8 @@ import { Card, Button } from "../../../components/commons";
 import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
 import { searchIcon } from "../../../assets/icons";
 import { fetchFees, fetchFeeStatistics, fetchHouseholdPaymentStatus } from "../../../utils/api";
+import { exportToExcelWithHeaders, formatDateForExcel, formatCurrencyForExcel } from "../../../utils/excelExport";
+import { toast } from "react-toastify";
 
 const FeeDashboard = () => {
   const [fees, setFees] = useState([]);
@@ -155,26 +157,44 @@ const FeeDashboard = () => {
     setCurrentPage(1);
   }, [searchTerm, filterStatus]);
 
-  // Export to CSV (exports ALL filtered data)
+  // Export to Excel (exports ALL filtered data)
   const handleExport = () => {
-    const headers = ["Số hộ khẩu", "Họ và tên chủ hộ", "Địa chỉ", "Trạng thái"];
-    const csvData = filteredAndSortedData.map(row => [
-      row.household_code,
-      row.owner_name,
-      row.address,
-      row.status === "paid" ? "Đã nộp" : "Chưa nộp"
-    ]);
+    try {
+      const exportData = filteredAndSortedData.map(row => ({
+        household_code: row.household_code,
+        owner_name: row.owner_name,
+        address: row.address,
+        status: row.status === "paid" ? "Đã nộp" : "Chưa nộp"
+      }));
 
-    const csvContent = [
-      headers.join(","),
-      ...csvData.map(row => row.map(cell => `"${cell}"`).join(","))
-    ].join("\n");
+      const headers = {
+        household_code: "Số hộ khẩu",
+        owner_name: "Họ và tên chủ hộ",
+        address: "Địa chỉ",
+        status: "Trạng thái"
+      };
 
-    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `thu_phi_${fees.find(f => f.fee_id === selectedFeeId)?.fee_name || 'export'}.csv`;
-    link.click();
+      const feeName = fees.find(f => f.fee_id === selectedFeeId)?.fee_name || 'export';
+      const today = new Date().toISOString().split('T')[0];
+      const fileName = `thu_phi_${feeName}_${today}`.replace(/\s+/g, '_');
+      const sheetName = feeName.substring(0, 30);
+
+      const success = exportToExcelWithHeaders(
+        exportData,
+        headers,
+        fileName,
+        sheetName
+      );
+
+      if (success) {
+        toast.success('Xuất Excel thành công!');
+      } else {
+        toast.error('Có lỗi khi xuất Excel. Vui lòng thử lại.');
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Có lỗi khi xuất Excel: ' + error.message);
+    }
   };
 
   // Stats từ API

@@ -6,6 +6,8 @@ import EnhancedTable from "../../../components/commons/Table/EnhancedTable";
 import { searchIcon } from "../../../assets/icons";
 import HouseholdDetailModal from "./HouseholdDetailModal";
 import { fetchOverallStatistics, fetchAllHouseholdsWithPaymentSummary } from "../../../utils/api";
+import { exportToExcelWithHeaders, formatCurrencyForExcel } from "../../../utils/excelExport";
+import { toast } from "react-toastify";
 
 const FeeDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -141,28 +143,47 @@ const FeeDetail = () => {
     setCurrentPage(1);
   }, [searchTerm, filterStatus]);
 
-  // Export to CSV (exports ALL filtered data, not just current page)
+  // Export to Excel (exports ALL filtered data, not just current page)
   const handleExport = () => {
-    const headers = ["Số hộ khẩu", "Họ tên chủ hộ", "Địa chỉ", "Số thành viên", "Tổng đã nộp", "Trạng thái"];
-    const csvData = filteredAndSortedData.map(row => [
-      row.household_code,
-      row.owner_name,
-      row.address,
-      row.member_count,
-      row.total_paid,
-      row.status === "paid" ? "Đã nộp đủ" : "Còn nợ"
-    ]);
+    try {
+      const exportData = filteredAndSortedData.map(row => ({
+        household_code: row.household_code,
+        owner_name: row.owner_name,
+        address: row.address,
+        member_count: row.member_count,
+        total_paid: formatCurrencyForExcel(row.total_paid),
+        status: row.status === "paid" ? "Đã nộp đủ" : "Còn nợ"
+      }));
 
-    const csvContent = [
-      headers.join(","),
-      ...csvData.map(row => row.map(cell => `"${cell}"`).join(","))
-    ].join("\n");
+      const headers = {
+        household_code: "Số hộ khẩu",
+        owner_name: "Họ tên chủ hộ",
+        address: "Địa chỉ",
+        member_count: "Số thành viên",
+        total_paid: "Tổng đã nộp (VND)",
+        status: "Trạng thái"
+      };
 
-    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `danh_sach_ho_khau_thu_phi.csv`;
-    link.click();
+      const today = new Date().toISOString().split('T')[0];
+      const fileName = `danh_sach_ho_khau_thu_phi_${today}`;
+      const sheetName = "Danh sách hộ khẩu";
+
+      const success = exportToExcelWithHeaders(
+        exportData,
+        headers,
+        fileName,
+        sheetName
+      );
+
+      if (success) {
+        toast.success('Xuất Excel thành công!');
+      } else {
+        toast.error('Có lỗi khi xuất Excel. Vui lòng thử lại.');
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Có lỗi khi xuất Excel: ' + error.message);
+    }
   };
 
   // Stats từ API
