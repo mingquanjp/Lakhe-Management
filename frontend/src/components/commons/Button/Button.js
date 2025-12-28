@@ -1,5 +1,5 @@
 import React from "react";
-import "./Buttons.css";
+import "./Button.css";
 
 /**
  * Button Component - Component nút bấm có thể tùy chỉnh

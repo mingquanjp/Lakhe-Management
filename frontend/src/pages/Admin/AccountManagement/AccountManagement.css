@@ -1,88 +1,120 @@
 .account-management-page {
-  padding: 24px;
+  padding: 20px;
+  background-color: #f5f7fb;
+  min-height: 100vh;
 }
 
 .page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .page-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-size: 18px;
+  font-weight: 700;
+  color: #32325d;
+  margin-bottom: 15px;
 }
 
-.toolbar {
+.account-toolbar {
   display: flex;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 10px;
   align-items: center;
 }
 
-.search-box {
+.account-search-box {
   position: relative;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
+  gap: 10px;
+  width: 300px;
+  box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15);
+  transition: all 0.2s ease;
 }
 
-.search-box input {
-  padding: 8px 12px 8px 36px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+.account-search-box:focus-within {
+  border-color: #2dce89;
+  box-shadow: 0 2px 6px rgba(45, 206, 137, 0.2);
+}
+
+.account-search-icon {
+  color: #adb5bd;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.account-search-box input {
+  border: none;
+  outline: none;
   font-size: 14px;
-  width: 280px;
+  flex: 1;
+  min-width: 0;
+  color: #525f7f;
+  background: transparent;
+  padding: 0;
+  margin-left: 0;
 }
 
-.search-icon {
-  position: absolute;
-  left: 12px;
-  color: #999;
+.account-search-box input::placeholder {
+  color: #adb5bd;
 }
 
 .account-btn-tool {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 8px 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
   background: white;
   cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15);
+  white-space: nowrap;
 }
 
 .account-btn-tool:hover {
-  background: #f5f5f5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(50, 50, 93, 0.2);
 }
 
-.btn-add {
-  background: #1890ff;
+.account-btn-add {
+  background: #2dce89;
   color: white;
+  border-color: #2dce89;
+  font-weight: 600;
 }
 
-.btn-add:hover {
-  background: #0077e6;
+.account-btn-add:hover {
+  background: #25a972;
+  border-color: #25a972;
 }
 
 .table-card {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 20px;
 }
 
 .card-top {
-  padding: 16px 24px;
-  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .card-title {
   font-size: 16px;
-  font-weight: 500;
-  color: #1a1a1a;
+  font-weight: 600;
+  color: #32325d;
 }
 
 .data-table {
@@ -91,27 +123,33 @@
 }
 
 .data-table thead {
-  background: #fafafa;
+  background-color: #f6f9fc;
 }
 
 .data-table th {
-  padding: 12px 16px;
   text-align: left;
-  font-size: 14px;
+  padding: 12px 15px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #8898aa;
+  border-bottom: 1px solid #e9ecef;
   font-weight: 600;
-  color: #666;
-  border-bottom: 1px solid #f0f0f0;
 }
 
 .data-table td {
-  padding: 16px;
+  padding: 15px;
   font-size: 14px;
-  color: #333;
-  border-bottom: 1px solid #f0f0f0;
+  color: #525f7f;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .data-table tbody tr:hover {
-  background: #fafafa;
+  background-color: #f6f9fc;
 }
 
 .role-badge {
@@ -119,53 +157,59 @@
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .role-admin {
-  background: #e6f7ff;
-  color: #1890ff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
 }
 
 .role-staff {
-  background: #f0f5ff;
-  color: #597ef7;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  color: #5e72e4;
+  box-shadow: 0 2px 6px rgba(168, 237, 234, 0.3);
 }
 
-.action-buttons {
+.account-action-buttons {
   display: flex;
   gap: 8px;
+  justify-content: center;
 }
 
-.btn-icon {
-  display: flex;
+.account-btn-icon {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
-.btn-edit {
-  background: #e6f7ff;
-  color: #1890ff;
+.account-btn-edit {
+  background: #e8eaf6;
+  color: #5e72e4;
 }
 
-.btn-edit:hover {
-  background: #bae7ff;
+.account-btn-edit:hover {
+  background: #5e72e4;
+  color: white;
+  transform: scale(1.05);
 }
 
 .account-btn-delete {
-  background: #f61f0b;
-  color: #fbf6f6;
+  background: #ffebee;
+  color: #f5365c;
 }
 
 .account-btn-delete:hover {
-  background: #ffccc7;
-  color: #ee0505;
+  background: #f5365c;
+  color: white;
+  transform: scale(1.05);
 }
 
 .user-form {
@@ -183,22 +227,24 @@
 
 .form-group label {
   font-size: 14px;
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #32325d;
 }
 
 .form-select {
   padding: 10px 12px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid #e9ecef;
   border-radius: 6px;
   font-size: 14px;
   transition: all 0.2s;
+  background: white;
+  color: #525f7f;
 }
 
 .form-select:focus {
   outline: none;
-  border-color: #1890ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+  border-color: #2dce89;
+  box-shadow: 0 0 0 2px rgba(45, 206, 137, 0.1);
 }
 
 .modal-actions {
@@ -213,15 +259,22 @@
 }
 
 .delete-confirmation p {
-  font-size: 14px;
-  color: #333;
+  font-size: 15px;
+  color: #525f7f;
   margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.delete-confirmation strong {
+  color: #32325d;
+  font-weight: 600;
 }
 
 .loading-state,
 .empty-state {
   text-align: center;
   padding: 48px 24px;
-  color: #999;
+  color: #8898aa;
   font-size: 14px;
+  font-weight: 500;
 }

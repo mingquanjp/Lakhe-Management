@@ -42,11 +42,11 @@ const Sidebar = () => {
       label: "Quản lý dân cư",
       icon: People,
       subItems: [
-        { id: "household", label: "Quản lý hộ khẩu thường trú", path: "/admin/household" },
-        { id: "householdtemporary", label: "Quản lý hộ khẩu tạm trú", path: "/admin/householdtemporary" },
+        { id: "household", label: "Quản lý hộ thường trú", path: "/admin/household" },
+        { id: "householdtemporary", label: "Quản lý hộ tạm trú", path: "/admin/householdtemporary" },
         { id: "temporary-absence", label: "Quản lý tạm vắng", path: "/admin/temporary-absence" },
         { id: "history", label: "Lịch sử biến động", path: "/admin/history" },
-        { id: "form", label: "Form khai báo", path: "/admin/form" },
+        { id: "form", label: "Biểu mẫu khai báo", path: "/admin/form" },
       ],
     },
 
@@ -188,15 +188,10 @@ const Sidebar = () => {
         {menuItems.map((item) => renderMenuItem(item))}
       </nav>
       <div className="sidebar-footer">
-        <Button
-          variant="primary"
-          size="medium"
-          className="sidebar-logout-btn"
-          onClick={handleLogout}
-        >
+        <button className="sidebar-logout-btn" onClick={handleLogout}>
           <img src={logoutIcon} alt="logout" className="logout-icon" />
-          <span>Log Out</span>
-        </Button>
+          <span>Đăng xuất</span>
+        </button>
       </div>
     </aside>
   );

@@ -21,6 +21,8 @@ const HouseholdList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   const [selectedHousehold, setSelectedHousehold] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilter, setShowFilter] = useState(false);
@@ -102,6 +104,8 @@ const HouseholdList = () => {
       setIsDeleteConfirmOpen(false);
       setHouseholdToDelete(null);
       loadData();
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
     } catch (error) {
       console.error("Lỗi xóa:", error);
       alert(error.message || "Không thể xóa hộ khẩu này");

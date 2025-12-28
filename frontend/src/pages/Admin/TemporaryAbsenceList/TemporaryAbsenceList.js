@@ -14,6 +14,8 @@ const TemporaryAbsenceList = () => {
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,35 +43,41 @@ const TemporaryAbsenceList = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa bản ghi tạm vắng này?")) {
-      try {
-        const token = getAuthToken();
-        const response = await fetch(`http://localhost:5000/api/residents/temporary-absence/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+  const handleDelete = (id) => {
+    setItemToDelete(id);
+    setIsDeleteConfirmOpen(true);
+  };
 
-        const result = await response.json();
-        if (response.ok && result.success) {
-          toast.success("Xóa thành công!");
-          fetchData();
-        } else {
-          toast.error(result.message || "Lỗi khi xóa");
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    try {
+      const token = getAuthToken();
+      const response = await fetch(`http://localhost:5000/api/residents/temporary-absence/${itemToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      } catch (error) {
-        console.error("Error deleting:", error);
-        toast.error("Lỗi kết nối server");
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        toast.success("Xóa thành công!");
+        fetchData();
+        setIsDeleteConfirmOpen(false);
+        setItemToDelete(null);
+      } else {
+        toast.error(result.message || "Lỗi khi xóa");
       }
+    } catch (error) {
+      console.error("Error deleting:", error);
+      toast.error("Lỗi kết nối server");
     }
   };
 
 
   // Filter logic
   const filteredData = data.filter(item => {
-    const fullName = `${item.last_name} ${item.first_name}`.toLowerCase();
+    const fullName = `${item.first_name} ${item.last_name}`.toLowerCase();
     const searchLower = searchTerm.toLowerCase();
     const birthDate = item.dob ? new Date(item.dob).toLocaleDateString('vi-VN') : "";
     const startDate = item.start_date ? new Date(item.start_date).toLocaleDateString('vi-VN') : "";
@@ -77,6 +85,7 @@ const TemporaryAbsenceList = () => {
     
     const matchesSearch = 
       fullName.includes(searchLower) ||
+      (item.household_code && item.household_code.toLowerCase().includes(searchLower)) ||
       (item.temporary_address && item.temporary_address.toLowerCase().includes(searchLower)) ||
       (item.identity_card_number && item.identity_card_number.includes(searchLower)) ||
       (birthDate && birthDate.includes(searchLower)) ||
@@ -122,24 +131,26 @@ const TemporaryAbsenceList = () => {
       <div className="page-header">
         <h2 className="page-title">Danh sách tạm vắng</h2>
         <div className="toolbar">
-          <div className="search-box">
-            <Search size={18} className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div className="toolbar-left">
+            <div className="search-temporary-box">
+              <Search size={18} className="search-icon" />
+              <input 
+                type="text" 
+                placeholder="Tìm kiếm..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <button className="btn-tool" onClick={handleExport}>
+              <Download size={16} /> Xuất Excel
+            </button>
           </div>
-          <button className="btn-tool" onClick={handleExport}>
-            <Download size={16} /> Xuất Excel
-          </button>
         </div>
       </div>
 
       <div className="table-card">
         <div className="card-top">
-          <span className="card-title">Danh sách tạm vắng ({filteredData.length})</span>
+          <span className="card-title">Tổng số người tạm vắng: {filteredData.length}</span>
         </div>
 
         <TemporaryAbsenceTable 
@@ -167,7 +178,7 @@ const TemporaryAbsenceList = () => {
               <strong>Mã hộ khẩu:</strong> {selectedItem.household_code}
             </div>
             <div className="detail-row">
-              <strong>Họ và tên:</strong> {selectedItem.last_name} {selectedItem.first_name}
+              <strong>Họ và tên:</strong> {selectedItem.first_name} {selectedItem.last_name}
             </div>
             <div className="detail-row">
               <strong>Ngày sinh:</strong> {new Date(selectedItem.dob).toLocaleDateString('vi-VN')}
@@ -192,6 +203,39 @@ const TemporaryAbsenceList = () => {
             </div>
           </div>
         )}
+      </Modal>
+
+      <Modal
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => {
+          setIsDeleteConfirmOpen(false);
+          setItemToDelete(null);
+        }}
+        title="Xác nhận xóa"
+        size="sm"
+      >
+        <div style={{ padding: "20px" }}>
+          <p style={{ marginBottom: "20px", color: "#333" }}>
+            Bạn có chắc chắn muốn xóa bản ghi tạm vắng này? Thao tác này không thể hoàn tác.
+          </p>
+          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+            <button
+              className="modal-btn-cancel"
+              onClick={() => {
+                setIsDeleteConfirmOpen(false);
+                setItemToDelete(null);
+              }}
+            >
+              Hủy
+            </button>
+            <button
+              className="modal-btn-delete"
+              onClick={handleConfirmDelete}
+            >
+              Xóa
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

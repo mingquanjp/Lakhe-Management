@@ -180,9 +180,9 @@ const AccountManagement = () => {
     <div className="account-management-page">
       <div className="page-header">
         <h2 className="page-title">Quản lý cán bộ</h2>
-        <div className="toolbar">
-          <div className="search-box">
-            <Search size={18} className="search-icon" />
+        <div className="account-toolbar">
+          <div className="account-search-box">
+            <Search size={18} className="account-search-icon" />
             <input
               type="text"
               placeholder="Tìm kiếm tài khoản..."
@@ -191,7 +191,7 @@ const AccountManagement = () => {
             />
           </div>
           <button
-            className="account-btn-tool btn-add"
+            className="account-btn-tool account-btn-add"
             onClick={() => {
               setFormData({ username: "", password: "", full_name: "", role: "staff" });
               setIsAddModalOpen(true);
@@ -234,16 +234,16 @@ const AccountManagement = () => {
                     </span>
                   </td>
                   <td>
-                    <div className="action-buttons">
+                    <div className="account-action-buttons">
                       <button
-                        className="btn-icon btn-edit"
+                        className="account-btn-icon account-btn-edit"
                         onClick={() => openEditModal(user)}
                         title="Chỉnh sửa"
                       >
                         <Edit2 size={16} />
                       </button>
                       <button
-                        className="btn-icon account-btn-delete"
+                        className="account-btn-icon account-btn-delete"
                         onClick={() => openDeleteModal(user)}
                         title="Xóa"
                       >
