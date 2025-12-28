@@ -373,6 +373,16 @@ const HouseholdDetail = () => {
                                         const reasonMatch = notes.match(/Lý do:\s*(.*?)(?=\s*Địa chỉ mới:|$)/);
                                         const addressMatch = notes.match(/Địa chỉ mới:\s*(.*)/);
 
+                                        let moveDateDisplay = dateMatch ? dateMatch[1].trim() : '';
+                                        if (moveDateDisplay) {
+                                            try {
+                                                const d = new Date(moveDateDisplay);
+                                                if (!isNaN(d.getTime())) {
+                                                    moveDateDisplay = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                                }
+                                            } catch (e) {}
+                                        }
+
                                         return (
                                             <div style={{ backgroundColor: '#f8f9fa', borderRadius: '8px', padding: '16px', border: '1px solid #e9ecef' }}>
                                                 {dateMatch && (
@@ -380,7 +390,7 @@ const HouseholdDetail = () => {
                                                         <span style={{ display: 'block', fontSize: '11px', color: '#8898aa', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
                                                             Ngày chuyển đi
                                                         </span>
-                                                        <span style={{ color: '#32325d', fontWeight: '500' }}>{dateMatch[1].trim()}</span>
+                                                        <span style={{ color: '#32325d', fontWeight: '500' }}>{moveDateDisplay}</span>
                                                     </div>
                                                 )}
                                                 {reasonMatch && (
@@ -417,7 +427,7 @@ const HouseholdDetail = () => {
                                             try {
                                                 const d = new Date(dateDisplay);
                                                 if (!isNaN(d.getTime())) {
-                                                    dateDisplay = d.toLocaleDateString('vi-VN');
+                                                    dateDisplay = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
                                                 }
                                             } catch (e) {}
                                         }
