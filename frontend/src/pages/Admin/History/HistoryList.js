@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import Table from '../../../components/commons/Table/Table';
-import Button from '../../../components/commons/Button/Button';
 import { getAuthToken } from '../../../utils/api';
 import './HistoryList.css';
 
@@ -105,13 +104,12 @@ const HistoryList = () => {
         ...h,
         last_change_date: new Date(h.last_change_date).toLocaleDateString('vi-VN'),
         actions: (
-            <Button 
-                variant="primary" 
-                size="small"
+            <button 
+                className="history-detail-btn"
                 onClick={() => navigate(`/admin/history/${h.household_id}`)}
             >
                 Chi tiết
-            </Button>
+            </button>
         )
     }));
 
@@ -199,14 +197,16 @@ const HistoryList = () => {
             </div>
 
             <div className="history-toolbar">
-                <div className="search-box">
-                    <Search size={18} className="search-icon" />
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                <div className="toolbar-left">
+                    <div className="search-history-box">
+                        <Search size={18} className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
                 </div>
             </div>
 
