@@ -30,7 +30,7 @@ const AgeChart = ({ data }) => {
           <YAxis axisLine={false} tickLine={false} />
           <Tooltip
             cursor={{ fill: "transparent" }}
-            formatter={(value) => [value, "Giá trị"]}
+            formatter={(value) => [value, "Số người"]}
           />
           <Bar dataKey="value" radius={[10, 10, 10, 10]}>
             {data.map((entry, index) => (
