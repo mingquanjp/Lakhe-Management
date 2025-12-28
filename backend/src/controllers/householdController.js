@@ -35,7 +35,7 @@ const getHouseholds = async (req, res) => {
         h.date_created,
         h.status,
         CONCAT(r.first_name, ' ', r.last_name) as head_name,
-        (SELECT COUNT(*) FROM residents WHERE household_id = h.household_id AND status = 'Permanent') as member_count
+        (SELECT COUNT(*) FROM residents WHERE household_id = h.household_id AND status IN ('Permanent', 'Temporary') AND deleted_at IS NULL) as member_count
        FROM households h
        LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
        WHERE h.status = 'Active'
@@ -334,6 +334,7 @@ const getTemporaryHouseholds = async (req, res) => {
           SELECT COUNT(*)::int 
           FROM residents res 
           WHERE res.household_id = h.household_id 
+          AND res.status IN ('Permanent', 'Temporary')
           AND res.deleted_at IS NULL
         ) as members
       FROM households h
@@ -432,7 +433,7 @@ const createTemporaryHousehold = async (req, res) => {
 
     const ownerValues = [
       newHouseholdId, firstName, lastName, owner.dob || null, owner.gender || 'Male',
-      owner.cccd || null, 'Chủ hộ', 
+      owner.cccd || null, owner.relation || 'Chủ hộ', 
       address, start_date, end_date, reason
     ];
     

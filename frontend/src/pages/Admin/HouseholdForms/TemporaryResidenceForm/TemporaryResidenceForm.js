@@ -55,13 +55,43 @@ const TemporaryResidenceForm = () => {
     const fetchHouseholds = async () => {
         try {
             const token = getAuthToken();
-            const response = await fetch('http://localhost:5000/api/households', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                const result = await response.json();
-                setHouseholds(result.data);
+            const [permResponse, tempResponse] = await Promise.all([
+                fetch('http://localhost:5000/api/households', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }),
+                fetch('http://localhost:5000/api/households/temporary', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+            ]);
+
+            let allHouseholds = [];
+
+            if (permResponse.ok) {
+                const permResult = await permResponse.json();
+                if (permResult.data) {
+                    const permHouseholds = permResult.data.map(h => ({ 
+                        ...h, 
+                        type: 'Permanent' 
+                    }));
+                    allHouseholds = [...allHouseholds, ...permHouseholds];
+                }
             }
+
+            if (tempResponse.ok) {
+                const tempResult = await tempResponse.json();
+                if (tempResult.data) {
+                    const tempHouseholds = tempResult.data.map(h => ({ 
+                        household_id: h.id,
+                        household_code: h.code,
+                        head_name: h.owner,
+                        address: h.address,
+                        type: 'Temporary'
+                    }));
+                    allHouseholds = [...allHouseholds, ...tempHouseholds];
+                }
+            }
+            
+            setHouseholds(allHouseholds);
         } catch (error) {
             console.error("Error fetching households:", error);
         }
@@ -144,8 +174,8 @@ const TemporaryResidenceForm = () => {
 
     const splitName = (fullName) => {
         const parts = fullName.trim().split(' ');
-        const firstName = parts.pop() || '';
-        const lastName = parts.join(' ') || '';
+        const lastName = parts.pop() || '';
+        const firstName = parts.join(' ') || '';
         return { firstName, lastName };
     };
 
@@ -171,7 +201,8 @@ const TemporaryResidenceForm = () => {
                     occupation: formData.job,
                     workplace: formData.workplace,
                     email: formData.email,
-                    phone: formData.phone
+                    phone: formData.phone,
+                    relationship_to_head: formData.relationshipWithHost
                 };
 
                 const response = await fetch('http://localhost:5000/api/residents/temporary-residence', {
@@ -210,7 +241,8 @@ const TemporaryResidenceForm = () => {
                         name: formData.fullName,
                         dob: formData.dob,
                         gender: 'Male', // Default or add field
-                        cccd: formData.identityCard
+                        cccd: formData.identityCard,
+                        relation: formData.relationshipWithHost || 'Chủ hộ'
                     },
                     members: []
                 };
@@ -342,7 +374,7 @@ const TemporaryResidenceForm = () => {
                         
                         {formData.type === 'temporary_residence_existing' && (
                             <div className="input-group">
-                                <label className="input-label">Chọn hộ khẩu thường trú</label>
+                                <label className="input-label">Chọn hộ khẩu thường trú / tạm trú</label>
                                 <select 
                                     className="input-field"
                                     name="hostHouseholdId"
@@ -353,7 +385,7 @@ const TemporaryResidenceForm = () => {
                                     <option value="">-- Chọn hộ khẩu --</option>
                                     {households.map(h => (
                                         <option key={h.household_id} value={h.household_id}>
-                                            {h.household_code} - {h.head_name}
+                                            {h.household_code} - {h.head_name} ({h.type === 'Permanent' ? 'Thường trú' : 'Tạm trú'})
                                         </option>
                                     ))}
                                 </select>
@@ -385,7 +417,7 @@ const TemporaryResidenceForm = () => {
                                                                 <option value="">-- Chọn hộ khẩu --</option>
                                                                 {households.map(h => (
                                                                     <option key={h.household_id} value={h.household_id}>
-                                                                        {h.household_code} - {h.head_name}
+                                                                        {h.household_code} - {h.head_name} ({h.type === 'Permanent' ? 'Thường trú' : 'Tạm trú'})
                                                                     </option>
                                                                 ))}
                                                             </select>
@@ -511,15 +543,7 @@ const TemporaryResidenceForm = () => {
                                         <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mb-3">Thông tin chủ hộ (Nơi tạm trú)</h3>
                                         <div className="grid grid-cols-2 gap-3">
                                             <Input
-                                                label="Địa chỉ tạm trú"
-                                                name="temporaryAddress"
-                                                value={formData.temporaryAddress}
-                                                onChange={handleChange}
-                                                required
-                                                placeholder="Nhập địa chỉ tạm trú"
-                                            />
-                                            <Input
-                                                label="Tên chủ hộ (nếu có)"
+                                                label="Tên chủ hộ"
                                                 name="hostName"
                                                 value={formData.hostName}
                                                 onChange={handleChange}
@@ -532,6 +556,17 @@ const TemporaryResidenceForm = () => {
                                                 onChange={handleChange}
                                             />
                                         </div>
+                                    </div>
+                                )}
+                                {formData.type === 'temporary_residence_new' && (
+                                    <div className="mt-4">
+                                        <Input
+                                            label="Quan hệ với chủ hộ"
+                                            name="relationshipWithHost"
+                                            value={formData.relationshipWithHost}
+                                            onChange={handleChange}
+                                            placeholder="VD: Chủ hộ"
+                                        />
                                     </div>
                                 )}
                             </>

@@ -187,10 +187,15 @@
   align-items: center;
 }
 
-.table-actions {
+/* Renamed from .table-actions to .household-table-actions to avoid CSS conflicts */
+.household-table-actions {
   display: flex;
-  gap: 12px; /* Tăng khoảng cách giữa nút Sửa và Xóa */
+  gap: 4px;
   align-items: center;
+}
+
+.household-table-actions .btn-action {
+  margin: 0;
 }
 
 .btn-delete {

@@ -254,14 +254,27 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
         <div className="form-row">
           <div className="form-group">
             <label>Quan hệ với chủ hộ <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              className="form-control"
-              name="relationship_to_head"
-              value={formData.relationship_to_head}
-              onChange={handleChange}
-              placeholder="Con, Vợ, Chồng..."
-            />
+            {type === 'NewBirth' ? (
+              <select
+                className="form-control"
+                name="relationship_to_head"
+                value={formData.relationship_to_head}
+                onChange={handleChange}
+              >
+                <option value="">Chọn quan hệ</option>
+                <option value="Con">Con</option>
+                <option value="Cháu">Cháu</option>
+              </select>
+            ) : (
+              <input
+                type="text"
+                className="form-control"
+                name="relationship_to_head"
+                value={formData.relationship_to_head}
+                onChange={handleChange}
+                placeholder="Con, Vợ, Chồng..."
+              />
+            )}
           </div>
           <div className="form-group">
             <label>Ngày đăng ký thường trú</label>

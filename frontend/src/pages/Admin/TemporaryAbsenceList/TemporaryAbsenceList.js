@@ -5,7 +5,7 @@ import "./TemporaryAbsenceList.css";
 import TemporaryAbsenceTable from "./TemporaryAbsenceTable";
 import Pagination from "../../../components/commons/Pagination";
 import Modal from "../../../components/commons/Modal";
-import { exportToCSV } from "../../../utils/exportUtils";
+import { exportToExcel } from "../../../utils/excelExport";
 import { toast } from "react-toastify";
 import { getAuthToken } from "../../../utils/api";
 
@@ -39,7 +39,7 @@ const TemporaryAbsenceList = () => {
         setData(result.data);
       }
     } catch (error) {
-      console.error('Error fetching temporary absences:', error);
+      // console.error('Error fetching temporary absences:', error);
     }
   };
 
@@ -69,7 +69,7 @@ const TemporaryAbsenceList = () => {
         toast.error(result.message || "Lỗi khi xóa");
       }
     } catch (error) {
-      console.error("Error deleting:", error);
+      // console.error("Error deleting:", error);
       toast.error("Lỗi kết nối server");
     }
   };
@@ -106,7 +106,7 @@ const TemporaryAbsenceList = () => {
       "Đến ngày": new Date(item.end_date).toLocaleDateString('vi-VN'),
       "Lý do": item.reason
     }));
-    exportToCSV(exportData, "Danh_sach_tam_vang");
+    exportToExcel(exportData, "Danh_sach_tam_vang", "Danh sách tạm vắng");
   };
 
   const handleDetailClick = (item) => {
@@ -184,7 +184,7 @@ const TemporaryAbsenceList = () => {
               <strong>Ngày sinh:</strong> {new Date(selectedItem.dob).toLocaleDateString('vi-VN')}
             </div>
             <div className="detail-row">
-              <strong>Giới tính:</strong> {selectedItem.gender}
+              <strong>Giới tính:</strong> {selectedItem.gender === 'Male' ? 'Nam' : selectedItem.gender === 'Female' ? 'Nữ' : selectedItem.gender}
             </div>
             <div className="detail-row">
               <strong>CMND/CCCD:</strong> {selectedItem.identity_card_number}
