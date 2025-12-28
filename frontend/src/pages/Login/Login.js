@@ -1,9 +1,11 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "./Login.css";
-import loginPics from "../../assets/images/loginpics.jpg";
+import loginPics1 from "../../assets/images/loginpics1.jpg";
+import loginPics2 from "../../assets/images/loginpics2.jpg";
+import loginPics3 from "../../assets/images/loginpics3.jpg";
 import logoLK from "../../assets/images/logoLK.png";
 
 const Login = () => {
@@ -13,9 +15,26 @@ const Login = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // Slideshow images - you can add more images here
+  const images = [
+    loginPics1,
+    loginPics2, // Duplicate for now, replace with different images if available
+    loginPics3,
+  ];
+
+  // Auto-rotate images every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [images.length]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,7 +75,24 @@ const Login = () => {
     <div className="login-container">
       <div className="login-left">
         <div className="login-illustration">
-          <img src={loginPics} alt="Login illustration" className="login-image" />
+          {images.map((img, index) => (
+            <img
+              key={index}
+              src={img}
+              alt={`Login illustration ${index + 1}`}
+              className={`login-image ${index === currentImageIndex ? 'active' : ''}`}
+            />
+          ))}
+          <div className="slideshow-dots">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                className={`dot ${index === currentImageIndex ? 'active' : ''}`}
+                onClick={() => setCurrentImageIndex(index)}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
       <div className="login-right">
@@ -107,11 +143,6 @@ const Login = () => {
                 disabled={loading}
                 required
               />
-            </div>
-            <div className="forgot-password-wrapper">
-              <a href="#" className="forgot-password">
-                Quên mật khẩu?
-              </a>
             </div>
 
             <button 
