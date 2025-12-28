@@ -508,32 +508,34 @@ const TemporaryResidenceForm = () => {
                                         onChange={handleChange}
                                     />
                                 </div>
-                                <div className="bg-yellow-50 p-4 rounded border border-yellow-100 mt-4">
-                                    <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mb-3">Thông tin chủ hộ (Nơi tạm trú)</h3>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <Input
-                                            label="Địa chỉ tạm trú"
-                                            name="temporaryAddress"
-                                            value={formData.temporaryAddress}
-                                            onChange={handleChange}
-                                            required
-                                            placeholder="Nhập địa chỉ tạm trú"
-                                        />
-                                        <Input
-                                            label="Tên chủ hộ (nếu có)"
-                                            name="hostName"
-                                            value={formData.hostName}
-                                            onChange={handleChange}
-                                            readOnly={formData.type === 'temporary_residence_existing'}
-                                        />
-                                        <Input
-                                            label="Quan hệ với chủ hộ"
-                                            name="relationshipWithHost"
-                                            value={formData.relationshipWithHost}
-                                            onChange={handleChange}
-                                        />
+                                {formData.type === 'temporary_residence_existing' && (
+                                    <div className="bg-yellow-50 p-4 rounded border border-yellow-100 mt-4">
+                                        <h3 className="text-lg font-semibold text-gray-700 border-b pb-2 mb-3">Thông tin chủ hộ (Nơi tạm trú)</h3>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <Input
+                                                label="Địa chỉ tạm trú"
+                                                name="temporaryAddress"
+                                                value={formData.temporaryAddress}
+                                                onChange={handleChange}
+                                                required
+                                                placeholder="Nhập địa chỉ tạm trú"
+                                            />
+                                            <Input
+                                                label="Tên chủ hộ (nếu có)"
+                                                name="hostName"
+                                                value={formData.hostName}
+                                                onChange={handleChange}
+                                                readOnly={formData.type === 'temporary_residence_existing'}
+                                            />
+                                            <Input
+                                                label="Quan hệ với chủ hộ"
+                                                name="relationshipWithHost"
+                                                value={formData.relationshipWithHost}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </>
                         ) : (
                             <>
