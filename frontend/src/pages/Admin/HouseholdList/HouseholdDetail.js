@@ -55,6 +55,8 @@ const HouseholdDetail = () => {
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
     const [historyData, setHistoryData] = useState([]);
     const [selectedResidentDetail, setSelectedResidentDetail] = useState(null); // For MovedOut/Deceased details
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const [residentToDelete, setResidentToDelete] = useState(null);
     const [notification, setNotification] = useState({
         isOpen: false,
         type: 'success',
@@ -110,42 +112,50 @@ const HouseholdDetail = () => {
         setIsAddMemberModalOpen(true);
     };
 
-    const handleDeleteClick = async (residentId) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa nhân khẩu này?')) {
-            try {
-                const token = getAuthToken();
-                
-                const response = await fetch(`http://localhost:5000/api/residents/${residentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                    
-                });
+    const handleDeleteClick = (residentId) => {
+        setResidentToDelete(residentId);
+        setIsDeleteConfirmOpen(true);
+    };
 
-                if (response.ok) {
-                    setNotification({
-                        isOpen: true,
-                        type: 'success',
-                        message: 'Xóa nhân khẩu thành công!'
-                    });
-                    fetchHouseholdDetails();
-                } else {
-                    const errorData = await response.json();
-                    setNotification({
-                        isOpen: true,
-                        type: 'error',
-                        message: `Lỗi: ${errorData.message}`
-                    });
+    const handleConfirmDelete = async () => {
+        if (!residentToDelete) return;
+        
+        try {
+            const token = getAuthToken();
+            
+            const response = await fetch(`http://localhost:5000/api/residents/${residentToDelete}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-            } catch (error) {
-                console.error('Error deleting resident:', error);
+                
+            });
+
+            if (response.ok) {
+                setNotification({
+                    isOpen: true,
+                    type: 'success',
+                    message: 'Xóa nhân khẩu thành công!'
+                });
+                fetchHouseholdDetails();
+            } else {
+                const errorData = await response.json();
                 setNotification({
                     isOpen: true,
                     type: 'error',
-                    message: 'Có lỗi xảy ra khi xóa nhân khẩu'
+                    message: `Lỗi: ${errorData.message}`
                 });
             }
+        } catch (error) {
+            console.error('Error deleting resident:', error);
+            setNotification({
+                isOpen: true,
+                type: 'error',
+                message: 'Có lỗi xảy ra khi xóa nhân khẩu'
+            });
+        } finally {
+            setIsDeleteConfirmOpen(false);
+            setResidentToDelete(null);
         }
     };
 
@@ -626,6 +636,40 @@ const HouseholdDetail = () => {
                     </table>
                 </div>
             </Modal>
+
+            <Modal
+                isOpen={isDeleteConfirmOpen}
+                onClose={() => {
+                    setIsDeleteConfirmOpen(false);
+                    setResidentToDelete(null);
+                }}
+                title="Xác nhận xóa"
+                size="sm"
+            >
+                <div style={{ padding: "20px" }}>
+                    <p style={{ marginBottom: "20px", color: "#333" }}>
+                        Bạn có chắc chắn muốn xóa nhân khẩu này? Thao tác này không thể hoàn tác.
+                    </p>
+                    <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                        <button
+                            className="modal-btn-cancel"
+                            onClick={() => {
+                                setIsDeleteConfirmOpen(false);
+                                setResidentToDelete(null);
+                            }}
+                        >
+                            Hủy
+                        </button>
+                        <button
+                            className="modal-btn-delete"
+                            onClick={handleConfirmDelete}
+                        >
+                            Xóa
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
             <Modal
                 isOpen={notification.isOpen}
                 onClose={() => setNotification({ ...notification, isOpen: false })}

@@ -189,8 +189,12 @@
 
 .table-actions {
   display: flex;
-  gap: 12px; /* Tăng khoảng cách giữa nút Sửa và Xóa */
+  gap: 4px;
   align-items: center;
+}
+
+.table-actions .btn-action {
+  margin: 0;
 }
 
 .btn-delete {
