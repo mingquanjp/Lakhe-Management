@@ -223,7 +223,7 @@ const HouseholdDetail = () => {
         dob: new Date(member.dob).toLocaleDateString('vi-VN'),
         statusDisplay: <StatusBadge status={member.status} />,
         actions: (
-            <div className="table-actions">
+            <div className="household-table-actions">
                 <button 
                     className="btn-action btn-detail"
                     onClick={() => handleEditClick(member)}
@@ -253,7 +253,7 @@ const HouseholdDetail = () => {
         dob: new Date(member.dob).toLocaleDateString('vi-VN'),
         statusDisplay: <StatusBadge status={member.status} />,
         actions: (
-            <div className="table-actions">
+            <div className="household-table-actions">
                 <button 
                     className="btn-action btn-detail"
                     onClick={() => setSelectedResidentDetail(member)}

@@ -187,13 +187,14 @@
   align-items: center;
 }
 
-.table-actions {
+/* Renamed from .table-actions to .household-table-actions to avoid CSS conflicts */
+.household-table-actions {
   display: flex;
   gap: 4px;
   align-items: center;
 }
 
-.table-actions .btn-action {
+.household-table-actions .btn-action {
   margin: 0;
 }
 
