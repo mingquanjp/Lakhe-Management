@@ -332,7 +332,7 @@ const FeeDashboard = () => {
               )}
             </div>
             <Button variant="outline" size="small" onClick={handleExport}>
-              Xuất CSV
+              Xuất Excel
             </Button>
           </div>
         }

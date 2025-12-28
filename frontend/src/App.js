@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Snowfall from "./components/effects/Snowfall";
 import AccountManagement from './pages/Admin/AccountManagement';
 // Pages
 import Login from "./pages/Login/Login";
@@ -127,6 +128,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <Snowfall />
         <ToastContainer position="bottom-right" autoClose={3000} />
         <AppRoutes />
       </Router>
