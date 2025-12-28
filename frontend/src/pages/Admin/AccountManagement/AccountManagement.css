@@ -136,6 +136,11 @@
   font-weight: 600;
 }
 
+.data-table th:last-child,
+.data-table td:last-child {
+  text-align: center;
+}
+
 .data-table td {
   padding: 15px;
   font-size: 14px;
