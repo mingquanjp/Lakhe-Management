@@ -85,7 +85,7 @@ const HouseholdDetail = () => {
             setHistoryData(data.data);
             setIsHistoryModalOpen(true);
         } catch (error) {
-            console.error('Error fetching history:', error);
+            // console.error('Error fetching history:', error);
             setNotification({
                 isOpen: true,
                 type: 'error',
@@ -147,7 +147,7 @@ const HouseholdDetail = () => {
                 });
             }
         } catch (error) {
-            console.error('Error deleting resident:', error);
+            // console.error('Error deleting resident:', error);
             setNotification({
                 isOpen: true,
                 type: 'error',
@@ -197,7 +197,7 @@ const HouseholdDetail = () => {
                 });
             }
         } catch (error) {
-            console.error('Error saving resident:', error);
+            // console.error('Error saving resident:', error);
             setNotification({
                 isOpen: true,
                 type: 'error',

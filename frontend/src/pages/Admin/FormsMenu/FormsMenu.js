@@ -36,7 +36,7 @@ const FormsMenu = () => {
     const renderFormContent = () => {
         switch(selectedForm) {
             case 'member-status-change':
-                return <MemberStatusChangeForm />;
+                return <MemberStatusChangeForm onClose={() => setSelectedForm(null)} />;
             case 'change-owner':
                 return <ChangeOwnerForm />;
             case 'temporary-residence':

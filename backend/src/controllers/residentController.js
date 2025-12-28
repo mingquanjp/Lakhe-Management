@@ -145,7 +145,14 @@ const getAllResidents = async (req, res) => {
     }
 
     if (search) {
-      query += ` AND (r.first_name ILIKE $${paramCount} OR r.last_name ILIKE $${paramCount} OR r.identity_card_number ILIKE $${paramCount} OR h.household_code ILIKE $${paramCount})`;
+      query += ` AND (
+        r.first_name ILIKE $${paramCount} 
+        OR r.last_name ILIKE $${paramCount} 
+        OR (r.last_name || ' ' || r.first_name) ILIKE $${paramCount}
+        OR (r.first_name || ' ' || r.last_name) ILIKE $${paramCount}
+        OR r.identity_card_number ILIKE $${paramCount} 
+        OR h.household_code ILIKE $${paramCount}
+      )`;
       values.push(`%${search}%`);
       paramCount++;
     }
@@ -206,6 +213,7 @@ const getResidentById = async (req, res) => {
 
 // 4. Update resident (Sửa thông tin nhân khẩu)
 const updateResident = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -224,10 +232,47 @@ const updateResident = async (req, res) => {
     const keys = Object.keys(updates).filter(key => allowedUpdates.includes(key));
 
     if (keys.length === 0) {
+      client.release();
       return res.status(400).json({
         success: false,
         message: 'Không có dữ liệu hợp lệ để cập nhật'
       });
+    }
+
+    await client.query('BEGIN');
+
+    // Check if resident is head and status is changing to MovedOut/Deceased
+    if (updates.status && ['MovedOut', 'Deceased', 'Đã chuyển đi', 'Đã qua đời'].includes(updates.status)) {
+        updates.relationship_to_head = 'Không'; // Reset relationship to 'Không'
+        const checkHeadQuery = `
+            SELECT r.household_id, h.head_of_household_id 
+            FROM residents r
+            JOIN households h ON r.household_id = h.household_id
+            WHERE r.resident_id = $1
+        `;
+        const checkHeadResult = await client.query(checkHeadQuery, [id]);
+        
+        if (checkHeadResult.rows.length > 0) {
+            const { household_id, head_of_household_id } = checkHeadResult.rows[0];
+            if (head_of_household_id === parseInt(id)) {
+                 const findNewHeadQuery = `
+                    SELECT resident_id FROM residents 
+                    WHERE household_id = $1 
+                    AND resident_id != $2
+                    AND status IN ('Permanent', 'Temporary', 'Thường trú', 'Tạm trú')
+                    AND deleted_at IS NULL
+                    ORDER BY dob ASC
+                    LIMIT 1
+                `;
+                const newHeadResult = await client.query(findNewHeadQuery, [household_id, id]);
+
+                if (newHeadResult.rows.length > 0) {
+                    const newHeadId = newHeadResult.rows[0].resident_id;
+                    await client.query('UPDATE households SET head_of_household_id = $1 WHERE household_id = $2', [newHeadId, household_id]);
+                    await client.query("UPDATE residents SET relationship_to_head = 'Chủ hộ' WHERE resident_id = $1", [newHeadId]);
+                }
+            }
+        }
     }
 
     // Helper to convert empty strings to null
@@ -243,9 +288,10 @@ const updateResident = async (req, res) => {
       RETURNING *
     `;
 
-    const result = await pool.query(query, values);
+    const result = await client.query(query, values);
 
     if (result.rows.length === 0) {
+      await client.query('ROLLBACK');
       return res.status(404).json({
         success: false,
         message: 'Không tìm thấy nhân khẩu để cập nhật'
@@ -264,7 +310,7 @@ const updateResident = async (req, res) => {
         else if (updates.status === 'MovedOut') changeType = 'MoveOut';
       }
 
-      await pool.query(
+      await client.query(
         `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
              VALUES ($1, $2, $3, $4)`,
         [updatedResident.household_id, id, changeType, userId]
@@ -273,18 +319,23 @@ const updateResident = async (req, res) => {
       console.error('Error logging history:', histError);
     }
 
+    await client.query('COMMIT');
+
     res.status(200).json({
       success: true,
       message: 'Cập nhật thông tin thành công',
       data: updatedResident
     });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Error updating resident:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi cập nhật nhân khẩu',
       error: error.message
     });
+  } finally {
+    client.release();
   }
 };
 
@@ -317,7 +368,7 @@ const deleteResident = async (req, res) => {
     }
 
     // Soft delete (MoveOut)
-    const updateQuery = "UPDATE residents SET status = 'MovedOut' WHERE resident_id = $1 RETURNING *";
+    const updateQuery = "UPDATE residents SET status = 'MovedOut', relationship_to_head = 'Không' WHERE resident_id = $1 RETURNING *";
     const result = await pool.query(updateQuery, [id]);
     const deletedResident = result.rows[0];
 
@@ -582,44 +633,101 @@ const registerTemporaryAbsence = async (req, res) => {
 
 // 8. Declare Death (Khai tử)
 const declareDeath = async (req, res) => {
+  const client = await pool.connect();
   try {
+    await client.query('BEGIN');
     const { id } = req.params; // resident_id
     const { death_date, notes } = req.body;
 
     if (!death_date) {
+      await client.query('ROLLBACK');
       return res.status(400).json({
         success: false,
         message: 'Vui lòng nhập ngày mất'
       });
     }
 
-    const query = `
-      UPDATE residents
-      SET status = 'Deceased',
-          notes = COALESCE(notes, '') || ' | Mất ngày: ' || $2 || '. ' || COALESCE($3, '')
-      WHERE resident_id = $1
-      RETURNING *
-    `;
+    // 1. Check if resident exists and get household info
+    const checkRes = await client.query(
+      'SELECT household_id FROM residents WHERE resident_id = $1',
+      [id]
+    );
 
-    const result = await pool.query(query, [id, death_date, notes]);
-
-    if (result.rows.length === 0) {
+    if (checkRes.rows.length === 0) {
+      await client.query('ROLLBACK');
       return res.status(404).json({
         success: false,
         message: 'Không tìm thấy nhân khẩu'
       });
     }
 
-    // Log history
+    const householdId = checkRes.rows[0].household_id;
+
+    // 2. Check if this resident is the Head of Household
+    if (householdId) {
+      const householdRes = await client.query(
+        'SELECT head_of_household_id FROM households WHERE household_id = $1',
+        [householdId]
+      );
+
+      if (householdRes.rows.length > 0 && householdRes.rows[0].head_of_household_id === parseInt(id)) {
+        // Find a replacement (oldest member, excluding the one dying)
+        const replacementRes = await client.query(
+          `SELECT resident_id FROM residents 
+           WHERE household_id = $1 AND resident_id != $2 AND status = 'Normal'
+           ORDER BY dob ASC 
+           LIMIT 1`,
+          [householdId, id]
+        );
+
+        if (replacementRes.rows.length > 0) {
+          const newHeadId = replacementRes.rows[0].resident_id;
+          
+          // Update household with new head
+          await client.query(
+            'UPDATE households SET head_of_household_id = $1 WHERE household_id = $2',
+            [newHeadId, householdId]
+          );
+
+          // Update new head's relationship
+          await client.query(
+            "UPDATE residents SET relationship_to_head = 'Chủ hộ' WHERE resident_id = $1",
+            [newHeadId]
+          );
+        } else {
+           // No one left in household
+           await client.query(
+            'UPDATE households SET head_of_household_id = NULL WHERE household_id = $1',
+            [householdId]
+          );
+        }
+      }
+    }
+
+    // 3. Update status to Deceased
+    const query = `
+      UPDATE residents
+      SET status = 'Deceased',
+          relationship_to_head = 'Không',
+          notes = COALESCE(notes, '') || ' | Mất ngày: ' || $2 || '. ' || COALESCE($3, '')
+      WHERE resident_id = $1
+      RETURNING *
+    `;
+
+    const result = await client.query(query, [id, death_date, notes]);
+
+    // 4. Log history
     try {
-      await pool.query(
+      await client.query(
         `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
              VALUES ($1, $2, 'Death', $3)`,
-        [result.rows[0].household_id, id, 1]
+        [householdId, id, 1]
       );
     } catch (histError) {
       console.error('Error logging history:', histError);
     }
+
+    await client.query('COMMIT');
 
     res.status(200).json({
       success: true,
@@ -627,12 +735,15 @@ const declareDeath = async (req, res) => {
       data: result.rows[0]
     });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Error declaring death:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi khai tử',
       error: error.message
     });
+  } finally {
+    client.release();
   }
 };
 

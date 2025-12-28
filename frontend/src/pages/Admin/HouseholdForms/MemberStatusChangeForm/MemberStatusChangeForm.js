@@ -6,7 +6,7 @@ import Modal from '../../../../components/commons/Modal';
 import { getAuthToken } from '../../../../utils/api';
 import './MemberStatusChangeForm.css';
 
-const MemberStatusChangeForm = () => {
+const MemberStatusChangeForm = ({ onClose }) => {
     const [formData, setFormData] = useState({
         residentId: '',
         memberName: '',
@@ -279,7 +279,12 @@ const MemberStatusChangeForm = () => {
                     <div className="modal-footer">
                         <button 
                             className={notification.type === 'success' ? "modal-btn-success" : "modal-btn-delete"}
-                            onClick={() => setNotification({ ...notification, isOpen: false })}
+                            onClick={() => {
+                                setNotification({ ...notification, isOpen: false });
+                                if (notification.type === 'success' && onClose) {
+                                    onClose();
+                                }
+                            }}
                         >
                             Đóng
                         </button>
