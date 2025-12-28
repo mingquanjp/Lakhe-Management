@@ -241,6 +241,29 @@ const updateResident = async (req, res) => {
 
     await client.query('BEGIN');
 
+    // Check if updating relationship to 'Chủ hộ'
+    if (updates.relationship_to_head === 'Chủ hộ') {
+        // Get household_id for this resident
+        const getHouseholdQuery = 'SELECT household_id FROM residents WHERE resident_id = $1';
+        const householdRes = await client.query(getHouseholdQuery, [id]);
+        
+        if (householdRes.rows.length > 0) {
+            const householdId = householdRes.rows[0].household_id;
+            
+            // Update household head pointer
+            await client.query(
+                'UPDATE households SET head_of_household_id = $1 WHERE household_id = $2',
+                [id, householdId]
+            );
+
+            // Demote other 'Chủ hộ' to 'Thành viên' to ensure uniqueness
+            await client.query(
+                "UPDATE residents SET relationship_to_head = 'Thành viên' WHERE household_id = $1 AND resident_id != $2 AND relationship_to_head = 'Chủ hộ'",
+                [householdId, id]
+            );
+        }
+    }
+
     // Check if resident is head and status is changing to MovedOut/Deceased
     if (updates.status && ['MovedOut', 'Deceased', 'Đã chuyển đi', 'Đã qua đời'].includes(updates.status)) {
         updates.relationship_to_head = 'Không'; // Reset relationship to 'Không'
