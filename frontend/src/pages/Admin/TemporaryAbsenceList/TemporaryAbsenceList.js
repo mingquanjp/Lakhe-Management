@@ -150,7 +150,7 @@ const TemporaryAbsenceList = () => {
 
       <div className="table-card">
         <div className="card-top">
-          <span className="card-title">Danh sách tạm vắng ({filteredData.length})</span>
+          <span className="card-title">Tổng số người tạm vắng: {filteredData.length}</span>
         </div>
 
         <TemporaryAbsenceTable 

@@ -142,7 +142,7 @@
 .login-button {
   width: 100%;
   padding: 14px 24px;
-  background: #ff6b35;
+  background: #2dce89;
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -150,14 +150,14 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   margin-top: 8px;
 }
 
 .login-button:hover {
-  background: #e55a2b;
+  background: #dc3545;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
 }
 
 .login-button:active {
@@ -166,7 +166,7 @@
 
 .login-button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+  box-shadow: 0 0 0 3px rgba(45, 206, 137, 0.2);
 }
 
 /* Responsive Design */
@@ -188,4 +188,3 @@
     max-width: 100%;
   }
 }
-

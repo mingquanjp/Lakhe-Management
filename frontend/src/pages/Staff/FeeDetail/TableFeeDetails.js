@@ -449,7 +449,7 @@ const TableFeeDetail = () => {
             <div className="search-box">
               <input
                 type="text"
-                placeholder="Tìm kiếm theo tên, số hộ khẩu, địa chỉ..."
+                placeholder="Tìm kiếm..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
