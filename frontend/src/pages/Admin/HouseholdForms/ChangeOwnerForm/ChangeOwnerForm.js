@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
+import { DateInput } from '../../../../components/commons/Input';
 import Modal from '../../../../components/commons/Modal';
 import { getAuthToken } from '../../../../utils/api';
 import './ChangeOwnerForm.css';
@@ -191,9 +192,8 @@ const ChangeOwnerForm = () => {
                     </select>
                 </div>
 
-                <Input
+                <DateInput
                     label="Ngày thay đổi"
-                    type="date"
                     name="date"
                     value={formData.date}
                     onChange={handleChange}

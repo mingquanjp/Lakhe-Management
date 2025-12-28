@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
+import { DateInput } from '../../../../components/commons/Input';
 import Card from '../../../../components/commons/Card/Card';
 import Modal from '../../../../components/commons/Modal';
 import './NewMemberForm.css';
@@ -105,9 +106,8 @@ const NewMemberForm = () => {
                             onChange={handleChange}
                         />
                         <div className="grid grid-cols-2 gap-4">
-                            <Input
+                            <DateInput
                                 label="Ngày sinh"
-                                type="date"
                                 name="dob"
                                 value={formData.dob}
                                 onChange={handleChange}
@@ -207,9 +207,8 @@ const NewMemberForm = () => {
                                 onChange={handleChange}
                                 required
                             />
-                            <Input
+                            <DateInput
                                 label="Ngày chuyển đến"
-                                type="date"
                                 name="moveInDate"
                                 value={formData.moveInDate}
                                 onChange={handleChange}

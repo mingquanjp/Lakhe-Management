@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
+import { DateInput } from '../../../../components/commons/Input';
 import Modal from '../../../../components/commons/Modal';
 import { getAuthToken } from '../../../../utils/api';
 import './MemberStatusChangeForm.css';
@@ -217,9 +218,8 @@ const MemberStatusChangeForm = () => {
                     </div>
                 </div>
 
-                <Input
+                <DateInput
                     label={formData.changeType === 'deceased' ? "Ngày mất" : "Ngày chuyển đi"}
-                    type="date"
                     name="changeDate"
                     value={formData.changeDate}
                     onChange={handleChange}
