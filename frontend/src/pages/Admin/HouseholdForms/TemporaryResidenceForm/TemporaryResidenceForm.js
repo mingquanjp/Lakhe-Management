@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
+import { DateInput } from '../../../../components/commons/Input';
 import Modal from '../../../../components/commons/Modal';
 import { getAuthToken } from '../../../../utils/api';
 import './TemporaryResidenceForm.css';
@@ -410,9 +411,8 @@ const TemporaryResidenceForm = () => {
                                                     </>
                                                 )}
 
-                                                <Input
+                                                <DateInput
                                                     label="Ngày sinh"
-                                                    type="date"
                                                     name="dob"
                                                     value={formData.dob}
                                                     onChange={handleChange}
@@ -459,17 +459,15 @@ const TemporaryResidenceForm = () => {
                                             <div className="space-y-4">
                                                 <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Thông tin cư trú</h3>
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    <Input
+                                                    <DateInput
                                                         label="Từ ngày"
-                                                        type="date"
                                                         name="fromDate"
                                                         value={formData.fromDate}
                                                         onChange={handleChange}
                                                         required
                                                     />
-                                                    <Input
+                                                    <DateInput
                                                         label="Đến ngày"
-                                                        type="date"
                                                         name="toDate"
                                                         value={formData.toDate}
                                                         onChange={handleChange}
