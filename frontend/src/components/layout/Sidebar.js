@@ -24,7 +24,7 @@ const Sidebar = () => {
     },
     {
       id: "overview",
-      label: "Overview",
+      label: "Tổng quan",
       icon: overView,
       path: "/admin/overview",
     },
