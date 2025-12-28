@@ -352,6 +352,7 @@ const deleteResident = async (req, res) => {
 const registerTemporaryResidence = async (req, res) => {
   try {
     const {
+      host_household_id,
       first_name,
       last_name,
       identity_card_number,
@@ -364,7 +365,8 @@ const registerTemporaryResidence = async (req, res) => {
       occupation,
       workplace,
       email, // Not stored in DB currently
-      phone  // Not stored in DB currently
+      phone,  // Not stored in DB currently
+      relationship_to_head
     } = req.body;
 
     if (!first_name || !last_name || !start_date || !end_date) {
@@ -385,7 +387,7 @@ const registerTemporaryResidence = async (req, res) => {
         temp_reason, temp_start_date, temp_end_date,
         status, relationship_to_head, registration_date
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Temporary', 'Tạm trú', CURRENT_DATE)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Temporary', $13, CURRENT_DATE)
       RETURNING *
     `;
 
@@ -393,7 +395,8 @@ const registerTemporaryResidence = async (req, res) => {
       host_household_id, first_name, last_name, cleanValue(identity_card_number),
       dob, gender,
       cleanValue(home_address), cleanValue(occupation), cleanValue(workplace),
-      cleanValue(reason), cleanValue(start_date), cleanValue(end_date)
+      cleanValue(reason), cleanValue(start_date), cleanValue(end_date),
+      relationship_to_head || 'Tạm trú'
     ];
 
     const result = await pool.query(query, values);

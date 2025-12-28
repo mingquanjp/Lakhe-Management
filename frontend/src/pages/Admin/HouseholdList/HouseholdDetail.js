@@ -55,6 +55,11 @@ const HouseholdDetail = () => {
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
     const [historyData, setHistoryData] = useState([]);
     const [selectedResidentDetail, setSelectedResidentDetail] = useState(null); // For MovedOut/Deceased details
+    const [notification, setNotification] = useState({
+        isOpen: false,
+        type: 'success',
+        message: ''
+    });
 
     useEffect(() => {
         fetchHouseholdDetails();
@@ -79,7 +84,11 @@ const HouseholdDetail = () => {
             setIsHistoryModalOpen(true);
         } catch (error) {
             console.error('Error fetching history:', error);
-            alert('Không thể tải lịch sử biến động. Vui lòng thử lại sau.');
+            setNotification({
+                isOpen: true,
+                type: 'error',
+                message: 'Không thể tải lịch sử biến động. Vui lòng thử lại sau.'
+            });
         }
     };
 
@@ -115,15 +124,27 @@ const HouseholdDetail = () => {
                 });
 
                 if (response.ok) {
-                    alert('Xóa nhân khẩu thành công!');
+                    setNotification({
+                        isOpen: true,
+                        type: 'success',
+                        message: 'Xóa nhân khẩu thành công!'
+                    });
                     fetchHouseholdDetails();
                 } else {
                     const errorData = await response.json();
-                    alert(`Lỗi: ${errorData.message}`);
+                    setNotification({
+                        isOpen: true,
+                        type: 'error',
+                        message: `Lỗi: ${errorData.message}`
+                    });
                 }
             } catch (error) {
                 console.error('Error deleting resident:', error);
-                alert('Có lỗi xảy ra khi xóa nhân khẩu');
+                setNotification({
+                    isOpen: true,
+                    type: 'error',
+                    message: 'Có lỗi xảy ra khi xóa nhân khẩu'
+                });
             }
         }
     };
@@ -149,17 +170,29 @@ const HouseholdDetail = () => {
             });
 
             if (response.ok) {
-                alert(editingMember ? 'Cập nhật nhân khẩu thành công!' : 'Thêm nhân khẩu thành công!');
+                setNotification({
+                    isOpen: true,
+                    type: 'success',
+                    message: editingMember ? 'Cập nhật nhân khẩu thành công!' : 'Thêm nhân khẩu thành công!'
+                });
                 setIsAddMemberModalOpen(false);
                 setEditingMember(null);
                 fetchHouseholdDetails(); // Refresh list
             } else {
                 const errorData = await response.json();
-                alert(`Lỗi: ${errorData.message}`);
+                setNotification({
+                    isOpen: true,
+                    type: 'error',
+                    message: `Lỗi: ${errorData.message}`
+                });
             }
         } catch (error) {
             console.error('Error saving resident:', error);
-            alert('Có lỗi xảy ra khi lưu thông tin nhân khẩu');
+            setNotification({
+                isOpen: true,
+                type: 'error',
+                message: 'Có lỗi xảy ra khi lưu thông tin nhân khẩu'
+            });
         }
     };
 
@@ -581,7 +614,7 @@ const HouseholdDetail = () => {
                                             </span>
                                         </td>
                                         <td>{item.changed_by || 'Admin'}</td>
-                                        <td>{item.last_name} {item.first_name}</td>
+                                        <td>{item.first_name} {item.last_name}</td>
                                     </tr>
                                 ))
                             ) : (
@@ -591,6 +624,24 @@ const HouseholdDetail = () => {
                             )}
                         </tbody>
                     </table>
+                </div>
+            </Modal>
+            <Modal
+                isOpen={notification.isOpen}
+                onClose={() => setNotification({ ...notification, isOpen: false })}
+                title={notification.type === 'success' ? 'Thành công' : 'Lỗi'}
+                size="sm"
+            >
+                <div style={{ padding: "20px" }}>
+                    <p style={{ marginBottom: "20px", color: "#333" }}>{notification.message}</p>
+                    <div className="modal-footer">
+                        <button 
+                            className={notification.type === 'success' ? "modal-btn-success" : "modal-btn-delete"}
+                            onClick={() => setNotification({ ...notification, isOpen: false })}
+                        >
+                            Đóng
+                        </button>
+                    </div>
                 </div>
             </Modal>
         </div>
