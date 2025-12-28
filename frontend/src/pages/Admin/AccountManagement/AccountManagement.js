@@ -14,7 +14,7 @@ const AccountManagement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -52,7 +52,7 @@ const AccountManagement = () => {
   // Handle create user
   const handleCreateUser = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.username || !formData.password || !formData.full_name) {
       toast.error("Vui lòng nhập đầy đủ thông tin");
       return;
@@ -70,7 +70,7 @@ const AccountManagement = () => {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         toast.success("Tạo tài khoản thành công!");
         setIsAddModalOpen(false);
@@ -88,7 +88,7 @@ const AccountManagement = () => {
   // Handle update user
   const handleUpdateUser = async (e) => {
     e.preventDefault();
-    
+
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -108,7 +108,7 @@ const AccountManagement = () => {
       );
 
       const data = await response.json();
-      
+
       if (data.success) {
         toast.success("Cập nhật tài khoản thành công!");
         setIsEditModalOpen(false);
@@ -138,7 +138,7 @@ const AccountManagement = () => {
       );
 
       const data = await response.json();
-      
+
       if (data.success) {
         toast.success("Xóa tài khoản thành công!");
         setIsDeleteModalOpen(false);
