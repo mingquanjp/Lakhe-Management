@@ -266,7 +266,7 @@ const updateResident = async (req, res) => {
 
     // Check if resident is head and status is changing to MovedOut/Deceased
     if (updates.status && ['MovedOut', 'Deceased', 'Đã chuyển đi', 'Đã qua đời'].includes(updates.status)) {
-        updates.relationship_to_head = 'Không'; // Reset relationship to 'Không'
+
         const checkHeadQuery = `
             SELECT r.household_id, h.head_of_household_id 
             FROM residents r
@@ -362,8 +362,9 @@ const updateResident = async (req, res) => {
   }
 };
 
-// 5. Delete resident (Xóa nhân khẩu - Soft delete to preserve history)
+// 5. Delete resident (Xóa nhân khẩu - Hard delete)
 const deleteResident = async (req, res) => {
+  const client = await pool.connect();
   try {
     const { id } = req.params;
 
@@ -374,9 +375,10 @@ const deleteResident = async (req, res) => {
       LEFT JOIN households h ON r.resident_id = h.head_of_household_id
       WHERE r.resident_id = $1
     `;
-    const checkResult = await pool.query(checkQuery, [id]);
+    const checkResult = await client.query(checkQuery, [id]);
 
     if (checkResult.rows.length === 0) {
+      client.release();
       return res.status(404).json({
         success: false,
         message: 'Không tìm thấy nhân khẩu'
@@ -384,41 +386,43 @@ const deleteResident = async (req, res) => {
     }
 
     if (checkResult.rows[0].head_of_household_id) {
+      client.release();
       return res.status(400).json({
         success: false,
         message: 'Không thể xóa chủ hộ. Vui lòng thay đổi chủ hộ trước khi xóa.'
       });
     }
 
-    // Soft delete (MoveOut)
-    const updateQuery = "UPDATE residents SET status = 'MovedOut', relationship_to_head = 'Không' WHERE resident_id = $1 RETURNING *";
-    const result = await pool.query(updateQuery, [id]);
+    await client.query('BEGIN');
+
+    // Delete related records in change_history
+    await client.query('DELETE FROM change_history WHERE resident_id = $1', [id]);
+
+    // Delete related records in temporary_absences
+    await client.query('DELETE FROM temporary_absences WHERE resident_id = $1', [id]);
+
+    // Hard delete resident
+    const deleteQuery = "DELETE FROM residents WHERE resident_id = $1 RETURNING *";
+    const result = await client.query(deleteQuery, [id]);
     const deletedResident = result.rows[0];
 
-    // Log history
-    try {
-      const userId = req.user ? req.user.user_id : 1;
-      await pool.query(
-        `INSERT INTO change_history (household_id, resident_id, change_type, changed_by_user_id)
-             VALUES ($1, $2, 'MoveOut', $3)`,
-        [deletedResident.household_id, id, userId]
-      );
-    } catch (histError) {
-      console.error('Error logging history:', histError);
-    }
+    await client.query('COMMIT');
 
     res.status(200).json({
       success: true,
-      message: 'Xóa nhân khẩu thành công (Đã chuyển sang trạng thái Chuyển đi)',
+      message: 'Xóa nhân khẩu thành công',
       data: deletedResident
     });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Error deleting resident:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi server khi xóa nhân khẩu',
       error: error.message
     });
+  } finally {
+    client.release();
   }
 };
 
@@ -731,7 +735,6 @@ const declareDeath = async (req, res) => {
     const query = `
       UPDATE residents
       SET status = 'Deceased',
-          relationship_to_head = 'Không',
           notes = COALESCE(notes, '') || ' | Mất ngày: ' || $2 || '. ' || COALESCE($3, '')
       WHERE resident_id = $1
       RETURNING *
