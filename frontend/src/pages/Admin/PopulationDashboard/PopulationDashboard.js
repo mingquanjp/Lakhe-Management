@@ -59,11 +59,11 @@ const CountUp = ({ end, duration = 1000 }) => {
 const PopulationDashboard = () => {
   // Calculate default dates
   const today = new Date();
-  const defaultEnd = today.toISOString().split('T')[0];
-  
+  const defaultEnd = today.toISOString().split("T")[0];
+
   const twentyYearsAgo = new Date();
   twentyYearsAgo.setFullYear(twentyYearsAgo.getFullYear() - 20);
-  const defaultStart = twentyYearsAgo.toISOString().split('T')[0];
+  const defaultStart = twentyYearsAgo.toISOString().split("T")[0];
 
   const [startDate, setStartDate] = useState(defaultStart);
   const [endDate, setEndDate] = useState(defaultEnd);
@@ -269,7 +269,7 @@ const PopulationDashboard = () => {
                       />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip formatter={(value) => [value, "Số người"]} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -323,7 +323,10 @@ const PopulationDashboard = () => {
                   tickLine={false}
                   tick={{ fill: "#828282", fontSize: 12 }}
                 />
-                <Tooltip cursor={{ fill: "transparent" }} />
+                <Tooltip
+                  cursor={{ fill: "transparent" }}
+                  formatter={(value) => [value, "Số người"]}
+                />
                 <Bar dataKey="value" fill="#E0E0E0" radius={[4, 4, 0, 0]}>
                   {ageData.map((entry, index) => (
                     <Cell

@@ -176,7 +176,10 @@ const StatsFinanceDashboard = () => {
                   border: "none",
                   boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
                 }}
-                formatter={(value) => value.toLocaleString() + " VND"}
+                formatter={(value) => [
+                  value.toLocaleString() + " VND",
+                  "Giá trị",
+                ]}
               />
               <Area
                 type="monotone"
@@ -221,7 +224,7 @@ const StatsFinanceDashboard = () => {
                       />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip formatter={(value) => [value, "Giá trị"]} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -276,7 +279,10 @@ const StatsFinanceDashboard = () => {
                 />
                 <Tooltip
                   cursor={{ fill: "transparent" }}
-                  formatter={(value) => value.toLocaleString() + " VND"}
+                  formatter={(value) => [
+                    value.toLocaleString() + " VND",
+                    "Giá trị",
+                  ]}
                 />
                 <Bar dataKey="value" fill="#2F80ED" radius={[4, 4, 0, 0]} />
               </BarChart>
