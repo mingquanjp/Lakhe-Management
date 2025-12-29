@@ -45,11 +45,27 @@ const getFinanceStats = async (req, res) => {
     const fee = feeQuery.rows[0];
 
     // 2. Get Total Households (Active + Temporary)
-    // Note: Temporary households also pay fees in this system
+    // Logic synchronized with feeController.getFeeStatistics to ensure consistency
     const totalHouseholdsQuery = await pool.query(
-      "SELECT COUNT(*) FROM households WHERE status IN ('Active', 'Temporary') AND deleted_at IS NULL"
+      `SELECT COUNT(DISTINCT h.household_id) as total 
+       FROM households h
+       LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
+       WHERE h.status IN ('Active', 'Temporary')
+         AND (
+           -- Hộ thường trú: chỉ tính nếu fee bắt đầu sau ngày hộ chuyển đến
+           (h.status = 'Active' AND r.status = 'Permanent' AND $1 >= h.date_created)
+           OR
+           -- Hộ tạm trú: chỉ tính nếu fee nằm trong khoảng thời gian tạm trú
+           (h.status = 'Temporary' 
+            AND r.status = 'Temporary'
+            AND r.temp_start_date IS NOT NULL 
+            AND r.temp_end_date IS NOT NULL
+            AND $1 <= r.temp_end_date
+            AND ($2::DATE IS NULL OR $2::DATE >= r.temp_start_date))
+         )`,
+      [fee.start_date, fee.end_date]
     );
-    const totalHouseholds = parseInt(totalHouseholdsQuery.rows[0].count);
+    const totalHouseholds = parseInt(totalHouseholdsQuery.rows[0].total);
 
     // 3. Get Payment Stats
     // Total collected amount
@@ -67,7 +83,7 @@ const getFinanceStats = async (req, res) => {
     const paidHouseholds = parseInt(paidHouseholdsQuery.rows[0].count);
 
     // Calculate Unpaid
-    const unpaidHouseholds = totalHouseholds - paidHouseholds;
+    const unpaidHouseholds = Math.max(0, totalHouseholds - paidHouseholds);
 
     // Calculate Expected Revenue
     let expectedRevenue = 0;
