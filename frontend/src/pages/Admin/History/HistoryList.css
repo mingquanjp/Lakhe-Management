@@ -11,33 +11,81 @@
 
 .history-toolbar {
     display: flex;
+    gap: 10px;
+    align-items: center;
     justify-content: flex-start;
     margin-bottom: 20px;
 }
 
-.search-box {
+.toolbar-left {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-history-box {
     position: relative;
     background: white;
-    border-radius: 20px;
+    border-radius: 6px;
     border: 1px solid #e9ecef;
-    padding: 8px 15px;
+    padding: 10px 12px;
     display: flex;
     align-items: center;
-    width: 250px;
-    box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15), 0 1px 0 rgba(0, 0, 0, 0.02);
+    gap: 10px;
+    width: 300px;
+    box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15);
+    transition: all 0.2s ease;
+}
+
+.search-history-box:focus-within {
+    border-color: #2dce89;
+    box-shadow: 0 2px 6px rgba(45, 206, 137, 0.2);
 }
 
 .search-icon {
     color: #adb5bd;
-    margin-right: 8px;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
 }
 
-.search-box input {
+.search-history-box input {
     border: none;
     outline: none;
     font-size: 14px;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     color: #525f7f;
+    background: transparent;
+    padding: 0;
+    margin-left: 20px;
+}
+
+.search-history-box input::placeholder {
+    color: #adb5bd;
+}
+
+/* Green Detail Button with Gradient */
+.history-detail-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(90deg, #28a745, #5cb85c);
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.history-detail-btn:hover {
+    background: linear-gradient(90deg, #218838, #4ca64c);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(40, 167, 69, 0.4);
 }
 
 /* Pagination Styles */
@@ -54,8 +102,10 @@
     height: 36px;
     border-radius: 50%;
     border: none;
-    background-color: #f8f9fa; /* Light gray background */
-    color: #5e6e82; /* Text color */
+    background-color: #f8f9fa;
+    /* Light gray background */
+    color: #5e6e82;
+    /* Text color */
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -71,8 +121,10 @@
 }
 
 .pagination-btn.active {
-    background-color: #ffe4e6; /* Light pink/red background matching the image */
-    color: #e11d48; /* Red text color */
+    background-color: #ffe4e6;
+    /* Light pink/red background matching the image */
+    color: #e11d48;
+    /* Red text color */
     font-weight: 600;
 }
 

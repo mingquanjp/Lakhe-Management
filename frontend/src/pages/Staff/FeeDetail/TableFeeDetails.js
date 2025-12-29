@@ -5,12 +5,12 @@ import PaymentForm from '../../../components/forms/Paymentform';
 import {
   getAllFees,
   getFeeById,
-  getFeeSummary,
   getAllHouseholdsForFee,
   createPayment,
   updatePayment,
   deletePayment
 } from '../../../services/feeService';
+import { fetchFeeStatistics } from '../../../utils/api';
 import { exportToExcelWithHeaders, formatDateForExcel, formatCurrencyForExcel } from '../../../utils/excelExport';
 import { toast } from 'react-toastify';
 import './TableFeeDetails.css';
@@ -30,6 +30,8 @@ const TableFeeDetail = () => {
   const [error, setError] = useState(null);
   const [paymentMode, setPaymentMode] = useState('create'); // 'create' hoặc 'edit'
   const [editingPayment, setEditingPayment] = useState(null); // Lưu payment đang edit
+  const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'Đã nộp', 'Chưa nộp'
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const itemsPerPage = 6;
 
   // ← THÊM: Fetch all fees và redirect nếu không có feeId
@@ -67,16 +69,19 @@ const TableFeeDetail = () => {
       setLoading(true);
       setError(null);
 
-      // Lấy chi tiết khoản thu hiện tại
       const feeResponse = await getFeeById(feeId);
       if (feeResponse.success) {
         setCurrentFee(feeResponse.data);
       }
-
-      // Lấy tổng hợp thống kê
-      const summaryResponse = await getFeeSummary(feeId);
-      if (summaryResponse.success) {
-        setFeeSummary(summaryResponse.data);
+      const statsResponse = await fetchFeeStatistics(feeId);
+      if (statsResponse.success) {
+        setFeeSummary({
+          total_collected: statsResponse.data.statistics.total_paid,
+          expected_total: statsResponse.data.statistics.expected_total,
+          paid_households: statsResponse.data.statistics.paid_households,
+          unpaid_households: statsResponse.data.statistics.unpaid_households,
+          total_households: statsResponse.data.statistics.total_households
+        });
       }
 
       // Lấy TẤT CẢ hộ (cả đã nộp và chưa nộp)
@@ -115,12 +120,19 @@ const TableFeeDetail = () => {
     { key: 'actions', title: 'Thông tin chi tiết' }
   ];
 
-  // Lọc dữ liệu theo search
-  const filteredData = householdData.filter(row =>
-    row.head_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    row.household_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    row.address?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Lọc dữ liệu theo search và trạng thái
+  const filteredData = householdData.filter(row => {
+    // Lọc theo từ khóa tìm kiếm
+    const matchesSearch =
+      row.head_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      row.household_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      row.address?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Lọc theo trạng thái
+    const matchesStatus = filterStatus === 'all' || row.payment_status === filterStatus;
+
+    return matchesSearch && matchesStatus;
+  });
 
   // Tính toán dữ liệu cho trang hiện tại
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -130,7 +142,7 @@ const TableFeeDetail = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, filterStatus]);
 
   // Xử lý khi click vào "Ghi nhận" hoặc "Xem chi tiết"
   const handleViewDetail = (household) => {
@@ -449,13 +461,44 @@ const TableFeeDetail = () => {
             <div className="search-box">
               <input
                 type="text"
-                placeholder="Tìm kiếm theo tên, số hộ khẩu, địa chỉ..."
+                placeholder="Tìm kiếm..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
               />
             </div>
             <div className="action-buttons">
+              <div className="filter-dropdown-container">
+                <Button
+                  variant="outline"
+                  size="small"
+                  onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                >
+                  Lọc {filterStatus !== 'all' && `(${filterStatus})`}
+                </Button>
+                {showFilterDropdown && (
+                  <div className="filter-dropdown">
+                    <div
+                      className={`filter-option ${filterStatus === 'all' ? 'active' : ''}`}
+                      onClick={() => { setFilterStatus('all'); setShowFilterDropdown(false); }}
+                    >
+                      Tất cả
+                    </div>
+                    <div
+                      className={`filter-option ${filterStatus === 'Đã nộp' ? 'active' : ''}`}
+                      onClick={() => { setFilterStatus('Đã nộp'); setShowFilterDropdown(false); }}
+                    >
+                      Đã nộp
+                    </div>
+                    <div
+                      className={`filter-option ${filterStatus === 'Chưa nộp' ? 'active' : ''}`}
+                      onClick={() => { setFilterStatus('Chưa nộp'); setShowFilterDropdown(false); }}
+                    >
+                      Chưa nộp
+                    </div>
+                  </div>
+                )}
+              </div>
               <Button
                 variant="outline"
                 size="small"

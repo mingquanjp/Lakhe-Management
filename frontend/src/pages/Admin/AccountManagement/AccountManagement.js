@@ -14,7 +14,7 @@ const AccountManagement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -52,7 +52,7 @@ const AccountManagement = () => {
   // Handle create user
   const handleCreateUser = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.username || !formData.password || !formData.full_name) {
       toast.error("Vui lòng nhập đầy đủ thông tin");
       return;
@@ -70,7 +70,7 @@ const AccountManagement = () => {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         toast.success("Tạo tài khoản thành công!");
         setIsAddModalOpen(false);
@@ -88,7 +88,7 @@ const AccountManagement = () => {
   // Handle update user
   const handleUpdateUser = async (e) => {
     e.preventDefault();
-    
+
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -108,7 +108,7 @@ const AccountManagement = () => {
       );
 
       const data = await response.json();
-      
+
       if (data.success) {
         toast.success("Cập nhật tài khoản thành công!");
         setIsEditModalOpen(false);
@@ -138,7 +138,7 @@ const AccountManagement = () => {
       );
 
       const data = await response.json();
-      
+
       if (data.success) {
         toast.success("Xóa tài khoản thành công!");
         setIsDeleteModalOpen(false);
@@ -170,19 +170,21 @@ const AccountManagement = () => {
     setIsDeleteModalOpen(true);
   };
 
-  // Filter users
+  // Filter users (exclude admin accounts)
   const filteredUsers = users.filter((user) =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+    user.role !== "admin" && (
+      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
 
   return (
     <div className="account-management-page">
       <div className="page-header">
         <h2 className="page-title">Quản lý cán bộ</h2>
-        <div className="toolbar">
-          <div className="search-box">
-            <Search size={18} className="search-icon" />
+        <div className="account-toolbar">
+          <div className="account-search-box">
+            <Search size={18} className="account-search-icon" />
             <input
               type="text"
               placeholder="Tìm kiếm tài khoản..."
@@ -191,7 +193,7 @@ const AccountManagement = () => {
             />
           </div>
           <button
-            className="btn-tool btn-add"
+            className="account-btn-tool account-btn-add"
             onClick={() => {
               setFormData({ username: "", password: "", full_name: "", role: "staff" });
               setIsAddModalOpen(true);
@@ -234,16 +236,16 @@ const AccountManagement = () => {
                     </span>
                   </td>
                   <td>
-                    <div className="action-buttons">
+                    <div className="account-action-buttons">
                       <button
-                        className="btn-icon btn-edit"
+                        className="account-btn-icon account-btn-edit"
                         onClick={() => openEditModal(user)}
                         title="Chỉnh sửa"
                       >
                         <Edit2 size={16} />
                       </button>
                       <button
-                        className="btn-icon btn-delete"
+                        className="account-btn-icon account-btn-delete"
                         onClick={() => openDeleteModal(user)}
                         title="Xóa"
                       >
@@ -298,7 +300,6 @@ const AccountManagement = () => {
               className="form-select"
             >
               <option value="staff">Nhân viên</option>
-              <option value="admin">Quản trị viên</option>
             </select>
           </div>
           <div className="modal-actions">
@@ -346,7 +347,6 @@ const AccountManagement = () => {
               className="form-select"
             >
               <option value="staff">Nhân viên</option>
-              <option value="admin">Quản trị viên</option>
             </select>
           </div>
           <div className="modal-actions">

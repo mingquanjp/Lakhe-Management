@@ -94,6 +94,7 @@
 
 .table-actions {
   display: flex;
+  justify-content: space-between;
   gap: 12px;
   align-items: center;
 }
@@ -156,6 +157,43 @@
 .action-buttons {
   display: flex;
   gap: 8px;
+}
+
+/* Filter Dropdown */
+.filter-dropdown-container {
+  position: relative;
+}
+
+.filter-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 120px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.filter-option {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.filter-option:hover {
+  background-color: #f3f4f6;
+}
+
+.filter-option.active {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-weight: 500;
 }
 
 /* Pagination */

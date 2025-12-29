@@ -1,6 +1,15 @@
-import React from 'react';
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import './AgeChart.css';
+import React from "react";
+import {
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import "./AgeChart.css";
 
 const AgeChart = ({ data }) => {
   return (
@@ -11,9 +20,18 @@ const AgeChart = ({ data }) => {
       <ResponsiveContainer width="100%" height={250}>
         <BarChart data={data} barSize={20}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
-          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#888'}} dy={10} />
+          <XAxis
+            dataKey="name"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12, fill: "#888" }}
+            dy={10}
+          />
           <YAxis axisLine={false} tickLine={false} />
-          <Tooltip cursor={{fill: 'transparent'}} />
+          <Tooltip
+            cursor={{ fill: "transparent" }}
+            formatter={(value) => [value, "Số người"]}
+          />
           <Bar dataKey="value" radius={[10, 10, 10, 10]}>
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.fill} />

@@ -24,7 +24,7 @@ const Sidebar = () => {
     },
     {
       id: "overview",
-      label: "Overview",
+      label: "Tổng quan",
       icon: overView,
       path: "/admin/overview",
     },
@@ -188,15 +188,10 @@ const Sidebar = () => {
         {menuItems.map((item) => renderMenuItem(item))}
       </nav>
       <div className="sidebar-footer">
-        <Button
-          variant="primary"
-          size="medium"
-          className="sidebar-logout-btn"
-          onClick={handleLogout}
-        >
+        <button className="sidebar-logout-btn" onClick={handleLogout}>
           <img src={logoutIcon} alt="logout" className="logout-icon" />
-          <span>Log Out</span>
-        </Button>
+          <span>Đăng xuất</span>
+        </button>
       </div>
     </aside>
   );

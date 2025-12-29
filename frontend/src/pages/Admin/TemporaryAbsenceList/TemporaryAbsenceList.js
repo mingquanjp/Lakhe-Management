@@ -5,7 +5,7 @@ import "./TemporaryAbsenceList.css";
 import TemporaryAbsenceTable from "./TemporaryAbsenceTable";
 import Pagination from "../../../components/commons/Pagination";
 import Modal from "../../../components/commons/Modal";
-import { exportToCSV } from "../../../utils/exportUtils";
+import { exportToExcel } from "../../../utils/excelExport";
 import { toast } from "react-toastify";
 import { getAuthToken } from "../../../utils/api";
 
@@ -39,7 +39,7 @@ const TemporaryAbsenceList = () => {
         setData(result.data);
       }
     } catch (error) {
-      console.error('Error fetching temporary absences:', error);
+      // console.error('Error fetching temporary absences:', error);
     }
   };
 
@@ -69,7 +69,7 @@ const TemporaryAbsenceList = () => {
         toast.error(result.message || "Lỗi khi xóa");
       }
     } catch (error) {
-      console.error("Error deleting:", error);
+      // console.error("Error deleting:", error);
       toast.error("Lỗi kết nối server");
     }
   };
@@ -77,7 +77,7 @@ const TemporaryAbsenceList = () => {
 
   // Filter logic
   const filteredData = data.filter(item => {
-    const fullName = `${item.last_name} ${item.first_name}`.toLowerCase();
+    const fullName = `${item.first_name} ${item.last_name}`.toLowerCase();
     const searchLower = searchTerm.toLowerCase();
     const birthDate = item.dob ? new Date(item.dob).toLocaleDateString('vi-VN') : "";
     const startDate = item.start_date ? new Date(item.start_date).toLocaleDateString('vi-VN') : "";
@@ -85,6 +85,7 @@ const TemporaryAbsenceList = () => {
     
     const matchesSearch = 
       fullName.includes(searchLower) ||
+      (item.household_code && item.household_code.toLowerCase().includes(searchLower)) ||
       (item.temporary_address && item.temporary_address.toLowerCase().includes(searchLower)) ||
       (item.identity_card_number && item.identity_card_number.includes(searchLower)) ||
       (birthDate && birthDate.includes(searchLower)) ||
@@ -105,7 +106,7 @@ const TemporaryAbsenceList = () => {
       "Đến ngày": new Date(item.end_date).toLocaleDateString('vi-VN'),
       "Lý do": item.reason
     }));
-    exportToCSV(exportData, "Danh_sach_tam_vang");
+    exportToExcel(exportData, "Danh_sach_tam_vang", "Danh sách tạm vắng");
   };
 
   const handleDetailClick = (item) => {
@@ -130,24 +131,26 @@ const TemporaryAbsenceList = () => {
       <div className="page-header">
         <h2 className="page-title">Danh sách tạm vắng</h2>
         <div className="toolbar">
-          <div className="search-box">
-            <Search size={18} className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div className="toolbar-left">
+            <div className="search-temporary-box">
+              <Search size={18} className="search-icon" />
+              <input 
+                type="text" 
+                placeholder="Tìm kiếm..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <button className="btn-tool" onClick={handleExport}>
+              <Download size={16} /> Xuất Excel
+            </button>
           </div>
-          <button className="btn-tool" onClick={handleExport}>
-            <Download size={16} /> Xuất Excel
-          </button>
         </div>
       </div>
 
       <div className="table-card">
         <div className="card-top">
-          <span className="card-title">Danh sách tạm vắng ({filteredData.length})</span>
+          <span className="card-title">Tổng số người tạm vắng: {filteredData.length}</span>
         </div>
 
         <TemporaryAbsenceTable 
@@ -181,7 +184,7 @@ const TemporaryAbsenceList = () => {
               <strong>Ngày sinh:</strong> {new Date(selectedItem.dob).toLocaleDateString('vi-VN')}
             </div>
             <div className="detail-row">
-              <strong>Giới tính:</strong> {selectedItem.gender}
+              <strong>Giới tính:</strong> {selectedItem.gender === 'Male' ? 'Nam' : selectedItem.gender === 'Female' ? 'Nữ' : selectedItem.gender}
             </div>
             <div className="detail-row">
               <strong>CMND/CCCD:</strong> {selectedItem.identity_card_number}

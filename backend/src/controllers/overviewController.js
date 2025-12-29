@@ -29,30 +29,46 @@ const getOverviewData = async (req, res) => {
 
     // 3. Thống kê nhóm tuổi
     const ageQuery = `
-      SELECT 
-        CASE 
-          WHEN EXTRACT(YEAR FROM AGE(dob)) < 6 THEN 'Mầm non'
-          WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 6 AND 10 THEN 'Cấp 1'
-          WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 11 AND 14 THEN 'Cấp 2'
-          WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 15 AND 17 THEN 'Cấp 3'
-          WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 18 AND 60 THEN 'Lao động'
-          ELSE 'Nghỉ hưu'
-        END as name,
-        COUNT(*) as value
-      FROM residents
-      WHERE deleted_at IS NULL AND status IN ('Permanent', 'Temporary')
-      GROUP BY 1
-    `;
+          SELECT 
+      CASE 
+        WHEN EXTRACT(YEAR FROM AGE(dob)) < 6 THEN 'Mầm non'
+        WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 6 AND 10 THEN 'Cấp 1'
+        WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 11 AND 14 THEN 'Cấp 2'
+        WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 15 AND 17 THEN 'Cấp 3'
+        WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 18 AND 60 THEN 'Lao động'
+        ELSE 'Nghỉ hưu'
+      END AS name,
+
+      CASE 
+        WHEN EXTRACT(YEAR FROM AGE(dob)) < 6 THEN 1
+        WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 6 AND 10 THEN 2
+        WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 11 AND 14 THEN 3
+        WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 15 AND 17 THEN 4
+        WHEN EXTRACT(YEAR FROM AGE(dob)) BETWEEN 18 AND 60 THEN 5
+        ELSE 6
+      END AS order_index,
+
+      COUNT(*) AS value
+    FROM residents
+    WHERE deleted_at IS NULL 
+      AND status IN ('Permanent', 'Temporary')
+    GROUP BY name, order_index
+    ORDER BY order_index;
+        `;
     const ageResult = await pool.query(ageQuery);
-    
+
     const ageColors = {
-      'Mầm non': '#9ba6fa', 'Cấp 1': '#5ce1e6', 'Cấp 2': '#000000',
-      'Cấp 3': '#74b9ff', 'Lao động': '#c4a6fa', 'Nghỉ hưu': '#55efc4'
+      "Mầm non": "#9ba6fa",
+      "Cấp 1": "#5ce1e6",
+      "Cấp 2": "#000000",
+      "Cấp 3": "#74b9ff",
+      "Lao động": "#c4a6fa",
+      "Nghỉ hưu": "#55efc4",
     };
-    const formattedAgeData = ageResult.rows.map(item => ({
+    const formattedAgeData = ageResult.rows.map((item) => ({
       ...item,
       value: parseInt(item.value),
-      fill: ageColors[item.name] || '#8884d8'
+      fill: ageColors[item.name] || "#8884d8",
     }));
 
     // 4. Thống kê giới tính

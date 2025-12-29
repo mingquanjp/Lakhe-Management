@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Button from '../../../../components/commons/Button/Button';
 import Input from '../../../../components/commons/Input/Input';
+import { DateInput } from '../../../../components/commons/Input';
 import Modal from '../../../../components/commons/Modal';
 import { getAuthToken } from '../../../../utils/api';
 import './MemberStatusChangeForm.css';
 
-const MemberStatusChangeForm = () => {
+const MemberStatusChangeForm = ({ onClose }) => {
     const [formData, setFormData] = useState({
         residentId: '',
         memberName: '',
@@ -217,9 +218,8 @@ const MemberStatusChangeForm = () => {
                     </div>
                 </div>
 
-                <Input
+                <DateInput
                     label={formData.changeType === 'deceased' ? "Ngày mất" : "Ngày chuyển đi"}
-                    type="date"
                     name="changeDate"
                     value={formData.changeDate}
                     onChange={handleChange}
@@ -279,7 +279,12 @@ const MemberStatusChangeForm = () => {
                     <div className="modal-footer">
                         <button 
                             className={notification.type === 'success' ? "modal-btn-success" : "modal-btn-delete"}
-                            onClick={() => setNotification({ ...notification, isOpen: false })}
+                            onClick={() => {
+                                setNotification({ ...notification, isOpen: false });
+                                if (notification.type === 'success' && onClose) {
+                                    onClose();
+                                }
+                            }}
                         >
                             Đóng
                         </button>

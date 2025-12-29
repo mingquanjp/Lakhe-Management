@@ -284,8 +284,8 @@ const FeeCard = ({ fee, isCompleted, onDelete }) => {
           />
         </div>
         <div className="progress-info">
-          <span className="progress-text">Đã thu: {paidHouseholds}</span>
-          <span className="progress-text">Tổng: {totalHouseholds}</span>
+          <span className="progress-text">Đã thu: {paidHouseholds}/{totalHouseholds}</span>
+          <span className="progress-text" style={{ fontWeight: 600, color: '#2dce89' }}>{progressPercentage}%</span>
         </div>
       </div>
 

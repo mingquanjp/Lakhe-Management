@@ -1,7 +1,56 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Modal from "../../../components/commons/Modal/Modal";
 import "./AddMemberModal.css";
+
+const DateInput = ({ value, onChange, className, name, ...props }) => {
+  const dateInputRef = useRef(null);
+
+  const formatDate = (dateString) => {
+      if (!dateString) return '';
+      const parts = dateString.split('-');
+      if (parts.length !== 3) return dateString;
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  };
+
+  const handleClick = () => {
+      if (dateInputRef.current && typeof dateInputRef.current.showPicker === 'function') {
+          dateInputRef.current.showPicker();
+      }
+  };
+
+  return (
+      <div style={{ position: 'relative', width: '100%' }}>
+          <input
+              type="text"
+              className={className}
+              value={formatDate(value)}
+              onClick={handleClick}
+              readOnly
+              placeholder="dd/mm/yyyy"
+              style={{ cursor: 'pointer', backgroundColor: '#fff' }}
+              {...props}
+          />
+          <input
+              type="date"
+              ref={dateInputRef}
+              name={name}
+              value={value}
+              onChange={onChange}
+              style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  width: 0,
+                  height: 0,
+                  opacity: 0,
+                  pointerEvents: 'none'
+              }}
+              tabIndex={-1}
+          />
+      </div>
+  );
+};
 
 const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialData }) => {
   const [formData, setFormData] = useState({
@@ -168,8 +217,7 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
           </div>
           <div className="form-group">
             <label>Ngày sinh <span className="text-red-500">*</span></label>
-            <input
-              type="date"
+            <DateInput
               className="form-control"
               name="dob"
               value={formData.dob}
@@ -206,19 +254,31 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
         <div className="form-row">
           <div className="form-group">
             <label>Quan hệ với chủ hộ <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              className="form-control"
-              name="relationship_to_head"
-              value={formData.relationship_to_head}
-              onChange={handleChange}
-              placeholder="Con, Vợ, Chồng..."
-            />
+            {type === 'NewBirth' ? (
+              <select
+                className="form-control"
+                name="relationship_to_head"
+                value={formData.relationship_to_head}
+                onChange={handleChange}
+              >
+                <option value="">Chọn quan hệ</option>
+                <option value="Con">Con</option>
+                <option value="Cháu">Cháu</option>
+              </select>
+            ) : (
+              <input
+                type="text"
+                className="form-control"
+                name="relationship_to_head"
+                value={formData.relationship_to_head}
+                onChange={handleChange}
+                placeholder="Con, Vợ, Chồng..."
+              />
+            )}
           </div>
           <div className="form-group">
             <label>Ngày đăng ký thường trú</label>
-            <input
-              type="date"
+            <DateInput
               className="form-control"
               name="registration_date"
               value={formData.registration_date}
@@ -292,8 +352,7 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
               </div>
               <div className="form-group">
                 <label>Ngày cấp</label>
-                <input
-                  type="date"
+                <DateInput
                   className="form-control"
                   name="identity_card_date"
                   value={formData.identity_card_date}
@@ -346,8 +405,7 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
             <div className="form-row">
               <div className="form-group">
                 <label>Ngày bắt đầu tạm trú <span className="text-red-500">*</span></label>
-                <input
-                  type="date"
+                <DateInput
                   className="form-control"
                   name="temp_start_date"
                   value={formData.temp_start_date}
@@ -356,8 +414,7 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
               </div>
               <div className="form-group">
                 <label>Ngày kết thúc tạm trú <span className="text-red-500">*</span></label>
-                <input
-                  type="date"
+                <DateInput
                   className="form-control"
                   name="temp_end_date"
                   value={formData.temp_end_date}

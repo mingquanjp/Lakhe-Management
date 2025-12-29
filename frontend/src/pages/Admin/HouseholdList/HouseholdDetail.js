@@ -55,6 +55,13 @@ const HouseholdDetail = () => {
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
     const [historyData, setHistoryData] = useState([]);
     const [selectedResidentDetail, setSelectedResidentDetail] = useState(null); // For MovedOut/Deceased details
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const [residentToDelete, setResidentToDelete] = useState(null);
+    const [notification, setNotification] = useState({
+        isOpen: false,
+        type: 'success',
+        message: ''
+    });
 
     useEffect(() => {
         fetchHouseholdDetails();
@@ -78,8 +85,12 @@ const HouseholdDetail = () => {
             setHistoryData(data.data);
             setIsHistoryModalOpen(true);
         } catch (error) {
-            console.error('Error fetching history:', error);
-            alert('Không thể tải lịch sử biến động. Vui lòng thử lại sau.');
+            // console.error('Error fetching history:', error);
+            setNotification({
+                isOpen: true,
+                type: 'error',
+                message: 'Không thể tải lịch sử biến động. Vui lòng thử lại sau.'
+            });
         }
     };
 
@@ -101,30 +112,50 @@ const HouseholdDetail = () => {
         setIsAddMemberModalOpen(true);
     };
 
-    const handleDeleteClick = async (residentId) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa nhân khẩu này?')) {
-            try {
-                const token = getAuthToken();
-                
-                const response = await fetch(`http://localhost:5000/api/residents/${residentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                    
-                });
+    const handleDeleteClick = (residentId) => {
+        setResidentToDelete(residentId);
+        setIsDeleteConfirmOpen(true);
+    };
 
-                if (response.ok) {
-                    alert('Xóa nhân khẩu thành công!');
-                    fetchHouseholdDetails();
-                } else {
-                    const errorData = await response.json();
-                    alert(`Lỗi: ${errorData.message}`);
+    const handleConfirmDelete = async () => {
+        if (!residentToDelete) return;
+        
+        try {
+            const token = getAuthToken();
+            
+            const response = await fetch(`http://localhost:5000/api/residents/${residentToDelete}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-            } catch (error) {
-                console.error('Error deleting resident:', error);
-                alert('Có lỗi xảy ra khi xóa nhân khẩu');
+                
+            });
+
+            if (response.ok) {
+                setNotification({
+                    isOpen: true,
+                    type: 'success',
+                    message: 'Xóa nhân khẩu thành công!'
+                });
+                fetchHouseholdDetails();
+            } else {
+                const errorData = await response.json();
+                setNotification({
+                    isOpen: true,
+                    type: 'error',
+                    message: `Lỗi: ${errorData.message}`
+                });
             }
+        } catch (error) {
+            // console.error('Error deleting resident:', error);
+            setNotification({
+                isOpen: true,
+                type: 'error',
+                message: 'Có lỗi xảy ra khi xóa nhân khẩu'
+            });
+        } finally {
+            setIsDeleteConfirmOpen(false);
+            setResidentToDelete(null);
         }
     };
 
@@ -149,17 +180,29 @@ const HouseholdDetail = () => {
             });
 
             if (response.ok) {
-                alert(editingMember ? 'Cập nhật nhân khẩu thành công!' : 'Thêm nhân khẩu thành công!');
+                setNotification({
+                    isOpen: true,
+                    type: 'success',
+                    message: editingMember ? 'Cập nhật nhân khẩu thành công!' : 'Thêm nhân khẩu thành công!'
+                });
                 setIsAddMemberModalOpen(false);
                 setEditingMember(null);
                 fetchHouseholdDetails(); // Refresh list
             } else {
                 const errorData = await response.json();
-                alert(`Lỗi: ${errorData.message}`);
+                setNotification({
+                    isOpen: true,
+                    type: 'error',
+                    message: `Lỗi: ${errorData.message}`
+                });
             }
         } catch (error) {
-            console.error('Error saving resident:', error);
-            alert('Có lỗi xảy ra khi lưu thông tin nhân khẩu');
+            // console.error('Error saving resident:', error);
+            setNotification({
+                isOpen: true,
+                type: 'error',
+                message: 'Có lỗi xảy ra khi lưu thông tin nhân khẩu'
+            });
         }
     };
 
@@ -180,7 +223,7 @@ const HouseholdDetail = () => {
         dob: new Date(member.dob).toLocaleDateString('vi-VN'),
         statusDisplay: <StatusBadge status={member.status} />,
         actions: (
-            <div className="table-actions">
+            <div className="household-table-actions">
                 <button 
                     className="btn-action btn-detail"
                     onClick={() => handleEditClick(member)}
@@ -210,7 +253,7 @@ const HouseholdDetail = () => {
         dob: new Date(member.dob).toLocaleDateString('vi-VN'),
         statusDisplay: <StatusBadge status={member.status} />,
         actions: (
-            <div className="table-actions">
+            <div className="household-table-actions">
                 <button 
                     className="btn-action btn-detail"
                     onClick={() => setSelectedResidentDetail(member)}
@@ -373,6 +416,16 @@ const HouseholdDetail = () => {
                                         const reasonMatch = notes.match(/Lý do:\s*(.*?)(?=\s*Địa chỉ mới:|$)/);
                                         const addressMatch = notes.match(/Địa chỉ mới:\s*(.*)/);
 
+                                        let moveDateDisplay = dateMatch ? dateMatch[1].trim() : '';
+                                        if (moveDateDisplay) {
+                                            try {
+                                                const d = new Date(moveDateDisplay);
+                                                if (!isNaN(d.getTime())) {
+                                                    moveDateDisplay = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                                }
+                                            } catch (e) {}
+                                        }
+
                                         return (
                                             <div style={{ backgroundColor: '#f8f9fa', borderRadius: '8px', padding: '16px', border: '1px solid #e9ecef' }}>
                                                 {dateMatch && (
@@ -380,7 +433,7 @@ const HouseholdDetail = () => {
                                                         <span style={{ display: 'block', fontSize: '11px', color: '#8898aa', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>
                                                             Ngày chuyển đi
                                                         </span>
-                                                        <span style={{ color: '#32325d', fontWeight: '500' }}>{dateMatch[1].trim()}</span>
+                                                        <span style={{ color: '#32325d', fontWeight: '500' }}>{moveDateDisplay}</span>
                                                     </div>
                                                 )}
                                                 {reasonMatch && (
@@ -417,7 +470,7 @@ const HouseholdDetail = () => {
                                             try {
                                                 const d = new Date(dateDisplay);
                                                 if (!isNaN(d.getTime())) {
-                                                    dateDisplay = d.toLocaleDateString('vi-VN');
+                                                    dateDisplay = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
                                                 }
                                             } catch (e) {}
                                         }
@@ -571,7 +624,7 @@ const HouseholdDetail = () => {
                                             </span>
                                         </td>
                                         <td>{item.changed_by || 'Admin'}</td>
-                                        <td>{item.last_name} {item.first_name}</td>
+                                        <td>{item.first_name} {item.last_name}</td>
                                     </tr>
                                 ))
                             ) : (
@@ -581,6 +634,58 @@ const HouseholdDetail = () => {
                             )}
                         </tbody>
                     </table>
+                </div>
+            </Modal>
+
+            <Modal
+                isOpen={isDeleteConfirmOpen}
+                onClose={() => {
+                    setIsDeleteConfirmOpen(false);
+                    setResidentToDelete(null);
+                }}
+                title="Xác nhận xóa"
+                size="sm"
+            >
+                <div style={{ padding: "20px" }}>
+                    <p style={{ marginBottom: "20px", color: "#333" }}>
+                        Bạn có chắc chắn muốn xóa nhân khẩu này? Thao tác này không thể hoàn tác.
+                    </p>
+                    <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                        <button
+                            className="modal-btn-cancel"
+                            onClick={() => {
+                                setIsDeleteConfirmOpen(false);
+                                setResidentToDelete(null);
+                            }}
+                        >
+                            Hủy
+                        </button>
+                        <button
+                            className="modal-btn-delete"
+                            onClick={handleConfirmDelete}
+                        >
+                            Xóa
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            <Modal
+                isOpen={notification.isOpen}
+                onClose={() => setNotification({ ...notification, isOpen: false })}
+                title={notification.type === 'success' ? 'Thành công' : 'Lỗi'}
+                size="sm"
+            >
+                <div style={{ padding: "20px" }}>
+                    <p style={{ marginBottom: "20px", color: "#333" }}>{notification.message}</p>
+                    <div className="modal-footer">
+                        <button 
+                            className={notification.type === 'success' ? "modal-btn-success" : "modal-btn-delete"}
+                            onClick={() => setNotification({ ...notification, isOpen: false })}
+                        >
+                            Đóng
+                        </button>
+                    </div>
                 </div>
             </Modal>
         </div>
