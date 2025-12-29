@@ -75,6 +75,11 @@ const ActivityList = ({ activities }) => {
               case "DeleteFee":
                 content = `Xóa đợt thu "${feeName}".`;
                 break;
+              case "UpdateInfo":
+                content = rName
+                  ? `Hộ ${hCode}: Cập nhật thông tin cho "${rName}".`
+                  : `Hộ ${hCode}: Cập nhật thông tin hộ khẩu.`;
+                break;
 
               default:
                 content = hCode 
