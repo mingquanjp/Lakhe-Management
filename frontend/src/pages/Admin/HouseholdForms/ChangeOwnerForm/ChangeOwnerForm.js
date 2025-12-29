@@ -15,7 +15,7 @@ const ChangeOwnerForm = () => {
     
     const [formData, setFormData] = useState({
         currentOwner: '', 
-        newOwnerId: '', // Đổi tên cho khớp với logic xử lý
+        newOwnerId: '', 
         reason: '',
         date: new Date().toISOString().split('T')[0]
     });
