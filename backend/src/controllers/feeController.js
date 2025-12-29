@@ -722,12 +722,13 @@ const getHouseholdPaymentHistory = async (req, res) => {
 /**
  * Lấy TOÀN BỘ danh sách hộ với thông tin thanh toán cho một khoản thu
  * GET /api/fees/:feeId/all-households
+ * CHÚ Ý: Áp dụng logic temporal - chỉ lấy các hộ đủ điều kiện nộp phí
  */
 const getAllHouseholdsForFee = async (req, res) => {
   try {
     const { feeId } = req.params;
 
-    // Kiểm tra khoản thu có tồn tại không
+    // Kiểm tra khoản thu có tồn tại không và lấy thông tin fee
     const feeCheck = await pool.query('SELECT * FROM fees WHERE fee_id = $1', [feeId]);
     if (feeCheck.rows.length === 0) {
       return res.status(404).json({
@@ -736,27 +737,42 @@ const getAllHouseholdsForFee = async (req, res) => {
       });
     }
 
+    const fee = feeCheck.rows[0];
+
+    // Áp dụng logic temporal giống như getFeeStatistics
     const result = await pool.query(
       `SELECT 
-    h.household_id,
-    h.household_code,
-    h.address,
-    CONCAT(r.first_name, ' ', r.last_name) as head_name,
-    (SELECT COUNT(*) FROM residents WHERE household_id = h.household_id AND status = 'Permanent') as member_count,
-    ph.payment_id, -- ← THÊM dòng này
-    ph.amount_paid,
-    ph.payment_date,
-    ph.notes,
-    CASE 
-      WHEN ph.payment_id IS NOT NULL THEN 'Đã nộp'
-      ELSE 'Chưa nộp'
-    END as payment_status
-   FROM households h
-   LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
-   LEFT JOIN payment_history ph ON h.household_id = ph.household_id AND ph.fee_id = $1
-   WHERE h.status = 'Active'
-   ORDER BY h.household_code`,
-      [feeId]
+        h.household_id,
+        h.household_code,
+        h.address,
+        CONCAT(r.first_name, ' ', r.last_name) as head_name,
+        (SELECT COUNT(*) FROM residents WHERE household_id = h.household_id AND status = 'Permanent') as member_count,
+        ph.payment_id,
+        ph.amount_paid,
+        ph.payment_date,
+        ph.notes,
+        CASE 
+          WHEN ph.payment_id IS NOT NULL THEN 'Đã nộp'
+          ELSE 'Chưa nộp'
+        END as payment_status
+       FROM households h
+       LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
+       LEFT JOIN payment_history ph ON h.household_id = ph.household_id AND ph.fee_id = $1
+       WHERE h.status IN ('Active', 'Temporary')
+         AND (
+           -- Hộ thường trú: chỉ tính nếu fee bắt đầu sau ngày hộ chuyển đến
+           (h.status = 'Active' AND r.status = 'Permanent' AND $2::DATE >= h.date_created)
+           OR
+           -- Hộ tạm trú: chỉ tính nếu fee nằm trong khoảng thời gian tạm trú
+           (h.status = 'Temporary' 
+            AND r.status = 'Temporary'
+            AND r.temp_start_date IS NOT NULL 
+            AND r.temp_end_date IS NOT NULL
+            AND $2::DATE <= r.temp_end_date
+            AND ($3::DATE IS NULL OR $3::DATE >= r.temp_start_date))
+         )
+       ORDER BY h.household_code`,
+      [feeId, fee.start_date, fee.end_date]
     );
 
     res.json({
@@ -834,12 +850,27 @@ const getFeeStatistics = async (req, res) => {
       expectedTotal = totalHouseholds * fee.amount;
     }
 
-    // Số hộ đã nộp
+    // Số hộ đã nộp (chỉ đếm các hộ đủ điều kiện theo temporal logic)
     const paidHouseholdsQuery = await pool.query(
-      `SELECT COUNT(DISTINCT household_id) as paid_count 
-       FROM payment_history 
-       WHERE fee_id = $1`,
-      [id]
+      `SELECT COUNT(DISTINCT ph.household_id) as paid_count 
+       FROM payment_history ph
+       INNER JOIN households h ON ph.household_id = h.household_id
+       LEFT JOIN residents r ON h.head_of_household_id = r.resident_id
+       WHERE ph.fee_id = $1
+         AND h.status IN ('Active', 'Temporary')
+         AND (
+           -- Hộ thường trú: chỉ tính nếu fee bắt đầu sau ngày hộ chuyển đến
+           (h.status = 'Active' AND r.status = 'Permanent' AND $2::DATE >= h.date_created)
+           OR
+           -- Hộ tạm trú: chỉ tính nếu fee nằm trong khoảng thời gian tạm trú
+           (h.status = 'Temporary' 
+            AND r.status = 'Temporary'
+            AND r.temp_start_date IS NOT NULL 
+            AND r.temp_end_date IS NOT NULL
+            AND $2::DATE <= r.temp_end_date
+            AND ($3::DATE IS NULL OR $3::DATE >= r.temp_start_date))
+         )`,
+      [id, fee.start_date, fee.end_date]
     );
     const paidHouseholds = parseInt(paidHouseholdsQuery.rows[0].paid_count);
 
