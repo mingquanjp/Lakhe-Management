@@ -738,8 +738,6 @@ const getAllHouseholdsForFee = async (req, res) => {
     }
 
     const fee = feeCheck.rows[0];
-
-    // Áp dụng logic temporal giống như getFeeStatistics
     const result = await pool.query(
       `SELECT 
         h.household_id,
