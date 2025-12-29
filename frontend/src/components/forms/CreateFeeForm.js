@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '../commons';
 import './Form.css';
 
@@ -9,6 +9,7 @@ const CreateFeeForm = ({ onSubmit, onCancel }) => {
     amount: '',
     deadline: ''
   });
+  const dateInputRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,9 +19,23 @@ const CreateFeeForm = ({ onSubmit, onCancel }) => {
     }));
   };
 
+  // Chuyển ISO date (yyyy-mm-dd) sang dd/mm/yyyy
+  const formatDateDisplay = (isoDate) => {
+    if (!isoDate) return '';
+    const [year, month, day] = isoDate.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
+  // Mở date picker khi click vào wrapper
+  const handleDateWrapperClick = () => {
+    if (dateInputRef.current) {
+      dateInputRef.current.showPicker();
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Validation
     if (formData.type === 'mandatory' && !formData.amount) {
       alert('Vui lòng nhập định mức cho khoản thu bắt buộc');
@@ -94,30 +109,36 @@ const CreateFeeForm = ({ onSubmit, onCancel }) => {
       )}
 
       <div className="form-group">
-        <label htmlFor="deadline">Hạn chót</label>
-        <input
-          type="date"
-          id="deadline"
-          name="deadline"
-          className="form-input"
-          value={formData.deadline}
-          onChange={handleChange}
-          min={new Date().toISOString().split('T')[0]}
-          required
-        />
+        <label htmlFor="deadline">Hạn chốt</label>
+        <div className="custom-date-wrapper" onClick={handleDateWrapperClick}>
+          <input
+            ref={dateInputRef}
+            type="date"
+            id="deadline"
+            name="deadline"
+            className="form-input custom-date-input"
+            value={formData.deadline}
+            onChange={handleChange}
+            min={new Date().toISOString().split('T')[0]}
+            required
+          />
+          <div className="custom-date-display">
+            {formData.deadline ? formatDateDisplay(formData.deadline) : 'dd/mm/yyyy'}
+          </div>
+        </div>
       </div>
 
       {/* Form Actions */}
       <div className="form-actions">
-        <Button 
-          type="button" 
-          variant="outline" 
+        <Button
+          type="button"
+          variant="outline"
           onClick={onCancel}
         >
           Hủy
         </Button>
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           variant="primary"
         >
           Tạo đợt thu
