@@ -53,6 +53,21 @@ const DateInput = ({ value, onChange, className, name, ...props }) => {
 };
 
 const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialData }) => {
+  const RELATION_OPTIONS = [
+    "Chủ hộ",
+    "Vợ",
+    "Chồng",
+    "Con",
+    "Cháu",
+    "Anh",
+    "Chị",
+    "Em",
+    "Bố",
+    "Mẹ",
+    "Ông",
+    "Bà",
+  ];
+
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -254,27 +269,26 @@ const AddMemberModal = ({ isOpen, onClose, onSave, type, householdId, initialDat
         <div className="form-row">
           <div className="form-group">
             <label>Quan hệ với chủ hộ <span className="text-red-500">*</span></label>
-            {type === 'NewBirth' ? (
-              <select
-                className="form-control"
-                name="relationship_to_head"
-                value={formData.relationship_to_head}
-                onChange={handleChange}
-              >
-                <option value="">Chọn quan hệ</option>
-                <option value="Con">Con</option>
-                <option value="Cháu">Cháu</option>
-              </select>
-            ) : (
-              <input
-                type="text"
-                className="form-control"
-                name="relationship_to_head"
-                value={formData.relationship_to_head}
-                onChange={handleChange}
-                placeholder="Con, Vợ, Chồng..."
-              />
-            )}
+            <select
+              className="form-control"
+              name="relationship_to_head"
+              value={formData.relationship_to_head}
+              onChange={handleChange}
+            >
+              <option value="">-- Chọn quan hệ --</option>
+              {type === 'NewBirth' ? (
+                <>
+                  <option value="Con">Con</option>
+                  <option value="Cháu">Cháu</option>
+                </>
+              ) : (
+                RELATION_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))
+              )}
+            </select>
           </div>
           <div className="form-group">
             <label>Ngày đăng ký thường trú</label>

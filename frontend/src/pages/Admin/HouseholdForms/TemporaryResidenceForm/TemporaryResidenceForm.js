@@ -9,6 +9,22 @@ import './TemporaryResidenceForm.css';
 
 const TemporaryResidenceForm = () => {
     const navigate = useNavigate();
+    
+    const RELATION_OPTIONS = [
+        "Chủ hộ",
+        "Vợ",
+        "Chồng",
+        "Con",
+        "Cháu",
+        "Anh",
+        "Chị",
+        "Em",
+        "Bố",
+        "Mẹ",
+        "Ông",
+        "Bà",
+    ];
+    
     const [formData, setFormData] = useState({
         type: 'temporary_residence_new', // 'temporary_residence_new', 'temporary_residence_existing', 'temporary_absence'
         householdCode: '', 
@@ -549,24 +565,23 @@ const TemporaryResidenceForm = () => {
                                                 onChange={handleChange}
                                                 readOnly={formData.type === 'temporary_residence_existing'}
                                             />
-                                            <Input
-                                                label="Quan hệ với chủ hộ"
-                                                name="relationshipWithHost"
-                                                value={formData.relationshipWithHost}
-                                                onChange={handleChange}
-                                            />
+                                            <div className="input-group">
+                                                <label className="input-label">Quan hệ với chủ hộ</label>
+                                                <select
+                                                    name="relationshipWithHost"
+                                                    value={formData.relationshipWithHost}
+                                                    onChange={handleChange}
+                                                    className="input-field"
+                                                >
+                                                    <option value="">-- Chọn quan hệ --</option>
+                                                    {RELATION_OPTIONS.map((opt) => (
+                                                        <option key={opt} value={opt}>
+                                                            {opt}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-                                {formData.type === 'temporary_residence_new' && (
-                                    <div className="mt-4">
-                                        <Input
-                                            label="Quan hệ với chủ hộ"
-                                            name="relationshipWithHost"
-                                            value={formData.relationshipWithHost}
-                                            onChange={handleChange}
-                                            placeholder="VD: Chủ hộ"
-                                        />
                                     </div>
                                 )}
                             </>
