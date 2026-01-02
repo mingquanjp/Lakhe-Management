@@ -1,0 +1,99 @@
+/* Reuse some base styles from global or PopulationDashboard if needed, but defining specific here */
+
+.finance-filter-section {
+  background-color: #d0e6f5; /* Light blue background matching the image */
+  padding: 24px 32px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.filter-label {
+  font-weight: 600;
+  font-size: 16px;
+  color: #1a1a1a;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.filter-select {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: none;
+  min-width: 300px;
+  font-size: 14px;
+  outline: none;
+  background-color: #ffffff;
+  color: #4f4f4f;
+  cursor: pointer;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Summary Cards Override */
+.summary-card.finance-card {
+  background-color: #f9fafb; /* Very light gray/white */
+  border-radius: 16px;
+  height: 140px;
+}
+
+.summary-card.finance-card .card-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.summary-card.finance-card .card-title {
+  font-size: 14px;
+  color: #828282;
+  font-weight: 400;
+}
+
+/* Chart Layouts */
+.full-width {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.mb-32 {
+  margin-bottom: 32px;
+}
+
+.chart-content-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 100%;
+}
+
+.chart-legend-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.legend-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.legend-item-row .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-item-row .label {
+  color: #1a1a1a;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.legend-item-row .value {
+  color: #1a1a1a;
+  font-weight: 600;
+}

@@ -1,0 +1,97 @@
+.household-page {
+  padding: 20px;
+  background-color: #f5f7fb;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.page-header { margin-bottom: 20px; }
+.page-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #32325d;
+  margin-bottom: 15px;
+}
+
+.toolbar { display: flex; gap: 15px; align-items: center; }
+
+.search-box {
+  position: relative;
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #e9ecef;
+  padding: 8px 15px;
+  display: flex;
+  align-items: center;
+  width: 250px;
+  box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15), 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+.search-icon { color: #adb5bd; margin-right: 8px; }
+.search-box input { border: none; outline: none; font-size: 14px; width: 100%; color: #525f7f; }
+
+.btn-tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #525f7f;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(50, 50, 93, 0.15);
+  transition: all 0.2s;
+}
+.btn-tool:hover { transform: translateY(-1px); }
+
+.table-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 2rem 0 rgba(136, 152, 170, .15);
+  padding: 20px;
+  border: 1px solid rgba(0, 0, 0, .05);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.card-title { font-size: 13px; text-transform: uppercase; color: #8898aa; font-weight: 600; }
+
+.code-icon {
+  background: #2dce89;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.page-dots {
+  padding: 8px 10px;
+  color: #8898aa;
+  font-weight: 600;
+}
+
+.btn-add {
+  margin-left: auto; 
+  background-color: #2dce89; 
+  border: px solid #2dce89;
+  border-radius: 6px;
+  color: #fff; 
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(45, 206, 137, 0.11); 
+}
+
+.btn-add:hover {
+  background-color: #25a972; 
+  border-color: #25a972;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(45, 206, 137, 0.3); 
+}
