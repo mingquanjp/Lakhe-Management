@@ -1,0 +1,229 @@
+.population-dashboard-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 24px;
+}
+
+/* Date Filter Section */
+.date-filter-section {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.date-input-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-width: 200px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.date-input-group:hover {
+  border-color: #2f80ed;
+  box-shadow: 0px 4px 8px rgba(47, 128, 237, 0.1);
+}
+
+.date-label {
+  font-weight: 600;
+  font-size: 16px;
+  color: #1a1a1a;
+}
+
+/* Summary Cards */
+.summary-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.summary-card {
+  border-radius: 16px !important;
+  border: none !important;
+  height: 120px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+}
+
+.summary-card:active {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.summary-card .card-content {
+  padding: 24px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.summary-card.blue-light {
+  background-color: #ebf5ff; /* Light blue background */
+}
+
+.card-title {
+  font-size: 14px;
+  color: #4f4f4f;
+  font-weight: 500;
+}
+
+.card-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.card-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.card-trend {
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-trend.positive {
+  color: #27ae60;
+}
+
+/* Charts Section */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.chart-card {
+  border-radius: 16px !important;
+  transition: box-shadow 0.3s ease !important;
+}
+
+.chart-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+.chart-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 24px;
+}
+
+.chart-content-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chart-legend-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 120px;
+}
+
+.legend-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.legend-item-row .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-item-row .label {
+  flex: 1;
+}
+
+.legend-item-row .value {
+  font-weight: 600;
+}
+
+/* Fluctuations Section */
+.fluctuations-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #828282;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+.fluctuations-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.fluctuation-card {
+  background: #e0e0e0; /* Default gray */
+  border-radius: 12px !important;
+  border: none !important;
+  height: 100px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer;
+}
+
+.fluctuation-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+.fluctuation-card .card-content {
+  padding: 16px 20px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.fluctuation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fluctuation-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.fluctuation-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-top: 8px;
+}
+
+.dashboard-icon {
+  width: 20px;
+  height: 20px;
+}
